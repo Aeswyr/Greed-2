@@ -1,0 +1,10 @@
+public enum ParticleType
+{
+	DUST_SMALL = 0,
+	DUST_LARGE = 1,
+	HITSPARK = 2,
+	FLIGHT_END = 3,
+	PROJECTILE_HITSPARK = 4,
+	FIREWORK_POP = 5,
+	ARMOR = 6
+}
