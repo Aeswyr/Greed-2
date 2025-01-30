@@ -76,8 +76,15 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  template: {fileID: 0}
-  anims: []
+  template: {fileID: 5751520286572398636, guid: 002c6c8b7b550444eba0663509cd1061, type: 3}
+  anims:
+  - {fileID: -1300594986908038686, guid: 903a1b7d8b3d81348ad1976c47d82646, type: 3}
+  - {fileID: 2016076567115708239, guid: 2add415b4fe1fda4f9c05f73e2937ef2, type: 3}
+  - {fileID: -218488023650193649, guid: 958371bb4b189cd4084ff9862b1672d1, type: 3}
+  - {fileID: 2067347211855425864, guid: a28a6fcf32b7ea94fa32b5c78e543b54, type: 3}
+  - {fileID: 8205039504272071048, guid: ba31df56ad0f10e4c94f286e76b122ba, type: 3}
+  - {fileID: 6948953308231912870, guid: b04b4379820cdc14d95aceadb7d996b3, type: 3}
+  - {fileID: 779891979630494364, guid: 0cf8c3b436c5d5d4093782064d44178e, type: 3}
   particles: []
   textPrefab: {fileID: 0}
   afterimagePrefab: {fileID: 1040999792124794, guid: b5e8f0ed6ed5ff942aa6c9aef7b7531e, type: 3}

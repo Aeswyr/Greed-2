@@ -42,9 +42,9 @@ public class LobbyCardController : NetworkBehaviour
 
 	private void Start()
 	{
-		if (base.transform.parent != NetworkSingleton<GameManager>.Instance.PlayerLobbyHolder)
+		if (base.transform.parent != GameManager.Instance.PlayerLobbyHolder)
 		{
-			base.transform.SetParent(NetworkSingleton<GameManager>.Instance.PlayerLobbyHolder);
+			base.transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
 		}
 		input = UnityEngine.Object.FindObjectOfType<InputHandler>();
 		if (player != null && player.isLocalPlayer)
@@ -103,7 +103,7 @@ public class LobbyCardController : NetworkBehaviour
 		ready = !ready;
 		if (ready)
 		{
-			NetworkSingleton<GameManager>.Instance.CheckLobbyReady();
+			GameManager.Instance.CheckLobbyReady();
 		}
 	}
 

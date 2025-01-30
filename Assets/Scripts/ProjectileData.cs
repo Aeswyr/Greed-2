@@ -64,7 +64,7 @@ public class ProjectileData : NetworkBehaviour
 		{
 			destroyAfterDelay = false;
 			NetworkServer.Destroy(base.gameObject);
-			NetworkSingleton<VFXManager>.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class ProjectileData : NetworkBehaviour
 		if (destroyOnWorldImpact)
 		{
 			NetworkServer.Destroy(base.gameObject);
-			NetworkSingleton<VFXManager>.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class ProjectileData : NetworkBehaviour
 		if (destroyOnEntityImpact)
 		{
 			NetworkServer.Destroy(base.gameObject);
-			NetworkSingleton<VFXManager>.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
 		}
 	}
 }

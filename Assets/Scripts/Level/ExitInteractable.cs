@@ -32,15 +32,15 @@ public class ExitInteractable : NetworkBehaviour
 	private void NextLevelReady()
 	{
 		playerCount = playerCount + 1;
-		if (playerCount >= NetworkSingleton<GameManager>.Instance.TotalPlayerCount())
+		if (playerCount >= GameManager.Instance.TotalPlayerCount())
 		{
-			NetworkSingleton<GameManager>.Instance.GoNextLevel();
+			GameManager.Instance.GoNextLevel();
 		}
 	}
 
 	private void UpdatePlayerCount(int oldValue, int newValue)
 	{
 		playerCounter.gameObject.SetActive(value: true);
-		playerCounter.text = $"{newValue}/{NetworkSingleton<GameManager>.Instance.TotalPlayerCount()}";
+		playerCounter.text = $"{newValue}/{GameManager.Instance.TotalPlayerCount()}";
 	}
 }

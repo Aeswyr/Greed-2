@@ -59,7 +59,7 @@ public struct AttackBuilder
 
 	public void Finish()
 	{
-		GameObject hitbox = NetworkSingleton<GameManager>.Instance.GetHitbox(position, Quaternion.identity, parent);
+		GameObject hitbox = GameManager.Instance.GetHitbox(position, Quaternion.identity, parent);
 		hitbox.GetComponent<BoxCollider2D>().size = size;
 		if (duration != 0f)
 		{

@@ -24,7 +24,7 @@ public class PurchasableInteractable : NetworkBehaviour
 	{
 		if (base.isServer)
 		{
-			int num = Mathf.Min(NetworkSingleton<GameManager>.Instance.GetLevelIndex(), 15);
+			int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 15);
 			cost = num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num);
 		}
 	}

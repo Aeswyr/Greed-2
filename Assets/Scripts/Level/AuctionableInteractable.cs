@@ -35,7 +35,7 @@ public class AuctionableInteractable : NetworkBehaviour
 	{
 		if (base.isServer)
 		{
-			int num = Mathf.Min(NetworkSingleton<GameManager>.Instance.GetLevelIndex(), 10);
+			int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 10);
 			cost = num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num);
 		}
 		auctionTimeout.text = "10s";

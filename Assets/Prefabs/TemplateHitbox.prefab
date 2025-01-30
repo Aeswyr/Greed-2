@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1315858683072965225}
   - component: {fileID: 258404905386626605}
   m_Layer: 8
-  m_Name: HitboxTemplate
+  m_Name: TemplateHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -182,7 +182,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 
-	private int weaponId = 4;
+	private int weaponId = 0; // 4
 
 	private int skillId = -1;
 
@@ -222,7 +222,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			input = Object.FindObjectOfType<InputHandler>();
 			jump.SetInput(input);
-			NetworkSingleton<GameManager>.Instance.AddLobbyCard(this, input);
+			GameManager.Instance.AddLobbyCard(this, input);
 		}
 	}
 
@@ -358,7 +358,7 @@ public class PlayerController : NetworkBehaviour
 			animator.SetTrigger("dodge");
 			move.OverrideCurve(dodgeSpeed, dodgeCurve, facing);
 			invuln = InvulnState.DODGE;
-			NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.DUST_LARGE, base.transform.position, facing == -1);
+			VFXManager.Instance.SyncVFX(ParticleType.DUST_LARGE, base.transform.position, facing == -1);
 			unitVFX.StartAfterImageChain(0.5f, 0.1f);
 		}
 		if (!acting && input.attack.pressed)
@@ -468,7 +468,7 @@ public class PlayerController : NetworkBehaviour
 		animator.SetTrigger("attack");
 		if (grounded)
 		{
-			NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.DUST_SMALL, base.transform.position, facing == -1);
+			VFXManager.Instance.SyncVFX(ParticleType.DUST_SMALL, base.transform.position, facing == -1);
 		}
 		switch (attackId)
 		{
@@ -607,7 +607,7 @@ public class PlayerController : NetworkBehaviour
 		if (grounded)
 		{
 			move.StartDeceleration();
-			NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.DUST_SMALL, base.transform.position, facing == -1);
+			VFXManager.Instance.SyncVFX(ParticleType.DUST_SMALL, base.transform.position, facing == -1);
 		}
 	}
 
@@ -737,7 +737,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			Vector3 vector = base.transform.position + 10f * aim.normalized;
 			RaycastHit2D raycastHit2D = Physics2D.BoxCast(vector, new Vector2(1.5f, 2.5f), 0f, Vector2.right, 0f, worldMask);
-			if (!raycastHit2D && !NetworkSingleton<GameManager>.Instance.GetCurrentLevel().IsPointInGeometry(vector))
+			if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(vector))
 			{
 				base.transform.position = vector;
 			}
@@ -795,7 +795,7 @@ public class PlayerController : NetworkBehaviour
 	[ClientRpc]
 	private void RecieveHit(int knockbackDir, Vector3 hitPosition, Transform source)
 	{
-		if (!base.isLocalPlayer || stasis || NetworkSingleton<GameManager>.Instance.IsLevelShop())
+		if (!base.isLocalPlayer || stasis || GameManager.Instance.IsLevelShop())
 		{
 			return;
 		}
@@ -810,7 +810,7 @@ public class PlayerController : NetworkBehaviour
 			}
 			if (invuln == InvulnState.ARMOR)
 			{
-				NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.ARMOR, base.transform.position, facing == -1);
+				VFXManager.Instance.SyncVFX(ParticleType.ARMOR, base.transform.position, facing == -1);
 				invuln = InvulnState.NONE;
 			}
 			return;
@@ -844,7 +844,7 @@ public class PlayerController : NetworkBehaviour
 				UpdateCrownDisplay();
 			}
 		}
-		NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (base.transform.position + hitPosition), flip: false);
+		VFXManager.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (base.transform.position + hitPosition), flip: false);
 		if (source != null && source.TryGetComponent<ProjectileData>(out var component))
 		{
 			component.OnEntityCollide();
@@ -854,13 +854,13 @@ public class PlayerController : NetworkBehaviour
 	[Command(requiresAuthority = false)]
 	private void DropLoot(int amt)
 	{
-		NetworkSingleton<GameManager>.Instance.SpawnGoldBurst(base.transform.position, amt);
+		GameManager.Instance.SpawnGoldBurst(base.transform.position, amt);
 	}
 
 	[Command(requiresAuthority = false)]
 	private void DropCrown()
 	{
-		NetworkSingleton<GameManager>.Instance.SpawnCrown(base.transform.position);
+		GameManager.Instance.SpawnCrown(base.transform.position);
 	}
 
 	public bool TrySpendMoney(int amt)
@@ -1231,7 +1231,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (flying)
 		{
-			NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.FLIGHT_END, base.transform.position, flip: false);
+			VFXManager.Instance.SyncVFX(ParticleType.FLIGHT_END, base.transform.position, flip: false);
 		}
 		endFlight = 0f;
 		flying = false;
@@ -1247,7 +1247,7 @@ public class PlayerController : NetworkBehaviour
 
 	public void EnterLevel()
 	{
-		if (NetworkSingleton<GameManager>.Instance.IsLevelShop())
+		if (GameManager.Instance.IsLevelShop())
 		{
 			UpdateMoneyDisplay();
 			UpdateMoneyLock(val: true);

@@ -57,7 +57,7 @@ public class UnitVFXController : NetworkBehaviour
 	[ClientRpc]
 	private void RecieveAfterimage(float duration)
 	{
-		GameObject gameObject = Object.Instantiate(NetworkSingleton<VFXManager>.Instance.GetAfterimagePrefab(), base.transform.position, Quaternion.identity);
+		GameObject gameObject = Object.Instantiate(VFXManager.Instance.GetAfterimagePrefab(), base.transform.position, Quaternion.identity);
 		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
 		SpriteRenderer spriteRenderer = sprite;
 		component.sprite = spriteRenderer.sprite;

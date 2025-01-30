@@ -88,7 +88,7 @@ public struct ProjectileBuilder
 
 	public void Finish()
 	{
-		NetworkSingleton<GameManager>.Instance.SpawnProjectile(this);
+		GameManager.Instance.SpawnProjectile(this);
 	}
 
 	public GameObject Apply(GameObject prefab)
