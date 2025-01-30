@@ -105,9 +105,9 @@ public class InputHandler : MonoBehaviour
 
 	public ButtonState jump => buttons[1];
 
-	public ButtonState primary => buttons[2];
+	public ButtonState attack => buttons[2];
 
-	public ButtonState secondary => buttons[3];
+	public ButtonState dodge => buttons[3];
 
 	public ButtonState item => buttons[4];
 
@@ -117,7 +117,6 @@ public class InputHandler : MonoBehaviour
 
 	public ButtonState any => buttons[7];
 
-	public ButtonState fly => buttons[8];
 
 	public void Start()
 	{
@@ -156,7 +155,7 @@ public class InputHandler : MonoBehaviour
 		Vector2 vector = aim;
 		vector.y = ctx.ReadValue<float>();
 		aim = vector;
-		buttons[8].Set(ctx);
+		//buttons[8].Set(ctx); fly button?
 	}
 
 	public void Jump(InputAction.CallbackContext ctx)

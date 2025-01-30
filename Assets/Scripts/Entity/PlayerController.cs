@@ -349,7 +349,7 @@ public class PlayerController : NetworkBehaviour
 				UpdateDodgeDisplay(staminaCooldown);
 			}
 		}
-		if (!acting && Time.time > nextStamina && grounded && input.secondary.pressed)
+		if (!acting && Time.time > nextStamina && grounded && input.dodge.pressed)
 		{
 			StartAction();
 			nextStamina = Time.time + staminaCooldown;
@@ -361,13 +361,13 @@ public class PlayerController : NetworkBehaviour
 			NetworkSingleton<VFXManager>.Instance.SyncVFX(ParticleType.DUST_LARGE, base.transform.position, facing == -1);
 			unitVFX.StartAfterImageChain(0.5f, 0.1f);
 		}
-		if (!acting && input.primary.pressed)
+		if (!acting && input.attack.pressed)
 		{
 			StartAction();
 			UpdateFacing(input.dir);
 			PressAttack();
 		}
-		if (charging && input.primary.released)
+		if (charging && input.attack.released)
 		{
 			ReleaseAttack();
 		}

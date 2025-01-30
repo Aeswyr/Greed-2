@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef156b2ef33b7384ba4c344956a69ddd, type: 3}
+  m_Name: PickupLibrary
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 6702642276315534257, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: -7049326846917546107, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: 5734626186013156018, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: 3786903985978363049, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: 4340319530178054269, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: 3490775292603637573, guid: 5ccf3d9ed2010864aaae0cb857932931, type: 3}
+  - {fileID: -1862350450897149070, guid: 6055932823f099d4999baa869fb2c256, type: 3}
+  - {fileID: -1393281527794220117, guid: 0ed8dc3ad3ff5124e92ac180f977c095, type: 3}
+  - {fileID: -4923063287056415587, guid: 80ba441e115f54d4da87f248fa2c8f12, type: 3}
+  - {fileID: 7700238458945516723, guid: e4b11c6baada2644fbd44ff7d545f274, type: 3}
+  - {fileID: -2845741961104467983, guid: 554dccf1836332b469171af4d498f119, type: 3}
+  - {fileID: 3442350136282204946, guid: a23e44a13d886ba4bbdc28766e81666e, type: 3}
+  - {fileID: 1736128997222606894, guid: c7e5b9f06ab6f57418ec9dc6aae10404, type: 3}
+  - {fileID: 6012326166979811016, guid: 0cfb178029512e34a8a14e0ef3056c26, type: 3}
+  - {fileID: -317676022942819403, guid: 7885f11bc67ba5b4eb2087e7b7cae70a, type: 3}
+  - {fileID: 5069459900095255382, guid: 8a8f8df9ae2b58049b6e55de1fd89d62, type: 3}
+  - {fileID: -1769316427382050531, guid: f5141127eeb19a74a93c7e2ba046bf2e, type: 3}
+  - {fileID: 5310742455253942599, guid: 477058efef694b847881c200bb6d9c6c, type: 3}

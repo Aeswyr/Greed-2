@@ -27,5 +27,8 @@ public class LevelObjectSpawn : MonoBehaviour
 
 	private void OnValidate()
 	{
+		if (spawnables != null && spawnables.Length > 0 && spawnables[0].TryGetComponent(out SpriteRenderer render)) {
+			sprite.sprite = render.sprite;
+		}
 	}
 }
