@@ -20,19 +20,6 @@ public class ShopInteractable : NetworkBehaviour
 
 	public Action<PickupType, PickupType> _Mirror_SyncVarHookDelegate_item;
 
-	public PickupType Networkitem
-	{
-		get
-		{
-			return item;
-		}
-		[param: In]
-		set
-		{
-			GeneratedSyncVarSetter(value, ref item, 1uL, _Mirror_SyncVarHookDelegate_item);
-		}
-	}
-
 	private void Start()
 	{
 	}
@@ -42,16 +29,16 @@ public class ShopInteractable : NetworkBehaviour
 		switch (type)
 		{
 		case "weapon":
-			Networkitem = (PickupType)UnityEngine.Random.Range(3, 9);
+			item = (PickupType)UnityEngine.Random.Range(3, 9);
 			break;
 		case "skill":
-			Networkitem = (PickupType)UnityEngine.Random.Range(9, 14);
+			item = (PickupType)UnityEngine.Random.Range(9, 14);
 			break;
 		case "crown":
-			Networkitem = PickupType.ITEM_CROWN;
+			item = PickupType.ITEM_CROWN;
 			break;
 		default:
-			Networkitem = (PickupType)UnityEngine.Random.Range(2, 14);
+			item = (PickupType)UnityEngine.Random.Range(2, 14);
 			break;
 		}
 	}
@@ -73,6 +60,6 @@ public class ShopInteractable : NetworkBehaviour
 	[Command(requiresAuthority = false)]
 	private void Cleanup()
 	{
-		NetworkServer.Destroy(base.gameObject);
+		NetworkServer.Destroy(gameObject);
 	}
 }

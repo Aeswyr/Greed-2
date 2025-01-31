@@ -48,7 +48,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int TotalPlayerCount()
 	{
-		return Object.FindObjectsOfType<PlayerController>().Length;
+		return FindObjectsOfType<PlayerController>().Length;
 	}
 
 	public void AddLobbyCard(PlayerController player, InputHandler input)
@@ -60,14 +60,14 @@ public class GameManager : NetworkSingleton<GameManager>
 	[Command(requiresAuthority = false)]
 	private void SyncCard(Transform player)
 	{
-		GameObject gameObject = Object.Instantiate(lobbyCardPrefab, playerLobbyHolder);
+		GameObject gameObject = Instantiate(lobbyCardPrefab, playerLobbyHolder);
 		gameObject.GetComponent<LobbyCardController>().Init(player.GetComponent<PlayerController>());
 		NetworkServer.Spawn(gameObject);
 	}
 
 	public void CheckLobbyReady()
 	{
-		LobbyCardController[] array = Object.FindObjectsOfType<LobbyCardController>();
+		LobbyCardController[] array = FindObjectsOfType<LobbyCardController>();
 		LobbyCardController[] array2 = array;
 		foreach (LobbyCardController lobbyCardController in array2)
 		{
@@ -88,7 +88,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	private void SyncGameStart()
 	{
 		playerLobby.SetActive(value: false);
-		PlayerController[] array = Object.FindObjectsOfType<PlayerController>();
+		PlayerController[] array = FindObjectsOfType<PlayerController>();
 		foreach (PlayerController playerController in array)
 		{
 			if (playerController.isLocalPlayer)
@@ -103,13 +103,13 @@ public class GameManager : NetworkSingleton<GameManager>
 		GameObject gameObject = null;
 		if (parent != null)
 		{
-			gameObject = Object.Instantiate(hitboxPrefab, parent);
+			gameObject = Instantiate(hitboxPrefab, parent);
 			gameObject.transform.localPosition = position;
 			gameObject.transform.localRotation = rotation;
 		}
 		else
 		{
-			gameObject = Object.Instantiate(hitboxPrefab, position, rotation);
+			gameObject = Instantiate(hitboxPrefab, position, rotation);
 		}
 		return gameObject;
 	}
@@ -118,7 +118,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		while (amount > 0)
 		{
-			GameObject gameObject = Object.Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
+			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
 			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
 			component.velocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
 			if (amount > 10)
@@ -137,7 +137,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void SpawnCrown(Vector3 position)
 	{
-		GameObject gameObject = Object.Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
+		GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
 		PickupData component = gameObject.GetComponent<PickupData>();
 		component.Init(PickupType.ITEM_CROWN);
 		component.SetFloaty(20f, new Vector2(Random.Range(-3, 3), Random.Range(8, 12)));
@@ -146,7 +146,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void GoNextLevel()
 	{
-		AuctionableInteractable[] array = Object.FindObjectsOfType<AuctionableInteractable>();
+		AuctionableInteractable[] array = FindObjectsOfType<AuctionableInteractable>();
 		foreach (AuctionableInteractable auctionableInteractable in array)
 		{
 			auctionableInteractable.RunAuctionComplete();
@@ -155,7 +155,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		[ClientRpc]
 		void NextLevel(int id)
 		{
-			Object.Destroy(currentLevel.gameObject);
+			Destroy(currentLevel.gameObject);
 			LoadLevel(id);
 		}
 	}
@@ -168,8 +168,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			original = shops[id];
 		}
-		currentLevel = Object.Instantiate(original).GetComponent<LevelController>();
-		PlayerController[] array = Object.FindObjectsOfType<PlayerController>();
+		currentLevel = Instantiate(original).GetComponent<LevelController>();
+		PlayerController[] array = FindObjectsOfType<PlayerController>();
 		foreach (PlayerController playerController in array)
 		{
 			if (playerController.isLocalPlayer)
@@ -185,12 +185,12 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void LoadLevelObjects()
 	{
-		LevelObjectSpawn[] array = Object.FindObjectsOfType<LevelObjectSpawn>();
+		LevelObjectSpawn[] array = FindObjectsOfType<LevelObjectSpawn>();
 		foreach (LevelObjectSpawn levelObjectSpawn in array)
 		{
-			if (base.isServer)
+			if (isServer)
 			{
-				GameObject gameObject = Object.Instantiate(levelObjectSpawn.GetSpawn(), levelObjectSpawn.transform.position, levelObjectSpawn.transform.rotation);
+				GameObject gameObject = Instantiate(levelObjectSpawn.GetSpawn(), levelObjectSpawn.transform.position, levelObjectSpawn.transform.rotation);
 				if (!string.IsNullOrEmpty(levelObjectSpawn.GetExtraData()))
 				{
 					string[] array2 = levelObjectSpawn.GetExtraData().Split(' ');
@@ -203,7 +203,7 @@ public class GameManager : NetworkSingleton<GameManager>
 				}
 				NetworkServer.Spawn(gameObject);
 			}
-			Object.Destroy(levelObjectSpawn.gameObject);
+			Destroy(levelObjectSpawn.gameObject);
 		}
 	}
 

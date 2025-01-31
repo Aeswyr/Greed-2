@@ -19,7 +19,7 @@ public class DestroyAfterDelay : MonoBehaviour
 	{
 		if (Time.time > lifetime)
 		{
-			Object.Destroy(base.gameObject);
+			Destroy(gameObject);
 		}
 	}
 }

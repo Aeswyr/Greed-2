@@ -429,10 +429,10 @@ MonoBehaviour:
       - m_Target: {fileID: 3583077376874939676}
         m_TargetAssemblyTypeName: PurchasableInteractable, Assembly-CSharp
         m_MethodName: OnInteract
-        m_Mode: 2
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: PlayerController, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -460,10 +460,10 @@ MonoBehaviour:
       - m_Target: {fileID: -7460476340828131052}
         m_TargetAssemblyTypeName: ShopInteractable, Assembly-CSharp
         m_MethodName: OnInteract
-        m_Mode: 2
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: PlayerController, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

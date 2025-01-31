@@ -8,6 +8,6 @@ public class InteractableData : MonoBehaviour
 
 	public void FireInteraction(PlayerController target)
 	{
-		action.Invoke(target);
+		action?.Invoke(target);
 	}
 }

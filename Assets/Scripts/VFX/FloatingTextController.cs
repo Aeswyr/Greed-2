@@ -24,8 +24,8 @@ public class FloatingTextController : MonoBehaviour
 	private void Start()
 	{
 		startTime = Time.time;
-		basePos = base.transform.position;
-		baseScale = base.transform.localScale;
+		basePos = transform.position;
+		baseScale = transform.localScale;
 	}
 
 	public void SetText(string text, Color color)
@@ -39,11 +39,11 @@ public class FloatingTextController : MonoBehaviour
 		float num = Time.time - startTime;
 		if (num >= scale.keys[scale.keys.Length - 1].time || num >= yPos.keys[yPos.keys.Length - 1].time)
 		{
-			Object.Destroy(base.gameObject);
+			Destroy(gameObject);
 			return;
 		}
-		base.transform.position = basePos + yPos.Evaluate(num) * Vector3.up;
-		base.transform.localScale = scale.Evaluate(num) * baseScale;
+		transform.position = basePos + yPos.Evaluate(num) * Vector3.up;
+		transform.localScale = scale.Evaluate(num) * baseScale;
 		Color color = text.color;
 		color.a = alpha.Evaluate(num);
 		text.color = color;

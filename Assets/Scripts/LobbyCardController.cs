@@ -42,11 +42,11 @@ public class LobbyCardController : NetworkBehaviour
 
 	private void Start()
 	{
-		if (base.transform.parent != GameManager.Instance.PlayerLobbyHolder)
+		if (transform.parent != GameManager.Instance.PlayerLobbyHolder)
 		{
-			base.transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
+			transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
 		}
-		input = UnityEngine.Object.FindObjectOfType<InputHandler>();
+		input = FindObjectOfType<InputHandler>();
 		if (player != null && player.isLocalPlayer)
 		{
 			SyncCardName(SteamUser.GetSteamID().m_SteamID);

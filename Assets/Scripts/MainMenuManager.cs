@@ -24,9 +24,9 @@ public class MainMenuManager : MonoBehaviour
 
 	private void Start()
 	{
-		if (Object.FindObjectOfType<NetworkAnimator>() == null)
+		if (FindObjectOfType<NetworkAnimator>() == null)
 		{
-			Object.Instantiate(networkPrefab);
+			Instantiate(networkPrefab);
 		}
 		GetFriendLobbies();
 	}
@@ -35,7 +35,7 @@ public class MainMenuManager : MonoBehaviour
 	{
 		for (int i = 0; i < joinParent.childCount; i++)
 		{
-			Object.Destroy(joinParent.GetChild(i).gameObject);
+			Destroy(joinParent.GetChild(i).gameObject);
 		}
 		GetFriendLobbies();
 	}
@@ -71,7 +71,7 @@ public class MainMenuManager : MonoBehaviour
 		{
 			text = nameOverride;
 		}
-		GameObject gameObject = Object.Instantiate(joinPrefab, joinParent);
+		GameObject gameObject = Instantiate(joinPrefab, joinParent);
 		gameObject.GetComponentInChildren<TextMeshProUGUI>().text = text;
 		gameObject.GetComponent<Button>().onClick.AddListener(JoinLobby);
 		void JoinLobby()
@@ -87,6 +87,6 @@ public class MainMenuManager : MonoBehaviour
 
 	public void OnHost()
 	{
-		Object.FindObjectOfType<SteamManager>().Host();
+		FindObjectOfType<SteamManager>().Host();
 	}
 }

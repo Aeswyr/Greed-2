@@ -62,7 +62,7 @@ public class PickupData : NetworkBehaviour
 		}
 	}
 
-	private void FixedUpdate()
+	void FixedUpdate()
 	{
 		if (floaty && Time.time > startFloat)
 		{
@@ -106,7 +106,7 @@ public class PickupData : NetworkBehaviour
 		[Command(requiresAuthority = false)]
 		void Cleanup()
 		{
-			NetworkServer.Destroy(base.gameObject);
+			NetworkServer.Destroy(gameObject);
 		}
 	}
 

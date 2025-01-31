@@ -35,11 +35,11 @@ public class ProjectileData : NetworkBehaviour
 
 	private void Start()
 	{
-		hitbox.SetParent(base.transform).Finish();
+		hitbox.SetParent(transform).Finish();
 		AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
 		animatorOverrideController["projectile"] = anims[animIndex];
 		animator.runtimeAnimatorController = animatorOverrideController;
-		base.transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
+		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
 	}
 
 	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, ParticleType particleType)
@@ -60,11 +60,11 @@ public class ProjectileData : NetworkBehaviour
 
 	private void FixedUpdate()
 	{
-		if (base.isServer && destroyAfterDelay && Time.time > destroyDelay)
+		if (isServer && destroyAfterDelay && Time.time > destroyDelay)
 		{
 			destroyAfterDelay = false;
-			NetworkServer.Destroy(base.gameObject);
-			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			NetworkServer.Destroy(gameObject);
+			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 	}
 
@@ -73,8 +73,8 @@ public class ProjectileData : NetworkBehaviour
 	{
 		if (destroyOnWorldImpact)
 		{
-			NetworkServer.Destroy(base.gameObject);
-			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			NetworkServer.Destroy(gameObject);
+			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 	}
 
@@ -83,8 +83,8 @@ public class ProjectileData : NetworkBehaviour
 	{
 		if (destroyOnEntityImpact)
 		{
-			NetworkServer.Destroy(base.gameObject);
-			VFXManager.Instance.CreateVFX(particleType, base.transform.position, flip: false);
+			NetworkServer.Destroy(gameObject);
+			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 	}
 }

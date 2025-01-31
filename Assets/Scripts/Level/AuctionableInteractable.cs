@@ -33,7 +33,7 @@ public class AuctionableInteractable : NetworkBehaviour
 
 	private void Start()
 	{
-		if (base.isServer)
+		if (isServer)
 		{
 			int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 10);
 			cost = num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num);
@@ -44,7 +44,7 @@ public class AuctionableInteractable : NetworkBehaviour
 
 	private void FixedUpdate()
 	{
-		if (!base.isServer)
+		if (!isServer)
 		{
 			return;
 		}
@@ -133,7 +133,7 @@ public class AuctionableInteractable : NetworkBehaviour
 		[Command(requiresAuthority = false)]
 		void Cleanup()
 		{
-			NetworkServer.Destroy(base.gameObject);
+			NetworkServer.Destroy(gameObject);
 		}
 		}
 	}

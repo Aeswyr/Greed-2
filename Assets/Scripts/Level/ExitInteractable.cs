@@ -13,8 +13,6 @@ public class ExitInteractable : NetworkBehaviour
 	[SyncVar(hook = nameof(UpdatePlayerCount))]
 	private int playerCount;
 
-	public Action<int, int> _Mirror_SyncVarHookDelegate_playerCount;
-
 	private void Start()
 	{
 		playerCounter.gameObject.SetActive(value: false);

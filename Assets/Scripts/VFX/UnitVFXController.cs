@@ -38,7 +38,7 @@ public class UnitVFXController : NetworkBehaviour
 
 	public void SyncAfterimage(float duration)
 	{
-		if (base.isServer)
+		if (isServer)
 		{
 			RecieveAfterimage(duration);
 		}
@@ -57,7 +57,7 @@ public class UnitVFXController : NetworkBehaviour
 	[ClientRpc]
 	private void RecieveAfterimage(float duration)
 	{
-		GameObject gameObject = Object.Instantiate(VFXManager.Instance.GetAfterimagePrefab(), base.transform.position, Quaternion.identity);
+		GameObject gameObject = Instantiate(VFXManager.Instance.GetAfterimagePrefab(), transform.position, Quaternion.identity);
 		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
 		SpriteRenderer spriteRenderer = sprite;
 		component.sprite = spriteRenderer.sprite;
@@ -68,7 +68,7 @@ public class UnitVFXController : NetworkBehaviour
 
 	public void SetFXState(PlayerVFX fx, bool state)
 	{
-		if (base.isServer)
+		if (isServer)
 		{
 			RecieveFXState(fx, state);
 		}

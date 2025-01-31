@@ -26,7 +26,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	public void SyncVFX(ParticleType type, Vector3 pos, bool flip, bool renderBehind = false)
 	{
-		if (base.isServer)
+		if (isServer)
 		{
 			RecieveVFX(type, pos, flip, renderBehind);
 		}
@@ -53,12 +53,12 @@ public class VFXManager : NetworkSingleton<VFXManager>
 		GameObject gameObject;
 		if (parent != null)
 		{
-			gameObject = Object.Instantiate(template, parent);
+			gameObject = Instantiate(template, parent);
 			gameObject.transform.localPosition = pos;
 		}
 		else
 		{
-			gameObject = Object.Instantiate(template, pos, Quaternion.identity);
+			gameObject = Instantiate(template, pos, Quaternion.identity);
 		}
 		Animator component = gameObject.GetComponent<Animator>();
 		AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(component.runtimeAnimatorController);
@@ -75,7 +75,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	public void SyncPrefabVFX(ParticlePrefabType type, Vector3 pos)
 	{
-		if (base.isServer)
+		if (isServer)
 		{
 			RecievePrefabVFX(type, pos);
 		}
@@ -101,12 +101,12 @@ public class VFXManager : NetworkSingleton<VFXManager>
 	{
 		if (parent != null)
 		{
-			GameObject gameObject = Object.Instantiate(particles[(int)type], parent);
+			GameObject gameObject = Instantiate(particles[(int)type], parent);
 			gameObject.transform.localPosition = pos;
 		}
 		else
 		{
-			GameObject gameObject = Object.Instantiate(particles[(int)type], pos, Quaternion.identity);
+			GameObject gameObject = Instantiate(particles[(int)type], pos, Quaternion.identity);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	public void CreateFloatingText(string text, Vector3 pos, Color color)
 	{
-		GameObject gameObject = Object.Instantiate(textPrefab, pos, Quaternion.identity);
+		GameObject gameObject = Instantiate(textPrefab, pos, Quaternion.identity);
 		FloatingTextController component = gameObject.GetComponent<FloatingTextController>();
 		component.SetText(text, color);
 	}

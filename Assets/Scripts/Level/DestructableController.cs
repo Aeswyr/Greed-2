@@ -21,14 +21,14 @@ public class DestructableController : NetworkBehaviour
 			{
 				component2.OnEntityCollide();
 			}
-			VFXManager.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (base.transform.position + data.transform.position), flip: false);
+			VFXManager.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (transform.position + data.transform.position), flip: false);
 			BreakObject();
 		}
 		[Command(requiresAuthority = false)]
 		void BreakObject()
 		{
-			GameManager.Instance.SpawnGoldBurst(base.transform.position, dropAmount, dropVariant);
-			NetworkServer.Destroy(base.gameObject);
+			GameManager.Instance.SpawnGoldBurst(transform.position, dropAmount, dropVariant);
+			NetworkServer.Destroy(gameObject);
 		}
 	}
 }

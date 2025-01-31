@@ -223,7 +223,7 @@ MonoBehaviour:
   activeDevice: 0
   buttonCount: 8
   bufferFrames: 5
-  bufferEnabled: 0
+  bufferEnabled: 1
 --- !u!114 &5337504922200969694
 MonoBehaviour:
   m_ObjectHideFlags: 0

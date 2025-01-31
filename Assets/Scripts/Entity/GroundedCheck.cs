@@ -16,6 +16,6 @@ public class GroundedCheck : MonoBehaviour
 
 	public bool CheckGrounded()
 	{
-		return Utils.Boxcast(base.transform.position + (Vector3)floorDetectOffset, footOffset + floorDetectDistance * 0.5f * Vector2.up, Vector2.down, floorDetectDistance, floorDetectMask);
+		return Utils.Boxcast(transform.position + (Vector3)floorDetectOffset, footOffset + floorDetectDistance * 0.5f * Vector2.up, Vector2.down, floorDetectDistance, floorDetectMask);
 	}
 }

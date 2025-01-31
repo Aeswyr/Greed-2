@@ -10,7 +10,7 @@ public class Singleton<T> : MonoBehaviour where T : Component
 		{
 			if (instance == null)
 			{
-				instance = Object.FindObjectOfType<T>();
+				instance = FindObjectOfType<T>();
 			}
 			return instance;
 		}

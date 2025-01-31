@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10f7a4c08f7d004b9396f8ab14c57b3, type: 3}
   m_Name: ProjectileLibrary
   m_EditorClassIdentifier: 
-  anims: []
+  anims:
+  - {fileID: -2227205145598344182, guid: 3a42d6bb60874fd4c95dbd72dcab6193, type: 3}
+  - {fileID: 381843994588018226, guid: 0f7cb07265295844787c9717b954f392, type: 3}
+  - {fileID: 8061794693472382463, guid: 5c532d1e836c88842816e55126c655b0, type: 3}
+  - {fileID: 6880389996565246232, guid: a1af1d77862620b40ba100d5605491c0, type: 3}
