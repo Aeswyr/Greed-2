@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activeDevice: 0
   buttonCount: 8
-  bufferFrames: 5
+  bufferFrames: 10
   bufferEnabled: 1
 --- !u!114 &5337504922200969694
 MonoBehaviour:
