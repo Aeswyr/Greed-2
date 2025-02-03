@@ -1,4 +1,5 @@
 using UnityEngine;
+using Steamworks;
 
 public class Utils
 {
@@ -21,5 +22,13 @@ public class Utils
 		Debug.DrawRay(start + (Vector3)(0.5f * size) + (Vector3)(dir * dist), size.y * Vector2.down, Color.red);
 		Debug.DrawRay(start + (Vector3)(0.5f * size) + (Vector3)(dir * dist), size.x * Vector2.left, Color.red);
 		return result;
+	}
+
+	public static string GetSteamName(ulong id) {
+		return SteamFriends.GetFriendPersonaName(new CSteamID(id));
+	}
+
+	public static string GetLocalSteamName() {
+		return SteamFriends.GetFriendPersonaName(new CSteamID(SteamUser.GetSteamID().m_SteamID));
 	}
 }

@@ -183,7 +183,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 
-	private int weaponId = 0; // 4
+	private int weaponId = 0;
 
 	private int skillId = -1;
 
@@ -212,6 +212,8 @@ public class PlayerController : NetworkBehaviour
 	private int[] stats = new int[5];
 
 	private LayerMask worldMask;
+	[SyncVar] private int playerId = -1;
+	public int PlayerID => playerId;
 
 	private void Start()
 	{
@@ -225,6 +227,12 @@ public class PlayerController : NetworkBehaviour
 			jump.SetInput(input);
 			GameManager.Instance.AddLobbyCard(this, input);
 		}
+		
+		unitUI.SetNameplate(Utils.GetLocalSteamName());
+	}
+
+	[Server] public void AssignId(int id) {
+		playerId = id;
 	}
 
 	private void FixedUpdate()
@@ -431,6 +439,7 @@ public class PlayerController : NetworkBehaviour
 		attacking = false;
 		move.ResetCurves();
 		invuln = InvulnState.NONE;
+		animator.ResetTrigger("release");
 		if (!input.move.down || input.move.released)
 		{
 			move.StartDeceleration();
@@ -1280,5 +1289,9 @@ public class PlayerController : NetworkBehaviour
 	public void LeaveLevel()
 	{
 		UpdateMoneyLock(val: false);
+	}
+
+	public void PingNameplate() {
+		unitUI.UpdateNameplate();
 	}
 }

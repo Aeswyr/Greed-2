@@ -1,7 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using Mirror;
 using Mirror.RemoteCalls;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
@@ -36,6 +39,8 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	[SerializeField]
 	private GameObject[] shops;
+	[Header("UI")]
+	[SerializeField] private Animator screenWipe;
 
 	private int levelCount = 0;
 
@@ -81,12 +86,27 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			lobbyCardController2.FinalizeReady();
 		}
+
+		AssignPlayerIds();
+
 		SyncGameStart();
+	}
+
+	private void AssignPlayerIds() {
+		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		int id = 0;
+		foreach (PlayerController playerController in array)
+		{
+			playerController.AssignId(id);
+			id++;
+		}
 	}
 
 	[ClientRpc]
 	private void SyncGameStart()
 	{
+		HandlePlayerSpawns();
+
 		playerLobby.SetActive(value: false);
 		PlayerController[] array = FindObjectsOfType<PlayerController>();
 		foreach (PlayerController playerController in array)
@@ -96,6 +116,8 @@ public class GameManager : NetworkSingleton<GameManager>
 				playerController.SetInputLocked(value: false);
 			}
 		}
+
+		CompleteLevelTransition();
 	}
 
 	public GameObject GetHitbox(Vector3 position, Quaternion rotation, Transform parent)
@@ -151,12 +173,13 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			auctionableInteractable.RunAuctionComplete();
 		}
+
 		NextLevel(0);
+
 		[ClientRpc]
 		void NextLevel(int id)
 		{
-			Destroy(currentLevel.gameObject);
-			LoadLevel(id);
+			StartCoroutine(SequenceLevelTransition(id));
 		}
 	}
 
@@ -168,19 +191,44 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			original = shops[id];
 		}
+
 		currentLevel = Instantiate(original).GetComponent<LevelController>();
+		
+		LoadLevelObjects();
+
+		HandlePlayerSpawns();
+	}
+
+	private void HandlePlayerSpawns() {
 		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		List<int> playerIds = new();
+
 		foreach (PlayerController playerController in array)
 		{
+			playerIds.Add(playerController.PlayerID);
 			if (playerController.isLocalPlayer)
 			{
-				playerController.SetStasis(value: false);
-				playerController.transform.position = Vector3.zero;
+				playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position;
 				playerController.EnterLevel();
+				playerController.PingNameplate();
 				levelDisplay.text = levelCount.ToString("D2");
 			}
 		}
-		LoadLevelObjects();
+
+		for (int i = 0; i < currentLevel.SpawnPoints.Count; i++) {
+			if (!playerIds.Contains(i))
+				currentLevel.SpawnPoints[i].SetActive(false);
+
+		}
+	}
+
+	public void CompleteLevelTransition() {
+		PlayerController[] array = FindObjectsOfType<PlayerController>();
+
+		foreach (PlayerController playerController in array)
+			if (playerController.isLocalPlayer)
+				playerController.SetStasis(value: false);
+
 	}
 
 	private void LoadLevelObjects()
@@ -231,5 +279,19 @@ public class GameManager : NetworkSingleton<GameManager>
 	public void SpawnProjectile(ProjectileBuilder data)
 	{
 		NetworkServer.Spawn(data.Apply(projectilePrefab));
+	}
+
+	private IEnumerator SequenceLevelTransition(int id) {
+		screenWipe.SetTrigger("wipeon");
+		yield return new WaitForSeconds(0.25f);
+
+		Destroy(currentLevel.gameObject);
+		LoadLevel(id);
+		yield return new WaitForSeconds(0.25f);
+
+		screenWipe.SetTrigger("wipeoff");
+		yield return new WaitForSeconds(0.25f);
+
+		CompleteLevelTransition();
 	}
 }

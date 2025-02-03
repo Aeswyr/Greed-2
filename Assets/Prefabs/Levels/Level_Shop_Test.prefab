@@ -86,6 +86,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 494747118947606028, guid: fce612b42769ede4c81ed3ce17930d39, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -2163887951401102806, guid: ebf02141a4a1aa5418c13533f2ba4115, type: 3}
     - target: {fileID: 1738130956640854049, guid: fce612b42769ede4c81ed3ce17930d39, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -126,6 +130,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2536381977237924002, guid: fce612b42769ede4c81ed3ce17930d39, type: 3}
+      propertyPath: spawnables.Array.data[0]
+      value: 
+      objectReference: {fileID: 6434597776946972388, guid: 865036df4cca5fe40b9b2863ccd0f73c, type: 3}
     - target: {fileID: 6836185257431951271, guid: fce612b42769ede4c81ed3ce17930d39, type: 3}
       propertyPath: m_Name
       value: Level_Shop_Test

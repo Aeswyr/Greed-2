@@ -53,7 +53,7 @@ public class LobbyCardController : NetworkBehaviour
 		}
 		else if (friendId.HasValue)
 		{
-			playerName.text = SteamFriends.GetFriendPersonaName(new CSteamID(friendId.Value));
+			playerName.text = Utils.GetSteamName(friendId.Value);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class LobbyCardController : NetworkBehaviour
 		[ClientRpc]
 		void SendCardName(ulong id)
 		{
-			playerName.text = SteamFriends.GetFriendPersonaName(new CSteamID(id));
+			playerName.text = Utils.GetSteamName(id);
 		}
 	}
 

@@ -36,12 +36,15 @@ public class PlayerUIController : MonoBehaviour
 
 	[SerializeField]
 	private TextMeshProUGUI crownCount;
+	[SerializeField]
+	private TextMeshProUGUI nameplate;
 
 	private bool moneyLock;
 
 	private bool healthFull;
 
 	private float moneyFade;
+	private float nameplateFade;
 
 	private float staminaFade;
 
@@ -60,6 +63,7 @@ public class PlayerUIController : MonoBehaviour
 		healthGroup.alpha = 0f;
 		skillGroup.alpha = 0f;
 		crownGroup.alpha = 0f;
+		nameplate.alpha = 0f;
 		interactIcon.SetActive(value: false);
 	}
 
@@ -145,6 +149,15 @@ public class PlayerUIController : MonoBehaviour
 		}
 	}
 
+	public void SetNameplate(string name) {
+		nameplate.text = name;
+	}
+
+	public void UpdateNameplate() {
+		nameplate.alpha = 1;
+		nameplateFade = Time.time + 2f;
+	}
+
 	private void FixedUpdate()
 	{
 		if (currentMoney != targetMoney)
@@ -169,6 +182,9 @@ public class PlayerUIController : MonoBehaviour
 		if (healthFull && Time.time > healthFade && healthGroup.alpha > 0f)
 		{
 			healthGroup.alpha -= 0.04f;
+		}
+		if (Time.time > nameplateFade && nameplate.alpha > 0) {
+			nameplate.alpha -= 0.02f;
 		}
 	}
 }
