@@ -205,20 +205,26 @@ public class GameManager : NetworkSingleton<GameManager>
 
 		foreach (PlayerController playerController in array)
 		{
-			playerIds.Add(playerController.PlayerID);
-			if (playerController.isLocalPlayer)
-			{
-				playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position;
-				playerController.EnterLevel();
-				playerController.PingNameplate();
-				levelDisplay.text = levelCount.ToString("D2");
-			}
+			StartCoroutine(SetupLevel(playerIds, playerController));
 		}
 
 		for (int i = 0; i < currentLevel.SpawnPoints.Count; i++) {
 			if (!playerIds.Contains(i))
 				currentLevel.SpawnPoints[i].SetActive(false);
 
+		}
+	}
+
+	private IEnumerator SetupLevel(List<int> playerIds, PlayerController playerController) {
+		playerIds.Add(playerController.PlayerID);
+		if (playerController.isLocalPlayer)
+		{
+			yield return new WaitUntil(() => playerController.PlayerID != -1);
+
+			playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position;
+			playerController.EnterLevel();
+			playerController.PingNameplate();
+			levelDisplay.text = levelCount.ToString("D2");
 		}
 	}
 

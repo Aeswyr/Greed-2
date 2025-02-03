@@ -110,7 +110,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 		}
 	}
 
-	public void SyncVFX(string text, Vector3 pos, Color color) {
+	public void SyncFloatingText(string text, Vector3 pos, Color color) {
 		if (isServer) {
 			RecieveFloatingText(text, pos, color);
 		} else {

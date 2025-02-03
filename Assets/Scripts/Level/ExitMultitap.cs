@@ -22,6 +22,9 @@ public class ExitMultitap : NetworkBehaviour
         if (Time.time > nextTap) {
             taps++;
             nextTap = Time.time + 1f;
+            #if UNITY_EDITOR
+                nextTap = Time.time;
+            #endif
         }
     }
 

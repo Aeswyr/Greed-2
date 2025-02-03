@@ -29,16 +29,16 @@ public class ShopInteractable : NetworkBehaviour
 		switch (type)
 		{
 		case "weapon":
-			item = (PickupType)UnityEngine.Random.Range(3, 9);
+			item = (PickupType)UnityEngine.Random.Range((int)PickupType.WEAPON_PICK, (int)PickupType.SKILL_MAGNET);
 			break;
 		case "skill":
-			item = (PickupType)UnityEngine.Random.Range(9, 14);
+			item = (PickupType)UnityEngine.Random.Range((int)PickupType.SKILL_MAGNET, (int)PickupType.MAX);
 			break;
 		case "crown":
 			item = PickupType.ITEM_CROWN;
 			break;
 		default:
-			item = (PickupType)UnityEngine.Random.Range(2, 14);
+			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_CROWN, (int)PickupType.MAX);
 			break;
 		}
 	}
@@ -50,7 +50,12 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
+		//TODO once bow is implemented, just get rid of this block
+		if (item == PickupType.WEAPON_BOW) {
+			VFXManager.Instance.SyncFloatingText("You should be ashamed.", transform.position + 5 * Vector3.up, Color.red);
+		}
 		owner.GetItem(item);
+	
 		if (singleUse)
 		{
 			Cleanup();

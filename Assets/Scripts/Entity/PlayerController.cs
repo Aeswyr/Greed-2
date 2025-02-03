@@ -214,6 +214,7 @@ public class PlayerController : NetworkBehaviour
 	private LayerMask worldMask;
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
+	public bool hasAmmo = true;
 
 	private void Start()
 	{
@@ -340,8 +341,10 @@ public class PlayerController : NetworkBehaviour
 			jump.ResetTerminalVelocity();
 			wallHanging = false;
 		}
-		if (!acting && (grounded || Time.time < wallCoyote || Time.time > nextStamina) && input.jump.pressed)
+		if ((!acting || (charging && Time.time > nextStamina)) && (grounded || Time.time < wallCoyote || Time.time > nextStamina) && input.jump.pressed)
 		{
+
+
 			jump.StartJump();
 			animator.SetTrigger("jump");
 			wallJump = 0f;
@@ -352,14 +355,22 @@ public class PlayerController : NetworkBehaviour
 				wallJump = Time.time + wallJumpDuration;
 				move.StartAcceleration(wallDir);
 			}
-			else if (!grounded)
+			else if (!grounded || charging)
 			{
 				nextStamina = Time.time + staminaCooldown;
 				UpdateDodgeDisplay(staminaCooldown);
+				if (charging) {
+					EndAction();
+					if (input.dir != 0)
+						move.StartAcceleration(input.dir);
+				}
 			}
 		}
-		if (!acting && Time.time > nextStamina && grounded && input.dodge.pressed)
+		if ((!acting || (charging && Time.time > nextStamina)) && Time.time > nextStamina && grounded && input.dodge.pressed)
 		{
+			if (charging) {
+				EndAction();
+			}
 			StartAction();
 			nextStamina = Time.time + staminaCooldown;
 			UpdateDodgeDisplay(staminaCooldown);
@@ -620,6 +631,7 @@ public class PlayerController : NetworkBehaviour
 			break;
 		case 2:
 		case 4:
+		case 5:
 			animator.SetTrigger("skill_other");
 			break;
 		}
@@ -786,8 +798,20 @@ public class PlayerController : NetworkBehaviour
 				.MakeProjectile(transform.position + 0.5f * Vector3.down)
 				.SetAnimation(1)
 				.SetVelocity(10f * aim)
+				.SetLifetime(2f)
 				.DisableEntityImpact()
 				.FlipSprite(aim.x < 0f)
+				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+				.Finish();
+			break;
+		case 5:
+			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+				.MakeProjectile(transform.position + 0.5f * Vector3.down)
+				.SetAnimation(2)
+				.SetVelocity(40f * aim)
+				.DisableWorldImpact()
+				.SetLifetime(5)
+				.RotateWithVelocity()
 				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
 				.Finish();
 			break;
@@ -993,6 +1017,7 @@ public class PlayerController : NetworkBehaviour
 			weaponId = 4;
 			break;
 		case PickupType.WEAPON_BOW:
+			hasAmmo = true;
 			weaponId = 5;
 			break;
 		case PickupType.SKILL_MAGNET:
@@ -1009,6 +1034,9 @@ public class PlayerController : NetworkBehaviour
 			break;
 		case PickupType.SKILL_SHOT:
 			skillId = 4;
+			break;
+		case PickupType.SKILL_DRILL:
+			skillId = 5;
 			break;
 		}
 	}
@@ -1192,13 +1220,16 @@ public class PlayerController : NetworkBehaviour
 				.Finish();
 			break;
 		case 8:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
-				.MakeProjectile(transform.position + 0.5f * Vector3.down)
-				.SetAnimation(3)
-				.SetVelocity(40f * aim)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-				.Finish();
+			if (hasAmmo) {
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
+					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+					.SetAnimation(3)
+					.SetVelocity(40f * aim)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+					.Finish();
+				hasAmmo = false;
+			}
 			break;
 		}
 	}
@@ -1279,6 +1310,7 @@ public class PlayerController : NetworkBehaviour
 
 	public void EnterLevel()
 	{
+		hasAmmo = true;
 		if (GameManager.Instance.IsLevelShop())
 		{
 			UpdateMoneyDisplay();
