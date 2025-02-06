@@ -61,6 +61,7 @@ MonoBehaviour:
   - {fileID: 8502693885247204858, guid: fa0b8596e01177c4090121a5d5276141, type: 3}
   shops:
   - {fileID: 8502693885247204858, guid: 0980dde5d6b6694428d87e63fb39a380, type: 3}
+  screenWipe: {fileID: 0}
 --- !u!114 &5441077926203003157
 MonoBehaviour:
   m_ObjectHideFlags: 0

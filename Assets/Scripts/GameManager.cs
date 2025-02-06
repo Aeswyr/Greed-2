@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Mirror.RemoteCalls;
+using Telepathy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,6 +44,8 @@ public class GameManager : NetworkSingleton<GameManager>
 	[SerializeField] private Animator screenWipe;
 
 	private int levelCount = 0;
+
+	private int readyPings;
 
 	public Transform PlayerLobbyHolder => playerLobbyHolder;
 
@@ -174,12 +177,12 @@ public class GameManager : NetworkSingleton<GameManager>
 			auctionableInteractable.RunAuctionComplete();
 		}
 
-		NextLevel(0);
+		NextLevel();
 
 		[ClientRpc]
-		void NextLevel(int id)
+		void NextLevel()
 		{
-			StartCoroutine(SequenceLevelTransition(id));
+			StartCoroutine(StartLevelLoadSequence());
 		}
 	}
 
@@ -287,12 +290,34 @@ public class GameManager : NetworkSingleton<GameManager>
 		NetworkServer.Spawn(data.Apply(projectilePrefab));
 	}
 
-	private IEnumerator SequenceLevelTransition(int id) {
+	private IEnumerator StartLevelLoadSequence() {
 		screenWipe.SetTrigger("wipeon");
+		
 		yield return new WaitForSeconds(0.25f);
-
+		
 		Destroy(currentLevel.gameObject);
+
+		NotifyReadyToLoad();
+	}
+
+	[Command(requiresAuthority = false)] private void NotifyReadyToLoad() {
+		readyPings++;
+
+		if (readyPings >= FindObjectsOfType<PlayerController>().Length) {
+			readyPings = 0;
+
+			int nextLevelId = 0;
+			FinishLoad(nextLevelId);
+		}
+	}
+
+	[ClientRpc] private void FinishLoad(int id) {
 		LoadLevel(id);
+
+		StartCoroutine(FinishLevelLoadSequence());
+	} 
+	
+	private IEnumerator FinishLevelLoadSequence() {
 		yield return new WaitForSeconds(0.25f);
 
 		screenWipe.SetTrigger("wipeoff");

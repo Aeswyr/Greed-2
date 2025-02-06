@@ -54,7 +54,7 @@ public struct AttackBuilder
 
 	public ProjectileBuilder MakeProjectile(Vector3 startPos)
 	{
-		return ProjectileBuilder.GetProjectile(startPos).SetHitbox(this);
+		return ProjectileBuilder.GetProjectile(startPos).SetHitbox(this).SetOwner(owner);
 	}
 
 	public void Finish()

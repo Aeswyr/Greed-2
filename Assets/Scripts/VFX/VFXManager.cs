@@ -50,6 +50,9 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	public void CreateVFX(ParticleType type, Vector3 pos, bool flip, Transform parent = null, bool renderBehind = false)
 	{
+		if (type == ParticleType.NONE)
+			return;
+
 		GameObject gameObject;
 		if (parent != null)
 		{

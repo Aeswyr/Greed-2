@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8a8f8df9ae2b58049b6e55de1fd89d62
+guid: c905764b9ab17f34d90dc36a8762122b
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -76,7 +76,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
@@ -89,7 +89,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
@@ -98,7 +98,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638739563587930371
+  platformSettingsDirtyTick: 638743091182711919
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -122,18 +122,38 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: skill_fanToss
+  - name: Frame_0
     originalName: 
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 1.2727273, y: 0.5}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 36
+      y: 4
+      width: 11
+      height: 14
+    spriteID: 094220d505ea010428f0f52a0a5d1b55
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 36, y: 4}
+  - name: Frame_1
+    originalName: 
+    pivot: {x: 0.5416667, y: 0.5}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 16
-      height: 15
-    spriteID: 7b9fbe434326b614f900672ce3e143e9
+      width: 24
+      height: 18
+    spriteID: 5fbe0ff2303767f48b07e8633c7fe05d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -142,24 +162,62 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
+  - name: Frame_2
+    originalName: 
+    pivot: {x: 0.36842105, y: 0.5}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 30
+      width: 19
+      height: 20
+    spriteID: 03754a739c1d1dc4a82312f171c42457
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 30}
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -253011026
-    name: skill_fanToss
+    guid: 1184348162
+    name: proj_bomb
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: skill_fanToss
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 0
-        y: 0
-        width: 16
-        height: 15
-      spriteId: 7b9fbe434326b614f900672ce3e143e9
+        x: 2
+        y: 9
+        width: 11
+        height: 14
+      spriteId: 094220d505ea010428f0f52a0a5d1b55
+    - name: Frame_1
+      frameIndex: 1
+      additiveSortOrder: 0
+      cellRect:
+        x: 3
+        y: 7
+        width: 24
+        height: 18
+      spriteId: 5fbe0ff2303767f48b07e8633c7fe05d
+    - name: Frame_2
+      frameIndex: 2
+      additiveSortOrder: 0
+      cellRect:
+        x: 9
+        y: 6
+        width: 19
+        height: 20
+      spriteId: 03754a739c1d1dc4a82312f171c42457
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -202,5 +260,5 @@ ScriptedImporter:
   generatePhysicsShape: 1
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 16, y: 16}
-  previousTextureSize: {x: 32, y: 32}
+  canvasSize: {x: 32, y: 32}
+  previousTextureSize: {x: 64, y: 64}

@@ -124,15 +124,15 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: skill_drill
     originalName: 
-    pivot: {x: 0.4666667, y: 0}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 15
-      height: 15
+      width: 16
+      height: 16
     spriteID: 6a436a369ae8748419af002e35153d00
     spriteBone: []
     spriteOutline: []
@@ -155,10 +155,10 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 1
+        x: 0
         y: 0
-        width: 15
-        height: 15
+        width: 16
+        height: 16
       spriteId: 6a436a369ae8748419af002e35153d00
     linkedCells: []
     parentIndex: -1

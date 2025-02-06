@@ -10,6 +10,9 @@ public class ProjectileData : NetworkBehaviour
 
 	[SerializeField]
 	private Animator animator;
+	[SerializeField] private Rigidbody2D rbody;
+	[SerializeField]
+	private ParticleSystem drillVFX;
 
 	[SyncVar]
 	private int animIndex;
@@ -28,10 +31,16 @@ public class ProjectileData : NetworkBehaviour
 
 	[SyncVar]
 	private ParticleType particleType;
+	
+	[SyncVar]
+	private UniqueProjectile uniqueFunction;
+	[SyncVar]
+	private Transform owner;
 
 	private bool destroyAfterDelay = false;
 
 	private float destroyDelay;
+	
 
 	private void Start()
 	{
@@ -42,7 +51,7 @@ public class ProjectileData : NetworkBehaviour
 		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
 	}
 
-	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, ParticleType particleType)
+	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, int uniqueFunction, ParticleType particleType, Transform owner)
 	{
 		this.hitbox = hitbox;
 		this.destroyOnEntityImpact = destroyOnEntityImpact;
@@ -50,6 +59,8 @@ public class ProjectileData : NetworkBehaviour
 		this.animIndex = animIndex;
 		this.flipSprite = flipSprite;
 		this.particleType = particleType;
+		this.uniqueFunction = (UniqueProjectile)uniqueFunction;
+		this.owner = owner;
 	}
 
 	public void ApplyLifetime(float lifetime)
@@ -74,7 +85,38 @@ public class ProjectileData : NetworkBehaviour
 		if (destroyOnWorldImpact)
 		{
 			NetworkServer.Destroy(gameObject);
-			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
+			if (particleType != ParticleType.NONE)
+				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
+		}
+
+		if (uniqueFunction == UniqueProjectile.BOMB) {
+			AttackBuilder.GetAttack(owner).SetParent(transform).SetSize(new Vector2(10f, 10f)).SetDuration(0.2f)
+				.MakeProjectile(transform.position)
+				.DisableWorldImpact()
+				.DisableEntityImpact()
+				.SetAnimation(5)
+				.SetLifetime(0.85f)
+				.Finish();
+		}
+
+		if (uniqueFunction == UniqueProjectile.DRILL) {
+			NotifyVFXStart();
+			rbody.velocity = 20 * rbody.velocity.normalized;
+
+			[ClientRpc] void NotifyVFXStart() {
+				drillVFX.Play();
+			}
+		}
+	}
+
+	[Command(requiresAuthority = false)] public void OnWorldExit() {
+		if (uniqueFunction == UniqueProjectile.DRILL) {
+			NotifyVFXStop();
+			rbody.velocity = 40 * rbody.velocity.normalized;
+
+			[ClientRpc] void NotifyVFXStop() {
+				drillVFX.Stop();
+			}
 		}
 	}
 
@@ -84,7 +126,12 @@ public class ProjectileData : NetworkBehaviour
 		if (destroyOnEntityImpact)
 		{
 			NetworkServer.Destroy(gameObject);
-			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
+			if (particleType != ParticleType.NONE)
+				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 	}
+}
+
+public enum UniqueProjectile {
+	DEFAULT, DRILL, BOMB
 }

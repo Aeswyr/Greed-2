@@ -23,12 +23,17 @@ public struct ProjectileBuilder
 
 	private int particleType;
 
+	private float gravity;
+	private Transform owner;
+	private int uniqueFunction;
+
 	public static ProjectileBuilder GetProjectile(Vector3 pos)
 	{
 		ProjectileBuilder result = default(ProjectileBuilder);
 		result.pos = pos;
 		result.destroyOnWorldImpact = true;
 		result.destroyOnEntityImpact = true;
+		result.particleType = (int)ParticleType.NONE;
 		return result;
 	}
 
@@ -86,6 +91,21 @@ public struct ProjectileBuilder
 		return this;
 	}
 
+	public ProjectileBuilder SetGravity(float gravity) {
+		this.gravity = gravity;
+		return this;
+	}
+
+	public ProjectileBuilder SetUnique(UniqueProjectile id) {
+		uniqueFunction = (int)id;
+		return this;
+	}
+
+	public ProjectileBuilder SetOwner(Transform owner) {
+		this.owner = owner;
+		return this;
+	}
+
 	public void Finish()
 	{
 		GameManager.Instance.SpawnProjectile(this);
@@ -95,12 +115,14 @@ public struct ProjectileBuilder
 	{
 		GameObject gameObject = Object.Instantiate(prefab, pos, Quaternion.identity);
 		ProjectileData component = gameObject.GetComponent<ProjectileData>();
-		component.Init(animationIndex, hitbox, destroyOnWorldImpact, destroyOnEntityImpact, flipSprite, (particleType == 0) ? ParticleType.HITSPARK : ((ParticleType)particleType));
+		component.Init(animationIndex, hitbox, destroyOnWorldImpact, destroyOnEntityImpact, flipSprite, uniqueFunction, (ParticleType)particleType, owner);
 		if (lifetime > 0f)
 		{
 			component.ApplyLifetime(lifetime);
 		}
-		gameObject.GetComponent<Rigidbody2D>().velocity = velocity;
+		var rbody = gameObject.GetComponent<Rigidbody2D>();
+		rbody.velocity = velocity;
+		rbody.gravityScale = gravity;
 		if (rotateWithVelocity)
 		{
 			gameObject.transform.localRotation = Quaternion.FromToRotation(Vector2.right, velocity);
@@ -119,6 +141,10 @@ public struct ProjectileBuilder
 		writer.Write(flipSprite);
 		writer.Write(rotateWithVelocity);
 		writer.Write(particleType);
+		writer.Write(gravity);
+		writer.Write(uniqueFunction);
+		writer.Write(owner);
+
 		hitbox.Write(writer);
 	}
 
@@ -133,6 +159,10 @@ public struct ProjectileBuilder
 		flipSprite = reader.Read<bool>();
 		rotateWithVelocity = reader.Read<bool>();
 		particleType = reader.Read<int>();
+		gravity = reader.Read<float>();
+		uniqueFunction = reader.Read<int>();
+		owner = reader.Read<Transform>();
+
 		hitbox.Read(reader);
 		return this;
 	}

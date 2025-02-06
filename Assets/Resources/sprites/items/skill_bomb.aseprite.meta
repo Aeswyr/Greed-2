@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8a8f8df9ae2b58049b6e55de1fd89d62
+guid: a5bb7511576c3684d89ef5b2a6e0ca7b
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -98,7 +98,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638739563587930371
+  platformSettingsDirtyTick: 638742835773398235
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -122,18 +122,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: skill_fanToss
+  - name: skill_bomb
     originalName: 
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.5, y: -0.071428575}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 16
-      height: 15
-    spriteID: 7b9fbe434326b614f900672ce3e143e9
+      width: 14
+      height: 14
+    spriteID: 58a56aebb04ef39478254b0bedc06e2f
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -145,21 +145,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -253011026
-    name: skill_fanToss
+    guid: -643282420
+    name: skill_bomb
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: skill_fanToss
+    - name: skill_bomb
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 0
-        y: 0
-        width: 16
-        height: 15
-      spriteId: 7b9fbe434326b614f900672ce3e143e9
+        x: 1
+        y: 1
+        width: 14
+        height: 14
+      spriteId: 58a56aebb04ef39478254b0bedc06e2f
     linkedCells: []
     parentIndex: -1
   platformSettings:

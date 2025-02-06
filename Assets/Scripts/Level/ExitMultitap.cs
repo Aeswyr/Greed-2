@@ -19,7 +19,7 @@ public class ExitMultitap : NetworkBehaviour
     }
 
     [Command(requiresAuthority =false)] private void AttemptTap() {
-        if (Time.time > nextTap) {
+        if (Time.time > nextTap && taps < 3) {
             taps++;
             nextTap = Time.time + 1f;
             #if UNITY_EDITOR
@@ -29,6 +29,8 @@ public class ExitMultitap : NetworkBehaviour
     }
 
     private void OnTapChanged(int oldValue, int newValue) {
+        if (newValue > 3)
+            newValue = 3;
         sprite.sprite = sprites[newValue];
     }
 }
