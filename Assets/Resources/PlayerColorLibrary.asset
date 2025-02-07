@@ -21,6 +21,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 1c0796773841322498e66933a72d3796, type: 2}
   - {fileID: 2100000, guid: ccb54f2621ca6204999a6d36f9897a67, type: 2}
   - {fileID: 2100000, guid: 22797e0b19542a14c86bdb391b6d188c, type: 2}
+  - {fileID: 2100000, guid: af2a778388854c44281ead94618ee6f8, type: 2}
+  - {fileID: 2100000, guid: ca34a458245f79d47a5835743dd5189b, type: 2}
   uiColors:
   - {fileID: 2100000, guid: e654b387076d0e84d851104d3b88d481, type: 2}
   - {fileID: 2100000, guid: 21ec88ea6d6c04b4eb344b1ca99b57de, type: 2}
@@ -30,3 +32,5 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 1c0796773841322498e66933a72d3796, type: 2}
   - {fileID: 2100000, guid: ccb54f2621ca6204999a6d36f9897a67, type: 2}
   - {fileID: 2100000, guid: 22797e0b19542a14c86bdb391b6d188c, type: 2}
+  - {fileID: 2100000, guid: 0197e300e89e18b4f903d0953ca14aca, type: 2}
+  - {fileID: 2100000, guid: a326cae7a3e2b224aa7db5cc960a0dd1, type: 2}

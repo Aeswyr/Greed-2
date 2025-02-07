@@ -610,15 +610,15 @@ public class PlayerController : NetworkBehaviour
 		case 9:
 			if (input.dir != 0f)
 			{
-				jump.SetGravity(0.5f);
-				jump.ForceVelocity(0);
-				jump.SetTerminalVelocity(2);
 				move.OverrideCurve(bowAttackSpeed, bowAttackCurve, facing);
 			}
 			else if (grounded)
 			{
 				move.StartDeceleration();
 			}
+			jump.SetGravity(0.5f);
+			jump.ForceVelocity(0);
+			jump.SetTerminalVelocity(2);
 			break;
 		}
 	}
@@ -927,6 +927,10 @@ public class PlayerController : NetworkBehaviour
 			}
 			return;
 		}
+
+		if (charging)
+			InterruptCharge();
+
 		invuln = InvulnState.HITSTUN;
 		StartAction();
 		UpdateFacing(-knockbackDir);
