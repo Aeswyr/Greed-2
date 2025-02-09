@@ -643,6 +643,7 @@ public class PlayerController : NetworkBehaviour
 		case 8:
 			charging = false;
 			animator.SetTrigger("release");
+			CreateAttack();
 			if (input.dir != 0f)
 			{
 				UpdateFacing(input.dir);
@@ -652,6 +653,7 @@ public class PlayerController : NetworkBehaviour
 		case 9:
 			charging = false;
 			animator.SetTrigger("release");
+			CreateAttack();
 			if (input.dir != 0f)
 			{
 				UpdateFacing(input.dir);
