@@ -126,6 +126,9 @@ public struct ProjectileBuilder
 		if (rotateWithVelocity)
 		{
 			gameObject.transform.localRotation = Quaternion.FromToRotation(Vector2.right, velocity);
+			if (velocity.x < 0 && velocity.y != 0) {
+				gameObject.GetComponent<SpriteRenderer>().flipY = true;
+			}
 		}
 		return gameObject;
 	}

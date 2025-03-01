@@ -184,7 +184,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 
-	private int weaponId = 6; //0
+	private int weaponId = 5; //0
 
 	private int skillId = 5; //-1
 
@@ -510,12 +510,16 @@ public class PlayerController : NetworkBehaviour
 			attackId = 7;
 			break;
 		case 5:
-			StartCharge();
-			attackId = 8;
+			if (hasAmmo) {
+				StartCharge();
+				attackId = 8;
+			} else {
+				attackId = 9;
+			}
 			break;
 		case 6:
 			StartCharge();
-			attackId = 9;
+			attackId = 10;
 			break;
 		}
 		animator.SetInteger("attackId", attackId);
@@ -610,6 +614,16 @@ public class PlayerController : NetworkBehaviour
 		case 9:
 			if (input.dir != 0f)
 			{
+				move.OverrideCurve(shieldAttackSpeed, shieldAttackCurve, facing);
+			}
+			else if (grounded)
+			{
+				move.StartDeceleration();
+			}
+			break;
+		case 10:
+			if (input.dir != 0f)
+			{
 				move.OverrideCurve(bowAttackSpeed, bowAttackCurve, facing);
 			}
 			else if (grounded)
@@ -650,7 +664,7 @@ public class PlayerController : NetworkBehaviour
 			}
 			move.OverrideCurve(bowReleaseSpeed, bowReleaseCurve, -facing);
 			break;
-		case 9:
+		case 10:
 			charging = false;
 			animator.SetTrigger("release");
 			CreateAttack();
@@ -1229,7 +1243,7 @@ public class PlayerController : NetworkBehaviour
 		case 7:
 			invuln = InvulnState.ARMOR;
 			break;
-		case 9:
+		case 10:
 			InterruptCharge();
 			break;
 		}
@@ -1237,7 +1251,7 @@ public class PlayerController : NetworkBehaviour
 
 	private void InterruptCharge() {
 		switch (attackId) {
-			case 9:
+			case 10:
 				jump.ResetGravity();
 				jump.ResetTerminalVelocity();
 				break;
@@ -1299,36 +1313,41 @@ public class PlayerController : NetworkBehaviour
 				.Finish();
 			break;
 		case 8:
-			if (hasAmmo) {
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
-					.MakeProjectile(transform.position + 0.5f * Vector3.down)
-					.SetAnimation(3)
-					.SetVelocity(40f * aim)
-					.RotateWithVelocity()
-					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-					.Finish();
-				hasAmmo = false;
-			}
+			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
+				.MakeProjectile(transform.position + 0.5f * Vector3.down)
+				.SetAnimation(3)
+				.SetVelocity(40f * aim)
+				.RotateWithVelocity()
+				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+				.Finish();
+			hasAmmo = false;
 			break;
 		case 9:
+			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+				.SetPosition(new Vector3(facing * 1.5f, -1f, 0f))
+				.SetSize(new Vector2(2f, 2f))
+				.Finish();
+			break;
+		case 10:
 			if (Time.time - chargeStart > 0.5f) {
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(12f, 1f)).SetDuration(0.2f)
+					.MakeProjectile(transform.position + 0.5f * Vector3.down + 6 * aim)
 					.SetAnimation(6)
-					.SetVelocity(20f * aim)
+					.SetVelocity(0.1f * aim)
+					.DisableEntityImpact()
+					.DisableWorldImpact()
 					.RotateWithVelocity()
-					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
 					.SetLifetime(0.5f)
 					.Finish();
 			} else {
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 2f))
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 2f)).SetDuration(0.2f)
 					.MakeProjectile(transform.position + 0.5f * Vector3.down + 3 * aim)
 					.SetAnimation(7)
 					.SetVelocity(0.1f * aim)
 					.RotateWithVelocity()
 					.DisableEntityImpact()
 					.DisableWorldImpact()
-					.SetLifetime(0.2f)
+					.SetLifetime(0.55f)
 					.Finish();
 			}
 			break;
