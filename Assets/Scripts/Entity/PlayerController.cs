@@ -217,7 +217,7 @@ public class PlayerController : NetworkBehaviour
 	private LayerMask worldMask;
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
-	public bool hasAmmo = true;
+	private bool hasAmmo = true;
 
 	private void Start()
 	{
@@ -1319,6 +1319,7 @@ public class PlayerController : NetworkBehaviour
 				.SetVelocity(40f * aim)
 				.RotateWithVelocity()
 				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+				.SetUnique(UniqueProjectile.ARROW)
 				.Finish();
 			hasAmmo = false;
 			break;
@@ -1445,5 +1446,21 @@ public class PlayerController : NetworkBehaviour
 
 	public void PingNameplate() {
 		unitUI.UpdateNameplate();
+	}
+
+	public void RefreshAmmo() {
+		if (isServer) {
+			RecieveAmmoRefresh();
+		} else {
+			SendAmmoRefresh();
+		}
+
+		[Server] void SendAmmoRefresh() {
+			RecieveAmmoRefresh();
+		}
+
+		[ClientRpc] void RecieveAmmoRefresh() {
+			hasAmmo = true;
+		}
 	}
 }

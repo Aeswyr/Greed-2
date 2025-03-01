@@ -223,6 +223,8 @@ MonoBehaviour:
   animator: {fileID: 125989154848861110}
   rbody: {fileID: 7547520477558154335}
   drillVFX: {fileID: 4807842021554240409}
+  spawnablePrefabs:
+  - {fileID: 2041888378276723531, guid: e037a3170e73fd748ae6b914ca115019, type: 3}
 --- !u!212 &2627454665097964148
 SpriteRenderer:
   m_ObjectHideFlags: 0

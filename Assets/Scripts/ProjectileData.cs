@@ -13,6 +13,7 @@ public class ProjectileData : NetworkBehaviour
 	[SerializeField] private Rigidbody2D rbody;
 	[SerializeField]
 	private ParticleSystem drillVFX;
+	[SerializeField] private GameObject[] spawnablePrefabs;
 
 	[SyncVar]
 	private int animIndex;
@@ -107,6 +108,19 @@ public class ProjectileData : NetworkBehaviour
 				drillVFX.Play();
 			}
 		}
+
+		if (uniqueFunction == UniqueProjectile.ARROW) {
+			CreateArrowPickup();
+		}
+	}
+
+	private void CreateArrowPickup() {
+		var arrowSpawn = Instantiate(spawnablePrefabs[0], transform.position, transform.rotation, GameManager.Instance.GetLevelObjectRoot());
+
+		var arrow = arrowSpawn.GetComponent<ArrowPickupController>();
+		arrow.SetOwner(owner);
+
+		NetworkServer.Spawn(arrowSpawn);
 	}
 
 	[Command(requiresAuthority = false)] public void OnWorldExit() {
@@ -129,9 +143,13 @@ public class ProjectileData : NetworkBehaviour
 			if (particleType != ParticleType.NONE)
 				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
+
+		if (uniqueFunction == UniqueProjectile.ARROW) {
+			CreateArrowPickup();
+		}
 	}
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB
+	DEFAULT, DRILL, BOMB, ARROW
 }
