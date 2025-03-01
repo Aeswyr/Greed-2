@@ -480,24 +480,24 @@ public class PlayerController : NetworkBehaviour
 		attacking = true;
 		switch (weaponId)
 		{
-		case 0:
+		case 0: // pickaxe
 			attackId = 0;
 			break;
-		case 1:
+		case 1: // sword
 			attackId = 1;
 			if (input.aim.y < 0f)
 			{
 				attackId = 2;
 			}
 			break;
-		case 2:
+		case 2: // kick
 			attackId = 3;
-			if (input.aim.y < 0f)
+			if (input.aim.y < 0f && !grounded)
 			{
 				attackId = 4;
 			}
 			break;
-		case 3:
+		case 3: // shield
 			attackId = 5;
 			if (input.aim.y < 0f)
 			{
@@ -505,11 +505,11 @@ public class PlayerController : NetworkBehaviour
 				attackId = 6;
 			}
 			break;
-		case 4:
+		case 4: // greatweapon
 			StartCharge();
 			attackId = 7;
 			break;
-		case 5:
+		case 5: // bow
 			if (hasAmmo) {
 				StartCharge();
 				attackId = 8;
@@ -517,7 +517,7 @@ public class PlayerController : NetworkBehaviour
 				attackId = 9;
 			}
 			break;
-		case 6:
+		case 6: // tome
 			StartCharge();
 			attackId = 10;
 			break;
@@ -1076,6 +1076,21 @@ public class PlayerController : NetworkBehaviour
 			UpdateHealthDisplay(health, maxHealth);
 			crowns++;
 			UpdateCrownDisplay();
+			break;
+		case PickupType.ITEM_POTION_HEALTH:
+			VFXManager.Instance.SyncFloatingText("Health +1", transform.position + 3 * Vector3.up, Color.red);
+			break;
+		case PickupType.ITEM_POTION_POWER:
+			VFXManager.Instance.SyncFloatingText("Power +1", transform.position + 3 * Vector3.up, Color.green);
+			break;
+		case PickupType.ITEM_POTION_SKILL:
+			VFXManager.Instance.SyncFloatingText("Skill +1", transform.position + 3 * Vector3.up, Color.blue);
+			break;
+		case PickupType.ITEM_POTION_SPEED:
+			VFXManager.Instance.SyncFloatingText("Speed +1", transform.position + 3 * Vector3.up, Color.cyan);
+			break;
+		case PickupType.ITEM_POTION_STAMINA:
+			VFXManager.Instance.SyncFloatingText("Stamina +1", transform.position + 3 * Vector3.up, Color.yellow);
 			break;
 		case PickupType.WEAPON_PICK:
 			weaponId = 0;

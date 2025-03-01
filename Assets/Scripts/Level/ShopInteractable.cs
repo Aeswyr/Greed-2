@@ -32,10 +32,13 @@ public class ShopInteractable : NetworkBehaviour
 			item = (PickupType)UnityEngine.Random.Range((int)PickupType.WEAPON_PICK, (int)PickupType.SKILL_MAGNET);
 			break;
 		case "skill":
-			item = (PickupType)UnityEngine.Random.Range((int)PickupType.SKILL_MAGNET, (int)PickupType.MAX);
+			item = (PickupType)UnityEngine.Random.Range((int)PickupType.SKILL_MAGNET, (int)PickupType.ITEM_POTION_HEALTH);
 			break;
 		case "crown":
 			item = PickupType.ITEM_CROWN;
+			break;
+		case "potion":
+			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_POTION_HEALTH, (int)PickupType.MAX);
 			break;
 		default:
 			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_CROWN, (int)PickupType.MAX);
