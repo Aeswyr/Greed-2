@@ -9,6 +9,13 @@ public class ArrowPickupController : NetworkBehaviour
     [SerializeField] private Rigidbody2D rbody;
     private bool chasing;
     private float chasingStart;
+
+    private float spawnTime;
+
+    void Start()
+    {
+        spawnTime = Time.time;
+    }
     public void SetOwner(Transform owner) {
         this.owner = owner;
     }
@@ -22,7 +29,7 @@ public class ArrowPickupController : NetworkBehaviour
                 NetworkServer.Destroy(gameObject);
 
                 owner.GetComponent<PlayerController>().RefreshAmmo();
-            } else if (!chasing && dif.sqrMagnitude < 36) {
+            } else if (!chasing && (dif.sqrMagnitude < 36 || Time.time - spawnTime > 12.5f)) {
                 chasing = true;
                 chasingStart = Time.time;
             }
