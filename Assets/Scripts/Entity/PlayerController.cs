@@ -8,11 +8,11 @@ public class PlayerController : NetworkBehaviour
 {
 	private enum Stat
 	{
-		AGILITY = 0,
-		SKILL = 1,
-		POWER = 2,
-		RESILIENCE = 3,
-		DEXTERITY = 4
+		HEALTH,
+		SKILL,
+		POWER,
+		SPEED,
+		STAMINA
 	}
 
 	private enum InvulnState
@@ -67,9 +67,6 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve knockbackCurve;
-
-	[SerializeField]
-	private float staminaCooldown;
 
 	[SerializeField]
 	private float dodgeSpeed;
@@ -143,85 +140,70 @@ public class PlayerController : NetworkBehaviour
 	[SerializeField]
 	private AnimationCurve bowReleaseCurve;
 
-	private float skillCooldown = 4f;
+	private float staminaCooldown => 2f - staminaMod;
+	private float skillCooldown => 4f - skillMod;
 
 	private int currentColor;
 
 	private int money;
-
 	private int crowns;
 
 	private int health;
-
-	private int maxHealth;
-
+	private int maxHealth => 100 + healthMod;
 	private bool healthEmptied;
 
 	private float nextStamina;
-
 	private float nextSkill;
 
 	private float endHitstop;
-
 	private bool isHitstop;
 
-	private float lastForward;
-
 	private bool grounded;
-
 	private int facing = 1;
-
 	private Vector3 aim;
 
 	private bool acting;
 	private bool attackCancel;
-
 	private bool attacking;
 
 	private float hitStunTime;
-
 	private bool hitStun;
 
 	private int attackId = -1;
-
 	private int weaponId = 5; //0
-
 	private int skillId = 5; //-1
 
 	private bool stasis;
-
 	private bool inputLocked;
 
 	private float wallCoyote;
-
 	private int wallDir;
-
 	private bool isWallJumping;
-
 	private float wallJump;
-
 	private bool wallHanging;
 
 	private InvulnState invuln;
 
 	private float endFlight;
-
 	private bool flying;
 
 	private bool charging;
-
 	private float chargeStart;
 
 	private int[] stats = new int[5];
-
 	private LayerMask worldMask;
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
 	private bool hasAmmo = true;
 
+	private int healthMod;
+	private float skillMod;
+	private float staminaMod;
+	private float speedMod;
+	private int powerMod;
+
 	private void Start()
 	{
-		maxHealth = 100;
 		health = maxHealth;
 		worldMask = LayerMask.GetMask("World");
 		sprite.material = colors[currentColor];
@@ -389,7 +371,7 @@ public class PlayerController : NetworkBehaviour
 			UpdateDodgeDisplay(staminaCooldown);
 			UpdateFacing(input.dir);
 			animator.SetTrigger("dodge");
-			move.OverrideCurve(dodgeSpeed, dodgeCurve, facing);
+			move.OverrideCurve(dodgeSpeed + speedMod, dodgeCurve, facing);
 			invuln = InvulnState.DODGE;
 			VFXManager.Instance.SyncVFX(ParticleType.DUST_LARGE, transform.position, facing == -1);
 			unitVFX.StartAfterImageChain(0.5f, 0.1f);
@@ -533,7 +515,7 @@ public class PlayerController : NetworkBehaviour
 		case 0:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(pickAttackSpeed, pickAttackCurve, facing);
+				move.OverrideCurve(pickAttackSpeed + speedMod, pickAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -543,7 +525,7 @@ public class PlayerController : NetworkBehaviour
 		case 1:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(swordAttackSpeed, swordAttackCurve, facing);
+				move.OverrideCurve(swordAttackSpeed + speedMod, swordAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -551,16 +533,16 @@ public class PlayerController : NetworkBehaviour
 			}
 			break;
 		case 2:
-			move.OverrideCurve(swordLungeSpeed, swordLungeCurve, facing);
+			move.OverrideCurve(swordLungeSpeed + speedMod, swordLungeCurve, facing);
 			break;
 		case 3:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(unarmedAttackSpeed, unarmedAttackCurve, facing);
+				move.OverrideCurve(unarmedAttackSpeed + speedMod, unarmedAttackCurve, facing);
 			}
 			else if (grounded)
 			{
-				move.OverrideCurve(unarmedShortSpeed, unarmedShortCurve, facing);
+				move.OverrideCurve(unarmedShortSpeed + speedMod, unarmedShortCurve, facing);
 			}
 			break;
 		case 4:
@@ -574,7 +556,7 @@ public class PlayerController : NetworkBehaviour
 		case 5:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldAttackSpeed, shieldAttackCurve, facing);
+				move.OverrideCurve(shieldAttackSpeed + speedMod, shieldAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -584,7 +566,7 @@ public class PlayerController : NetworkBehaviour
 		case 6:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldParrySpeed, shieldParryCurve, facing);
+				move.OverrideCurve(shieldParrySpeed + speedMod, shieldParryCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -594,7 +576,7 @@ public class PlayerController : NetworkBehaviour
 		case 7:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(greatweaponAttackSpeed, greatweaponAttackCurve, facing);
+				move.OverrideCurve(greatweaponAttackSpeed + speedMod, greatweaponAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -604,7 +586,7 @@ public class PlayerController : NetworkBehaviour
 		case 8:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(bowAttackSpeed, bowAttackCurve, facing);
+				move.OverrideCurve(bowAttackSpeed + speedMod, bowAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -614,7 +596,7 @@ public class PlayerController : NetworkBehaviour
 		case 9:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldAttackSpeed, shieldAttackCurve, facing);
+				move.OverrideCurve(shieldAttackSpeed + speedMod, shieldAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -624,7 +606,7 @@ public class PlayerController : NetworkBehaviour
 		case 10:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(bowAttackSpeed, bowAttackCurve, facing);
+				move.OverrideCurve(bowAttackSpeed + speedMod, bowAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -647,7 +629,7 @@ public class PlayerController : NetworkBehaviour
 			if (input.dir != 0f)
 			{
 				UpdateFacing(input.dir);
-				move.OverrideCurve(greatweaponReleaseSpeed, greatweaponReleaseCurve, facing);
+				move.OverrideCurve(greatweaponReleaseSpeed + speedMod, greatweaponReleaseCurve, facing);
 			}
 			else
 			{
@@ -662,7 +644,7 @@ public class PlayerController : NetworkBehaviour
 			{
 				UpdateFacing(input.dir);
 			}
-			move.OverrideCurve(bowReleaseSpeed, bowReleaseCurve, -facing);
+			move.OverrideCurve(bowReleaseSpeed + speedMod, bowReleaseCurve, -facing);
 			break;
 		case 10:
 			charging = false;
@@ -672,7 +654,7 @@ public class PlayerController : NetworkBehaviour
 			{
 				UpdateFacing(input.dir);
 			}
-			move.OverrideCurve(bowReleaseSpeed, bowReleaseCurve, -facing);
+			move.OverrideCurve(bowReleaseSpeed + speedMod, bowReleaseCurve, -facing);
 			break;
 		}
 	}
@@ -905,23 +887,23 @@ public class PlayerController : NetworkBehaviour
 				parent = parent.parent;
 				flag = true;
 			}
-			SendHit((int)Mathf.Sign(transform.position.x - parent.position.x), source.transform.position, flag ? parent : null);
+			SendHit((int)Mathf.Sign(transform.position.x - parent.position.x), source.transform.position, flag ? parent : null, source.Owner);
 		}
 		[Command(requiresAuthority = false)]
-		void SendHit(int knockbackDir, Vector3 hitPosition, Transform source)
+		void SendHit(int knockbackDir, Vector3 hitPosition, Transform source, Transform owner)
 		{
-			RecieveHit(knockbackDir, hitPosition, source);
+			RecieveHit(knockbackDir, hitPosition, source, owner);
 		}
 	}
 
 	[Command]
 	private void SpoofHit()
 	{
-		RecieveHit(facing, Vector3.zero, null);
+		RecieveHit(facing, Vector3.zero, null, null);
 	}
 
 	[ClientRpc]
-	private void RecieveHit(int knockbackDir, Vector3 hitPosition, Transform source)
+	private void RecieveHit(int knockbackDir, Vector3 hitPosition, Transform source, Transform owner)
 	{
 		if (!isLocalPlayer || stasis || GameManager.Instance.IsLevelShop())
 		{
@@ -953,7 +935,7 @@ public class PlayerController : NetworkBehaviour
 		animator.SetBool("hurt", value: true);
 		hitStun = true;
 		hitStunTime = Time.time + knockbackDuration;
-		move.OverrideCurve(knockbackSpeed, knockbackCurve, knockbackDir);
+		move.OverrideCurve(knockbackSpeed + speedMod, knockbackCurve, knockbackDir);
 		jump.ForceLanding();
 		jump.ForceVelocity(30f);
 		DoHitstop(0.15f);
@@ -966,7 +948,11 @@ public class PlayerController : NetworkBehaviour
 		}
 		if (health > 0 && crowns > 0)
 		{
-			health -= 50;
+			if (source != null) {
+				health -= 50 + owner.GetComponent<PlayerController>().powerMod;
+			} else {
+				health -= 50;
+			}
 			UpdateHealthDisplay(health, maxHealth);
 			if (health <= 0)
 			{
@@ -1079,18 +1065,23 @@ public class PlayerController : NetworkBehaviour
 			break;
 		case PickupType.ITEM_POTION_HEALTH:
 			VFXManager.Instance.SyncFloatingText("Health +1", transform.position + 3 * Vector3.up, Color.red);
+			IncreaseStat(Stat.HEALTH);
 			break;
 		case PickupType.ITEM_POTION_POWER:
 			VFXManager.Instance.SyncFloatingText("Power +1", transform.position + 3 * Vector3.up, Color.green);
+			IncreaseStat(Stat.POWER);
 			break;
 		case PickupType.ITEM_POTION_SKILL:
 			VFXManager.Instance.SyncFloatingText("Skill +1", transform.position + 3 * Vector3.up, Color.blue);
+			IncreaseStat(Stat.SKILL);
 			break;
 		case PickupType.ITEM_POTION_SPEED:
 			VFXManager.Instance.SyncFloatingText("Speed +1", transform.position + 3 * Vector3.up, Color.cyan);
+			IncreaseStat(Stat.SPEED);
 			break;
 		case PickupType.ITEM_POTION_STAMINA:
 			VFXManager.Instance.SyncFloatingText("Stamina +1", transform.position + 3 * Vector3.up, Color.yellow);
+			IncreaseStat(Stat.STAMINA);
 			break;
 		case PickupType.WEAPON_PICK:
 			weaponId = 0;
@@ -1470,12 +1461,43 @@ public class PlayerController : NetworkBehaviour
 			SendAmmoRefresh();
 		}
 
-		[Server] void SendAmmoRefresh() {
+		[Command] void SendAmmoRefresh() {
 			RecieveAmmoRefresh();
 		}
 
 		[ClientRpc] void RecieveAmmoRefresh() {
 			hasAmmo = true;
+		}
+	}
+
+	private void IncreaseStat(Stat stat) {
+		if (isServer) {
+			RecieveStatIncrease(stat);
+		} else {
+			SendStatIncrease(stat);
+		}
+
+		[Command] void SendStatIncrease(Stat stat) {
+			RecieveStatIncrease(stat);
+		}
+
+		[ClientRpc] void RecieveStatIncrease(Stat stat) {
+			stats[(int)stat]++;
+
+			healthMod = 25 * stats[(int)Stat.HEALTH];
+			skillMod = Mathf.Min(0.5f * stats[(int)Stat.SKILL], 3f);
+			powerMod = 30 * stats[(int)Stat.POWER];
+			speedMod = 1f * stats[(int)Stat.SPEED];
+			staminaMod = Mathf.Min(0.1f * stats[(int)Stat.STAMINA], 1);
+
+			string currstats = "Stats:\n";
+			foreach (var s in stats) {
+				currstats += $"{s}\n";
+			}
+			Debug.Log(currstats);
+			Debug.Log($"{maxHealth}, {skillCooldown}, {powerMod}, {speedMod}, {staminaCooldown}");
+
+			move.AdjustBaseSpeed(speedMod);
 		}
 	}
 }

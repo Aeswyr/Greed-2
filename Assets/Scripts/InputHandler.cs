@@ -141,6 +141,10 @@ public class InputHandler : MonoBehaviour
 
 	public void Move(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		dir = ctx.ReadValue<float>();
 		buttons[0].Set(ctx);
@@ -151,51 +155,82 @@ public class InputHandler : MonoBehaviour
 
 	public void Aim(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		Vector2 vector = aim;
 		vector.y = ctx.ReadValue<float>();
 		aim = vector;
-		//buttons[8].Set(ctx); fly button?
 	}
 
 	public void Jump(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[1].Set(ctx);
 	}
 
 	public void Primary(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[2].Set(ctx);
 	}
 
 	public void Secondary(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[3].Set(ctx);
 	}
 
 	public void Item(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[4].Set(ctx);
 	}
 
 	public void Interact(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[5].Set(ctx);
 	}
 
 	public void Menu(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[6].Set(ctx);
 	}
 
 	public void Any(InputAction.CallbackContext ctx)
 	{
+		if (buttons == null) {
+			return;
+		}
+
 		UpdateActiveController(ctx);
 		buttons[7].Set(ctx);
 	}

@@ -3,10 +3,16 @@ using Mirror;
 using Steamworks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
+	[SerializeField]
+	private GameObject joinMenu;
+	[SerializeField]
+	private GameObject mainMenu;
+
 	[SerializeField]
 	private GameObject joinPrefab;
 
@@ -21,14 +27,28 @@ public class MainMenuManager : MonoBehaviour
 
 	[SerializeField]
 	private GameObject networkPrefab;
+	[SerializeField]
+	private NetworkManager networkManager;
+	[SerializeField]
+	private PlayerInputManager playerInput;
 
 	private void Start()
 	{
+		playerInput.onPlayerJoined += FirstPlayerJoined;
+
 		if (FindObjectOfType<NetworkAnimator>() == null)
 		{
 			Instantiate(networkPrefab);
 		}
 		GetFriendLobbies();
+
+		mainMenu.SetActive(true);
+		joinMenu.SetActive(false);
+	}
+
+	private void FirstPlayerJoined(PlayerInput player) {
+		playerInput.DisableJoining();
+		playerInput.onPlayerJoined -= FirstPlayerJoined;
 	}
 
 	public void RefreshLobbies()
@@ -85,8 +105,24 @@ public class MainMenuManager : MonoBehaviour
 		Application.Quit();
 	}
 
+	public void OnLocal() {
+		playerInput.EnableJoining();
+
+		networkManager.maxConnections = 0;
+		networkManager.StartHost();
+	}
 	public void OnHost()
 	{
 		FindObjectOfType<SteamManager>().Host();
+	}
+
+	public void OnJoin() {
+		mainMenu.SetActive(false);
+		joinMenu.SetActive(true);
+	}
+
+	public void OnBack() {
+		mainMenu.SetActive(true);
+		joinMenu.SetActive(false);
 	}
 }

@@ -42,11 +42,14 @@ public class MovementHandler : MonoBehaviour
 
 	private float storedVelocity;
 
+	private float baseSpeed => speed + speedMod;
+	private float speedMod;
+
 	private void Awake()
 	{
 		accelerationTime = accelerationCurve[accelerationCurve.length - 1].time;
 		decelerationTime = decelerationCurve[decelerationCurve.length - 1].time;
-		maxSpeed = speed;
+		maxSpeed = baseSpeed;
 	}
 
 	private void FixedUpdate()
@@ -71,7 +74,7 @@ public class MovementHandler : MonoBehaviour
 			{
 				rbody.velocity = rbody.velocity.y * Vector2.up;
 			}
-			maxSpeed = speed;
+			maxSpeed = baseSpeed;
 		}
 	}
 
@@ -80,7 +83,7 @@ public class MovementHandler : MonoBehaviour
 		moving = false;
 		currentCurve = decelerationCurve;
 		curveTime = decelerationTime;
-		currentSpeed = speed;
+		currentSpeed = baseSpeed;
 		if (Mathf.Abs(rbody.velocity.x) < currentSpeed)
 		{
 			currentSpeed = Mathf.Abs(rbody.velocity.x);
@@ -93,7 +96,7 @@ public class MovementHandler : MonoBehaviour
 		moving = true;
 		currentCurve = accelerationCurve;
 		curveTime = accelerationTime;
-		currentSpeed = speed;
+		currentSpeed = baseSpeed;
 		timestamp = Time.time + curveTime;
 	}
 
@@ -133,7 +136,7 @@ public class MovementHandler : MonoBehaviour
 
 	public void ResetCurves()
 	{
-		currentSpeed = speed;
+		currentSpeed = baseSpeed;
 	}
 
 	public void Pause(float endPause)
@@ -153,5 +156,10 @@ public class MovementHandler : MonoBehaviour
 			storedVelocity = rbody.velocity.x;
 			rbody.velocity = new Vector2(0f, rbody.velocity.y);
 		}
+	}
+
+	public void AdjustBaseSpeed(float mod) {
+		speedMod = mod;
+		maxSpeed = baseSpeed;
 	}
 }
