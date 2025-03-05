@@ -1705,7 +1705,6 @@ MonoBehaviour:
   playButton: {fileID: 1478922280}
   networkPrefab: {fileID: 928625649}
   networkManager: {fileID: 928625653}
-  playerInput: {fileID: 2122626543}
 --- !u!1 &1817257736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1905,7 +1904,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 3
   m_MaxPlayerCount: 8
   m_AllowJoining: 1
   m_JoinBehavior: 0

@@ -145,6 +145,8 @@ public class InputHandler : MonoBehaviour
 			return;
 		}
 
+		Debug.Log("moving!!");
+
 		UpdateActiveController(ctx);
 		dir = ctx.ReadValue<float>();
 		buttons[0].Set(ctx);

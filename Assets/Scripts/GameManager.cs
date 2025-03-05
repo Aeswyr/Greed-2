@@ -5,10 +5,13 @@ using Mirror.RemoteCalls;
 using Telepathy;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
+	[SerializeField]
+	private GameObject playerPrefab;
 	[SerializeField]
 	private GameObject hitboxPrefab;
 
@@ -49,14 +52,32 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public Transform PlayerLobbyHolder => playerLobbyHolder;
 
+	public bool IsLocalGame {
+		get;
+		private set;
+	}
+
 	private void Start()
 	{
+		if (PlayerInputManager.instance != null) {
+			IsLocalGame = true;
+			PlayerInputManager.instance.onPlayerJoined += AddLocalPlayer;
+		}
+
 		LoadLevelObjects();
 	}
 
 	public int TotalPlayerCount()
 	{
 		return FindObjectsOfType<PlayerController>().Length;
+	}
+
+	public void AddLocalPlayer(PlayerInput input) {
+		Debug.Log("Creating new player");
+
+		var playerObj = Instantiate(playerPrefab);
+		NetworkServer.Spawn(playerObj);
+		playerObj.GetComponent<PlayerController>().SetupInput(input.GetComponent<InputHandler>());
 	}
 
 	public void AddLobbyCard(PlayerController player, InputHandler input)
@@ -108,6 +129,10 @@ public class GameManager : NetworkSingleton<GameManager>
 	[ClientRpc]
 	private void SyncGameStart()
 	{
+		if (IsLocalGame) {
+			Destroy(FindObjectOfType<PlayerInputManager>());
+		}
+
 		HandlePlayerSpawns();
 
 		playerLobby.SetActive(value: false);
@@ -303,7 +328,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	[Command(requiresAuthority = false)] private void NotifyReadyToLoad() {
 		readyPings++;
 
-		if (readyPings >= FindObjectsOfType<PlayerController>().Length) {
+		if (readyPings >= TotalPlayerCount() || IsLocalGame) {
 			readyPings = 0;
 
 			int nextLevelId = 0;

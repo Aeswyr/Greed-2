@@ -202,6 +202,8 @@ public class PlayerController : NetworkBehaviour
 	private float speedMod;
 	private int powerMod;
 
+	new public bool isLocalPlayer => base.isLocalPlayer || GameManager.Instance.IsLocalGame;
+
 	private void Start()
 	{
 		health = maxHealth;
@@ -209,12 +211,33 @@ public class PlayerController : NetworkBehaviour
 		sprite.material = colors[currentColor];
 		if (isLocalPlayer)
 		{
-			input = FindObjectOfType<InputHandler>();
-			jump.SetInput(input);
-			GameManager.Instance.AddLobbyCard(this, input);
+			if (input == null) {
+				SetupInput(FindObjectOfType<InputHandler>());
+			}
+		}
+
+		if (GameManager.Instance.IsLocalGame && isClient) {
+			GrantAuthority();
+		}
+
+		[Command(requiresAuthority = false)] void GrantAuthority() {
+			PlayerController[] array = FindObjectsOfType<PlayerController>();
+			NetworkConnectionToClient conn = null;
+			foreach (var player in array) {
+				if (player.connectionToClient != null) {
+					conn = player.connectionToClient;
+				}
+			}
+			this.netIdentity.AssignClientAuthority(conn);
 		}
 		
 		unitUI.SetNameplate(Utils.GetLocalSteamName());
+	}
+
+	public void SetupInput(InputHandler input) {
+			this.input = input;
+			jump.SetInput(input);
+			GameManager.Instance.AddLobbyCard(this, input);
 	}
 
 	[Server] public void AssignId(int id) {

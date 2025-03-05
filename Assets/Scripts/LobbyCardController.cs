@@ -46,7 +46,9 @@ public class LobbyCardController : NetworkBehaviour
 		{
 			transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
 		}
-		input = FindObjectOfType<InputHandler>();
+		if (input == null) {
+			input = FindObjectOfType<InputHandler>();
+		}
 		if (player != null && player.isLocalPlayer)
 		{
 			SyncCardName(SteamUser.GetSteamID().m_SteamID);

@@ -49,6 +49,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  playerPrefab: {fileID: 1614625426629266069, guid: bc8aff305ec88d8439ca1af5d142062e, type: 3}
   hitboxPrefab: {fileID: 6270408004382830173, guid: a752c5221aa7f254fb8d8cbced7296ca, type: 3}
   projectilePrefab: {fileID: 4487121627072284427, guid: e60a7db48182ff446983b02c88f14a0c, type: 3}
   pickupPrefab: {fileID: 3715200049304643111, guid: 0c0910197bc4fab4bb7fc08a5ab49096, type: 3}
