@@ -48,6 +48,9 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private PlayerUIController unitUI;
+	
+	[SerializeField]
+	private HurtboxController hurtbox;
 
 	[SerializeField]
 	private InteractboxController interactBox;
@@ -932,6 +935,14 @@ public class PlayerController : NetworkBehaviour
 		{
 			return;
 		}
+
+		if (source != null && source.TryGetComponent<ProjectileData>(out var p)) {
+			if (hurtbox.HasSeenHitbox(source)) {
+				return;
+			}
+			hurtbox.MarkHitboxSeen(source);
+		}
+
 		if (invuln != 0)
 		{
 			if (invuln == InvulnState.PARRY)
@@ -971,7 +982,7 @@ public class PlayerController : NetworkBehaviour
 		}
 		if (health > 0 && crowns > 0)
 		{
-			if (source != null) {
+			if (owner != null) {
 				health -= 50 + owner.GetComponent<PlayerController>().powerMod;
 			} else {
 				health -= 50;

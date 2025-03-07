@@ -328,6 +328,7 @@ MonoBehaviour:
   ground: {fileID: 8159103413656961595}
   unitVFX: {fileID: 1540460984353991659}
   unitUI: {fileID: 6560019811812238406}
+  hurtbox: {fileID: 3317204567871656676}
   interactBox: {fileID: 4221439202891782295}
   colors: {fileID: 11400000, guid: 9b1a20cac212b624ea8e2dd8457c30d0, type: 2}
   wallJumpDuration: 0.5
@@ -366,7 +367,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  staminaCooldown: 2
   dodgeSpeed: 22
   dodgeCurve:
     serializedVersion: 2

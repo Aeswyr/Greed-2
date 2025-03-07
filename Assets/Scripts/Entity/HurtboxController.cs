@@ -7,29 +7,26 @@ public class HurtboxController : MonoBehaviour
 	[SerializeField]
 	private UnityEvent<HitboxData> action;
 
-	private List<Collider2D> hitColliders = new();
+	private List<Transform> seenHitboxes = new();
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (hitColliders.Contains(other))
-			return;
-
 		if (other.transform.parent != null && other.transform.parent.TryGetComponent<PlayerController>(out var component))
 		{
 			component.DoHitstop(0.15f);
 		}
 		action?.Invoke(other.GetComponent<HitboxData>());
-
-		CleanColliders();
-		hitColliders.Add(other);
 	}
 
-	public void CleanColliders() {
-		for (int i = 0; i < hitColliders.Count; i++) {
-			if (hitColliders == null) {
-				hitColliders.RemoveAt(i);
-				i--;
-			}
+	public void MarkHitboxSeen(Transform hitbox) {
+		seenHitboxes.Add(hitbox);
+
+		while (seenHitboxes.Count > 10) {
+			seenHitboxes.RemoveAt(0);
 		}
+	}
+
+	public bool HasSeenHitbox(Transform hitbox) {
+		return seenHitboxes.Contains(hitbox);
 	}
 }
