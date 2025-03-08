@@ -53,10 +53,6 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
-		//TODO once bow is implemented, just get rid of this block
-		if (item == PickupType.WEAPON_BOW) {
-			VFXManager.Instance.SyncFloatingText("You should be ashamed.", transform.position + 5 * Vector3.up, Color.red);
-		}
 		owner.GetItem(item);
 	
 		if (singleUse)
