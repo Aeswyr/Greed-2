@@ -29,7 +29,7 @@ public class UnitVFXController : NetworkBehaviour
 				activeImages.RemoveAt(i);
 				i--;
 			} else if (Time.time > image.next) {
-				CreateAfterimage(image.duration);
+				CreateAfterimage(image);
 				image.next = Time.time + image.delay;
 
 				activeImages[i] = image;
@@ -37,58 +37,83 @@ public class UnitVFXController : NetworkBehaviour
 		}
 	}
 
-	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f)
+	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default)
 	{
-		if (isServer) {
-			RecieveAfterImage(duration, imageDelay, imageDuration);
-		} else {
-			SendAfterImage(duration, imageDelay, imageDuration);
+		if (color == default) {
+			color = Color.white;
 		}
 
-		[Command] void SendAfterImage(float duration, float imageDelay, float imageDuration) {
-			RecieveAfterImage(duration, imageDelay, imageDuration);
-		}
-		
-		[ClientRpc] void RecieveAfterImage(float duration, float imageDelay, float imageDuration) {
-			activeImages.Add(new (){
+		AfterimageData data = new (){
 				end = Time.time + duration,
 				next = Time.time + imageDelay,
 				delay = imageDelay,
-				duration = imageDuration
-			});
+				duration = imageDuration,
+				materialOverride = overrideMaterial,
+				color = color
+			};
+
+		if (isServer) {
+			RecieveAfterImage(data);
+		} else {
+			SendAfterImage(data);
+		}
+
+		[Command] void SendAfterImage(AfterimageData data) {
+			RecieveAfterImage(data);
+		}
+		
+		[ClientRpc] void RecieveAfterImage(AfterimageData data) {
+			activeImages.Add(data);
 		}
 	}
 
-	public void SyncAfterimage(float duration)
+	public void SyncAfterimage(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default)
 	{
+		if (color == default) {
+			color = Color.white;
+		}
+
+		AfterimageData data = new (){
+				end = Time.time + duration,
+				next = Time.time + imageDelay,
+				delay = imageDelay,
+				duration = imageDuration,
+				materialOverride = overrideMaterial,
+				color = color
+			};
+
 		if (isServer)
 		{
-			RecieveAfterimage(duration);
+			RecieveAfterimage(data);
 		}
 		else
 		{
-			SendAfterimage(duration);
+			SendAfterimage(data);
 		}
 			
-		[Command] void SendAfterimage(float duration)
+		[Command] void SendAfterimage(AfterimageData data)
 		{
-			RecieveAfterimage(duration);
+			RecieveAfterimage(data);
 		}
 
-		[ClientRpc] void RecieveAfterimage(float duration)
+		[ClientRpc] void RecieveAfterimage(AfterimageData data)
 		{
-			CreateAfterimage(duration);
+			CreateAfterimage(data);
 		}
 	}
 
-	private void CreateAfterimage(float duration) {
+	private void CreateAfterimage(AfterimageData data) {
 		GameObject gameObject = Instantiate(VFXManager.Instance.GetAfterimagePrefab(), transform.position, Quaternion.identity);
 		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
 		SpriteRenderer spriteRenderer = sprite;
 		component.sprite = spriteRenderer.sprite;
-		component.material = spriteRenderer.material;
+		if (data.materialOverride)
+			component.material = spriteRenderer.material;
+		else 
+			component.color = data.color;
 		component.flipX = spriteRenderer.flipX;
-		gameObject.GetComponent<DestroyAfterDelay>().Init(duration);
+		gameObject.GetComponent<DestroyAfterDelay>().Init(data.duration);
+		gameObject.GetComponent<AlphaDecay>().SetDuration(data.duration);
 	}
 
 	public void SetFXState(PlayerVFX fx, bool state)
@@ -153,5 +178,8 @@ public class UnitVFXController : NetworkBehaviour
 		public float next;
 		public float duration;
 		public float delay;
+		public bool materialOverride;
+		public Color color;
+
 	}
 }

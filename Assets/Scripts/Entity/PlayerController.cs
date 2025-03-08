@@ -1559,13 +1559,35 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	public void GiveBuff(BuffType type) {
-		unitVFX.SetFXState(PlayerVFX.POWERUP_GENERIC, true);
-		unitVFX.StartAfterImageChain(10f, 0.05f, 0.1f);
+		var buffColor = Color.magenta;
 
 		if (type == BuffType.RANDOM)
 			type = (BuffType)Random.Range(0, (int)BuffType.RANDOM);
 
-		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, Color.magenta);
+		switch (type) {
+			case BuffType.BARRIER:
+				buffColor = Color.gray;
+				break;
+			case BuffType.SWIFT:
+				buffColor = Color.yellow;
+				break;
+			case BuffType.BLOODLUST:
+				buffColor = Color.red;
+				break;
+			case BuffType.GREED:
+				buffColor = Color.green;
+				break;
+			case BuffType.GHOSTFORM:
+				buffColor = Color.cyan;
+				break;
+		}
+
+		unitVFX.SetFXState(PlayerVFX.POWERUP_GENERIC, true);
+		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, buffColor);
+		
+		buffColor.a = 0.5f;
+		unitVFX.StartAfterImageChain(10f, 0.05f, 0.2f, false, buffColor);
+
 		SendBuff(type);
 
 		[Command(requiresAuthority = false)] void SendBuff(BuffType type) {
