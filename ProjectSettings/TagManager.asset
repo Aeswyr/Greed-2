@@ -19,8 +19,8 @@ TagManager:
   - CollectBox
   - Interactbox
   - Interactable
-  - 
-  - 
+  - Detect
+  - PlayerDetect
   - 
   - 
   - 

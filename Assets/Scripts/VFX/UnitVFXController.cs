@@ -19,21 +19,44 @@ public class UnitVFXController : NetworkBehaviour
 	private float afterImageDelay;
 
 	private float nextImage;
+	private List<AfterimageData> activeImages = new();
 
 	private void FixedUpdate()
 	{
-		if (Time.time < afterImageTimer && Time.time > nextImage)
-		{
-			SyncAfterimage(0.5f);
-			nextImage = Time.time + afterImageDelay;
+		for (int i = 0; i < activeImages.Count; i++) {
+			var image = activeImages[i];
+			if (Time.time > image.end) {
+				activeImages.RemoveAt(i);
+				i--;
+			} else if (Time.time > image.next) {
+				CreateAfterimage(image.duration);
+				image.next = Time.time + image.delay;
+
+				activeImages[i] = image;
+			}
 		}
 	}
 
-	public void StartAfterImageChain(float duration, float delay)
+	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f)
 	{
-		afterImageTimer = Time.time + duration;
-		afterImageDelay = delay;
-		nextImage = Time.time + delay;
+		if (isServer) {
+			RecieveAfterImage(duration, imageDelay, imageDuration);
+		} else {
+			SendAfterImage(duration, imageDelay, imageDuration);
+		}
+
+		[Command] void SendAfterImage(float duration, float imageDelay, float imageDuration) {
+			RecieveAfterImage(duration, imageDelay, imageDuration);
+		}
+		
+		[ClientRpc] void RecieveAfterImage(float duration, float imageDelay, float imageDuration) {
+			activeImages.Add(new (){
+				end = Time.time + duration,
+				next = Time.time + imageDelay,
+				delay = imageDelay,
+				duration = imageDuration
+			});
+		}
 	}
 
 	public void SyncAfterimage(float duration)
@@ -46,17 +69,19 @@ public class UnitVFXController : NetworkBehaviour
 		{
 			SendAfterimage(duration);
 		}
+			
+		[Command] void SendAfterimage(float duration)
+		{
+			RecieveAfterimage(duration);
+		}
+
+		[ClientRpc] void RecieveAfterimage(float duration)
+		{
+			CreateAfterimage(duration);
+		}
 	}
 
-	[Command]
-	private void SendAfterimage(float duration)
-	{
-		RecieveAfterimage(duration);
-	}
-
-	[ClientRpc]
-	private void RecieveAfterimage(float duration)
-	{
+	private void CreateAfterimage(float duration) {
 		GameObject gameObject = Instantiate(VFXManager.Instance.GetAfterimagePrefab(), transform.position, Quaternion.identity);
 		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
 		SpriteRenderer spriteRenderer = sprite;
@@ -121,5 +146,12 @@ public class UnitVFXController : NetworkBehaviour
 		{
 			playerParticles[(int)fx].Stop();
 		}
+	}
+
+	private struct AfterimageData {
+		public float end;
+		public float next;
+		public float duration;
+		public float delay;
 	}
 }

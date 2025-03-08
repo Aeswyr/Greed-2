@@ -9,4 +9,9 @@ public class PickupboxController : MonoBehaviour
 	{
 		owner.DoPickup(other.GetComponent<PickupData>());
 	}
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        owner.DoPickup(other.GetComponent<PickupData>());
+    }
 }

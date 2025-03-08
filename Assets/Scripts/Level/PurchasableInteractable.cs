@@ -9,9 +9,13 @@ public class PurchasableInteractable : NetworkBehaviour
 {
 	[SerializeField]
 	private TextMeshPro priceTag;
+	[SerializeField]
+	private BoxCollider2D interactBox;
 
 	[SerializeField]
 	private UnityEvent<PlayerController> output;
+	[SerializeField]
+	private bool oneTimePurchase;
 
 	private int baseCost = 10;
 
@@ -39,7 +43,18 @@ public class PurchasableInteractable : NetworkBehaviour
 		if (owner.TrySpendMoney(cost))
 		{
 			output.Invoke(owner);
+			if (oneTimePurchase)
+				SendActivation();
 		}
+
+		[Command(requiresAuthority = false)] void SendActivation() {
+            RecieveActivation();
+        }
+
+        [ClientRpc] void RecieveActivation() {
+            priceTag.transform.parent.gameObject.SetActive(false);
+            interactBox.enabled = false;
+        }
 	}
 
 

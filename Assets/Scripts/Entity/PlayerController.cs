@@ -51,6 +51,8 @@ public class PlayerController : NetworkBehaviour
 	
 	[SerializeField]
 	private HurtboxController hurtbox;
+	[SerializeField]
+	private CircleCollider2D pickupBox;
 
 	[SerializeField]
 	private InteractboxController interactBox;
@@ -143,8 +145,8 @@ public class PlayerController : NetworkBehaviour
 	[SerializeField]
 	private AnimationCurve bowReleaseCurve;
 
-	private float staminaCooldown => 2f - staminaMod;
-	private float skillCooldown => 4f - skillMod;
+	private float staminaCooldown => 2.5f - staminaMod - (HasBuff(BuffType.GHOSTFORM) ? 1 : 0);
+	private float skillCooldown => 6f - skillMod;
 
 	private int currentColor;
 
@@ -173,8 +175,8 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 5; //0
-	private int skillId = 5; //-1
+	private int weaponId = 0; //0
+	private int skillId = 7; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -194,16 +196,19 @@ public class PlayerController : NetworkBehaviour
 	private float chargeStart;
 
 	private int[] stats = new int[5];
+	private float[] buffs = new float[(int)BuffType.RANDOM];
+	private bool[] buffDirty = new bool[(int)BuffType.RANDOM];
 	private LayerMask worldMask;
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
 	private bool hasAmmo = true;
 
-	private int healthMod;
-	private float skillMod;
-	private float staminaMod;
-	private float speedMod;
-	private int powerMod;
+	private int healthMod => 25 * stats[(int)Stat.HEALTH];
+	private float skillMod => Mathf.Min(0.5f * stats[(int)Stat.SKILL], 3f);
+	private float staminaMod => Mathf.Min(0.1f * stats[(int)Stat.STAMINA], 1);
+	private float speedMod => 1f * stats[(int)Stat.SPEED];
+	private float speedMult => 1 + (HasBuff(BuffType.SWIFT) ? 0.5f : 0) + (HasBuff(BuffType.GHOSTFORM) ? 0.2f : 0);
+	private int powerMod => 30 * stats[(int)Stat.POWER];
 
 	new public bool isLocalPlayer => base.isLocalPlayer || GameManager.Instance.IsLocalGame;
 
@@ -251,6 +256,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		unitUI.UpdateStamina(1f - (nextStamina - Time.time) / staminaCooldown);
 		unitUI.UpdateSkill(1f - (nextSkill - Time.time) / skillCooldown);
+		DoBuffCleanup();
 		if (!isLocalPlayer || inputLocked)
 		{
 			return;
@@ -397,7 +403,7 @@ public class PlayerController : NetworkBehaviour
 			UpdateDodgeDisplay(staminaCooldown);
 			UpdateFacing(input.dir);
 			animator.SetTrigger("dodge");
-			move.OverrideCurve(dodgeSpeed + speedMod, dodgeCurve, facing);
+			move.OverrideCurve(CalculateSpeed(dodgeSpeed), dodgeCurve, facing);
 			invuln = InvulnState.DODGE;
 			VFXManager.Instance.SyncVFX(ParticleType.DUST_LARGE, transform.position, facing == -1);
 			unitVFX.StartAfterImageChain(0.5f, 0.1f);
@@ -541,7 +547,7 @@ public class PlayerController : NetworkBehaviour
 		case 0:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(pickAttackSpeed + speedMod, pickAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(pickAttackSpeed), pickAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -551,7 +557,7 @@ public class PlayerController : NetworkBehaviour
 		case 1:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(swordAttackSpeed + speedMod, swordAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(swordAttackSpeed), swordAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -559,16 +565,16 @@ public class PlayerController : NetworkBehaviour
 			}
 			break;
 		case 2:
-			move.OverrideCurve(swordLungeSpeed + speedMod, swordLungeCurve, facing);
+			move.OverrideCurve(CalculateSpeed(swordLungeSpeed), swordLungeCurve, facing);
 			break;
 		case 3:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(unarmedAttackSpeed + speedMod, unarmedAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(unarmedAttackSpeed), unarmedAttackCurve, facing);
 			}
 			else if (grounded)
 			{
-				move.OverrideCurve(unarmedShortSpeed + speedMod, unarmedShortCurve, facing);
+				move.OverrideCurve(CalculateSpeed(unarmedShortSpeed), unarmedShortCurve, facing);
 			}
 			break;
 		case 4:
@@ -582,7 +588,7 @@ public class PlayerController : NetworkBehaviour
 		case 5:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldAttackSpeed + speedMod, shieldAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -592,7 +598,7 @@ public class PlayerController : NetworkBehaviour
 		case 6:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldParrySpeed + speedMod, shieldParryCurve, facing);
+				move.OverrideCurve(CalculateSpeed(shieldParrySpeed), shieldParryCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -602,7 +608,7 @@ public class PlayerController : NetworkBehaviour
 		case 7:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(greatweaponAttackSpeed + speedMod, greatweaponAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(greatweaponAttackSpeed), greatweaponAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -612,7 +618,7 @@ public class PlayerController : NetworkBehaviour
 		case 8:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(bowAttackSpeed + speedMod, bowAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -622,7 +628,7 @@ public class PlayerController : NetworkBehaviour
 		case 9:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(shieldAttackSpeed + speedMod, shieldAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -632,7 +638,7 @@ public class PlayerController : NetworkBehaviour
 		case 10:
 			if (input.dir != 0f)
 			{
-				move.OverrideCurve(bowAttackSpeed + speedMod, bowAttackCurve, facing);
+				move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
 			}
 			else if (grounded)
 			{
@@ -655,7 +661,7 @@ public class PlayerController : NetworkBehaviour
 			if (input.dir != 0f)
 			{
 				UpdateFacing(input.dir);
-				move.OverrideCurve(greatweaponReleaseSpeed + speedMod, greatweaponReleaseCurve, facing);
+				move.OverrideCurve(CalculateSpeed(greatweaponReleaseSpeed), greatweaponReleaseCurve, facing);
 			}
 			else
 			{
@@ -670,7 +676,7 @@ public class PlayerController : NetworkBehaviour
 			{
 				UpdateFacing(input.dir);
 			}
-			move.OverrideCurve(bowReleaseSpeed + speedMod, bowReleaseCurve, -facing);
+			move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
 			break;
 		case 10:
 			charging = false;
@@ -680,7 +686,7 @@ public class PlayerController : NetworkBehaviour
 			{
 				UpdateFacing(input.dir);
 			}
-			move.OverrideCurve(bowReleaseSpeed + speedMod, bowReleaseCurve, -facing);
+			move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
 			break;
 		}
 	}
@@ -691,6 +697,7 @@ public class PlayerController : NetworkBehaviour
 		{
 		case 0:
 		case 1:
+		case 7:
 			animator.SetTrigger("skill_self");
 			break;
 		case 3:
@@ -895,6 +902,9 @@ public class PlayerController : NetworkBehaviour
 				.SetUnique(UniqueProjectile.BOMB)
 				.Finish();
 			break;
+		case 7:
+			GiveBuff(BuffType.RANDOM);
+			break;
 		}
 	}
 
@@ -960,6 +970,12 @@ public class PlayerController : NetworkBehaviour
 			return;
 		}
 
+		if (HasBuff(BuffType.BARRIER)) {
+			VFXManager.Instance.SyncVFX(ParticleType.ARMOR, transform.position, facing == -1);
+			buffs[(int)BuffType.BARRIER] = 0;
+			return;
+		}
+
 		if (charging)
 			InterruptCharge();
 
@@ -969,21 +985,31 @@ public class PlayerController : NetworkBehaviour
 		animator.SetBool("hurt", value: true);
 		hitStun = true;
 		hitStunTime = Time.time + knockbackDuration;
-		move.OverrideCurve(knockbackSpeed + speedMod, knockbackCurve, knockbackDir);
+		move.OverrideCurve(CalculateSpeed(knockbackSpeed), knockbackCurve, knockbackDir);
 		jump.ForceLanding();
 		jump.ForceVelocity(30f);
 		DoHitstop(0.15f);
 		if (money > 0)
 		{
 			int num = Mathf.CeilToInt((float)money / 2f);
+			if (owner != null 
+				&& owner.TryGetComponent<PlayerController>(out var player) 
+				&& player.HasBuff(BuffType.BLOODLUST)) {
+				num = money;
+			}
 			DropLoot(num);
 			money -= num;
 			UpdateMoneyDisplay();
 		}
 		if (health > 0 && crowns > 0)
 		{
-			if (owner != null) {
-				health -= 50 + owner.GetComponent<PlayerController>().powerMod;
+			if (owner != null && owner.TryGetComponent<PlayerController>(out var player)) {
+				
+				if (player.HasBuff(BuffType.BLOODLUST)) {
+					health = 0;
+				} else {
+					health -= 50 + owner.GetComponent<PlayerController>().powerMod;
+				}
 			} else {
 				health -= 50;
 			}
@@ -1159,6 +1185,9 @@ public class PlayerController : NetworkBehaviour
 			break;
 		case PickupType.SKILL_BOMB:
 			skillId = 6;
+			break;
+		case PickupType.SKILL_FLASK:
+			skillId = 7;
 			break;
 		}
 	}
@@ -1518,12 +1547,6 @@ public class PlayerController : NetworkBehaviour
 		[ClientRpc] void RecieveStatIncrease(Stat stat) {
 			stats[(int)stat]++;
 
-			healthMod = 25 * stats[(int)Stat.HEALTH];
-			skillMod = Mathf.Min(0.5f * stats[(int)Stat.SKILL], 3f);
-			powerMod = 30 * stats[(int)Stat.POWER];
-			speedMod = 1f * stats[(int)Stat.SPEED];
-			staminaMod = Mathf.Min(0.1f * stats[(int)Stat.STAMINA], 1);
-
 			string currstats = "Stats:\n";
 			foreach (var s in stats) {
 				currstats += $"{s}\n";
@@ -1531,7 +1554,52 @@ public class PlayerController : NetworkBehaviour
 			Debug.Log(currstats);
 			Debug.Log($"{maxHealth}, {skillCooldown}, {powerMod}, {speedMod}, {staminaCooldown}");
 
-			move.AdjustBaseSpeed(speedMod);
+			move.AdjustBaseSpeed(speedMod, speedMult);
 		}
+	}
+
+	public void GiveBuff(BuffType type) {
+		unitVFX.SetFXState(PlayerVFX.POWERUP_GENERIC, true);
+		unitVFX.StartAfterImageChain(10f, 0.05f, 0.1f);
+
+		if (type == BuffType.RANDOM)
+			type = (BuffType)Random.Range(0, (int)BuffType.RANDOM);
+
+		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, Color.magenta);
+		SendBuff(type);
+
+		[Command(requiresAuthority = false)] void SendBuff(BuffType type) {
+			RecieveBuff(type);
+		}
+
+		[ClientRpc] void RecieveBuff(BuffType type) {
+			buffs[(int)type] = Time.time + 10f;
+			buffDirty[(int)type] = true;
+
+			move.AdjustBaseSpeed(speedMod, speedMult);
+
+			if (type == BuffType.GREED)
+				pickupBox.radius = 5f;
+		}
+	}
+
+	public bool HasBuff(BuffType type) {
+		return Time.time < buffs[(int)type];
+	}
+
+	public void DoBuffCleanup() {
+		for (int i = 0; i < (int)BuffType.RANDOM; i++) {
+			if (buffDirty[i] && Time.time > buffs[i]) {
+				buffDirty[i] = false;
+				if ((BuffType)i == BuffType.SWIFT || (BuffType)i == BuffType.GHOSTFORM)
+					move.AdjustBaseSpeed(speedMod, speedMult);
+				if ((BuffType)i == BuffType.GREED)
+					pickupBox.radius = 1f;
+			}
+		}
+	}
+
+	private float CalculateSpeed(float baseSpeed) {
+		return (baseSpeed + speedMod) * speedMult;
 	}
 }

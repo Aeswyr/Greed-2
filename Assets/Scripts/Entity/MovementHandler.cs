@@ -158,8 +158,12 @@ public class MovementHandler : MonoBehaviour
 		}
 	}
 
-	public void AdjustBaseSpeed(float mod) {
-		speedMod = mod;
+	public void AdjustBaseSpeed(float mod, float multiplier = 0) {
+		if (multiplier != 0) {
+			speedMod = (mod + speed) * multiplier - speed;
+		} else {
+			speedMod = mod;
+		}
 		maxSpeed = baseSpeed;
 	}
 }
