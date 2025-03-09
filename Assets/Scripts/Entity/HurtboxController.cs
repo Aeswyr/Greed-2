@@ -8,14 +8,27 @@ public class HurtboxController : MonoBehaviour
 	private UnityEvent<HitboxData> action;
 
 	private List<Transform> seenHitboxes = new();
+	private bool isPlayerOwned;
 
-	private void OnTriggerEnter2D(Collider2D other)
+    void Start()
+    {
+        isPlayerOwned = transform.parent != null && transform.parent.TryGetComponent(out PlayerController owner);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.transform.parent != null && other.transform.parent.TryGetComponent<PlayerController>(out var component))
+		var data = other.GetComponent<HitboxData>();
+		PlayerController player;
+		if (other.transform.parent != null && other.transform.parent.TryGetComponent(out player))
 		{
-			component.DoHitstop(0.15f);
+			player.DoHitstop(0.15f);
 		}
-		action?.Invoke(other.GetComponent<HitboxData>());
+
+		if (data.Owner != null && !isPlayerOwned && data.Owner.TryGetComponent(out player)) {
+			player.OnHitTrigger(data.transform);
+		}
+
+		action?.Invoke(data);
 	}
 
 	public void MarkHitboxSeen(Transform hitbox) {

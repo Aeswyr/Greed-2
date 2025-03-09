@@ -912,6 +912,27 @@ public class PlayerController : NetworkBehaviour
 	{
 	}
 
+	public void OnHitTrigger(Transform source) {
+
+		if (isServer) {
+			RecieveTrigger(source.position);
+		} else {
+			SendTrigger(source.position);
+		}
+
+		[Command] void SendTrigger(Vector3 pos) {
+			RecieveTrigger(pos);
+		}
+
+		[ClientRpc] void RecieveTrigger(Vector3 pos) {
+			if (isLocalPlayer) {
+				if (HasBuff(BuffType.GREED)) {
+					GameManager.Instance.SpawnGemBurst(pos, Random.Range(1, 6));
+				}
+			}
+		}
+
+	}
 	public void OnHit(HitboxData source)
 	{
 		if (source.FriendlyFire || !(source.Owner == transform))
@@ -972,7 +993,7 @@ public class PlayerController : NetworkBehaviour
 
 		if (HasBuff(BuffType.BARRIER)) {
 			VFXManager.Instance.SyncVFX(ParticleType.ARMOR, transform.position, facing == -1);
-			buffs[(int)BuffType.BARRIER] = 0;
+			EndBuff(BuffType.BARRIER);
 			return;
 		}
 
@@ -1008,8 +1029,10 @@ public class PlayerController : NetworkBehaviour
 				if (player.HasBuff(BuffType.BLOODLUST)) {
 					health = 0;
 				} else {
-					health -= 50 + owner.GetComponent<PlayerController>().powerMod;
+					health -= 50 + player.powerMod;
 				}
+
+				player.OnHitTrigger(source);
 			} else {
 				health -= 50;
 			}
@@ -1115,6 +1138,10 @@ public class PlayerController : NetworkBehaviour
 			break;
 		case PickupType.MONEY_LARGE:
 			money += 10;
+			UpdateMoneyDisplay();
+			break;
+		case PickupType.MONEY_BONUS:
+			money += 5;
 			UpdateMoneyDisplay();
 			break;
 		case PickupType.ITEM_CROWN:
@@ -1586,7 +1613,8 @@ public class PlayerController : NetworkBehaviour
 		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, buffColor);
 		
 		buffColor.a = 0.5f;
-		unitVFX.StartAfterImageChain(10f, 0.05f, 0.2f, false, buffColor);
+		unitVFX.EndChain(type.ToString());
+		unitVFX.StartAfterImageChain(10f, 0.05f, 0.2f, false, buffColor, type.ToString());
 
 		SendBuff(type);
 
@@ -1607,6 +1635,11 @@ public class PlayerController : NetworkBehaviour
 
 	public bool HasBuff(BuffType type) {
 		return Time.time < buffs[(int)type];
+	}
+
+	public void EndBuff(BuffType type) {
+		buffs[(int)type] = 0;
+		unitVFX.EndChain(type.ToString());
 	}
 
 	public void DoBuffCleanup() {

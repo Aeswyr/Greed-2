@@ -48,7 +48,7 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void UpdateMerchandise(PickupType oldvalue, PickupType newValue)
 	{
-		sprite.sprite = iconLibrary[(int)(newValue + 4)];
+		sprite.sprite = iconLibrary[(int)(newValue + 6)];
 	}
 
 	public void OnInteract(PlayerController owner)

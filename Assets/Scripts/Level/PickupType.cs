@@ -2,6 +2,7 @@ public enum PickupType
 {
 	MONEY_SMALL,
 	MONEY_LARGE,
+	MONEY_BONUS,
 	ITEM_CROWN,
 	WEAPON_PICK,
 	WEAPON_SWORD,

@@ -185,6 +185,21 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 	}
 
+	public void SpawnGemBurst(Vector3 position, int amount)
+	{
+		while (amount > 0)
+		{
+			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
+			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
+			component.velocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+
+			gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_BONUS, PickupVariant.ALL);
+			amount--;
+			
+			NetworkServer.Spawn(gameObject);
+		}
+	}
+
 	public void SpawnCrown(Vector3 position)
 	{
 		GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);

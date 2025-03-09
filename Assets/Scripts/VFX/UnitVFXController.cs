@@ -37,7 +37,7 @@ public class UnitVFXController : NetworkBehaviour
 		}
 	}
 
-	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default)
+	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default, string tag = null)
 	{
 		if (color == default) {
 			color = Color.white;
@@ -49,7 +49,8 @@ public class UnitVFXController : NetworkBehaviour
 				delay = imageDelay,
 				duration = imageDuration,
 				materialOverride = overrideMaterial,
-				color = color
+				color = color,
+				tag = tag
 			};
 
 		if (isServer) {
@@ -79,7 +80,8 @@ public class UnitVFXController : NetworkBehaviour
 				delay = imageDelay,
 				duration = imageDuration,
 				materialOverride = overrideMaterial,
-				color = color
+				color = color,
+				tag = null
 			};
 
 		if (isServer)
@@ -114,6 +116,26 @@ public class UnitVFXController : NetworkBehaviour
 		component.flipX = spriteRenderer.flipX;
 		gameObject.GetComponent<DestroyAfterDelay>().Init(data.duration);
 		gameObject.GetComponent<AlphaDecay>().SetDuration(data.duration);
+	}
+
+	public void EndChain(string tag) {
+		if (isServer) {
+			RecieveTag(tag);
+		} else {
+			SendTag(tag);
+		}
+		[Command] void SendTag(string tag) {
+			RecieveTag(tag);
+		}
+
+		[ClientRpc] void RecieveTag(string tag) {
+			for (int i = 0; i < activeImages.Count; i++) {
+				if (activeImages[i].tag == tag) {
+					activeImages.RemoveAt(i);
+					i--;
+				}
+			}
+		}
 	}
 
 	public void SetFXState(PlayerVFX fx, bool state)
@@ -172,14 +194,36 @@ public class UnitVFXController : NetworkBehaviour
 			playerParticles[(int)fx].Stop();
 		}
 	}
-
-	private struct AfterimageData {
+}
+	public struct AfterimageData {
 		public float end;
 		public float next;
 		public float duration;
 		public float delay;
 		public bool materialOverride;
 		public Color color;
+		public string tag;
 
+		public void Write(NetworkWriter writer)
+		{
+			writer.Write(end);
+			writer.Write(next);
+			writer.Write(duration);
+			writer.Write(delay);
+			writer.Write(materialOverride);
+			writer.Write(color);
+			writer.Write(tag);
+		}
+
+		public AfterimageData Read(NetworkReader reader)
+		{
+			end = reader.Read<float>();
+			next = reader.Read<float>();
+			duration = reader.Read<float>();
+			delay = reader.Read<float>();
+			materialOverride = reader.Read<bool>();
+			color = reader.Read<Color>();
+			tag = reader.Read<string>();
+			return this;
+		}
 	}
-}

@@ -33,6 +33,7 @@ public class PickupData : NetworkBehaviour
 	private float startFloat;
 
 	private Vector2 baseVelocity;
+	private bool collected;
 
 	public void Init(PickupType type, PickupVariant variant = PickupVariant.ALL)
 	{
@@ -80,28 +81,29 @@ public class PickupData : NetworkBehaviour
 
 	private void UpdateSprite()
 	{
-		if (type == PickupType.MONEY_SMALL || type == PickupType.MONEY_LARGE)
+		if (type == PickupType.MONEY_SMALL || type == PickupType.MONEY_LARGE || type == PickupType.MONEY_BONUS)
 		{
 			if (variant == PickupVariant.ALL)
 			{
-				this.variant = (PickupVariant)Random.Range(0, 3);
+				variant = (PickupVariant)Random.Range(0, 3);
 			}
 			int i = (int)(3 * (int)type + variant);
 			sprite.sprite = icons[i];
 		}
 		else
 		{
-			sprite.sprite = icons[(int)(type + 4)];
+			sprite.sprite = icons[(int)type + 6];
 		}
 	}
 
 	public bool CanPickup()
 	{
-		return Time.time > lockout;
+		return Time.time > lockout && !collected;
 	}
 
 	public void OnPickup()
 	{
+		collected = true;
 		Cleanup();
 		[Command(requiresAuthority = false)]
 		void Cleanup()
@@ -119,5 +121,4 @@ public class PickupData : NetworkBehaviour
 	{
 		return variant;
 	}
-
 }
