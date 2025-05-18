@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5767d3431f9a07d42931d4100d50025f
+guid: 4517fa104b5dbf646a2413aa66003315
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -81,7 +81,7 @@ ScriptedImporter:
     mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
-    generateAnimationClips: 0
+    generateAnimationClips: 1
     addSortingGroup: 1
     addShadowCasters: 0
   asepriteImporterSettings:
@@ -94,11 +94,11 @@ ScriptedImporter:
     mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
-    generateAnimationClips: 0
+    generateAnimationClips: 1
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638830070924354887
+  platformSettingsDirtyTick: 638742835831263458
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -122,18 +122,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: destructable_0
+  - name: Frame_0
     originalName: 
-    pivot: {x: 0.4615385, y: 0}
+    pivot: {x: 0.5, y: -1}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 26
-      height: 11
-    spriteID: 4b06f544d76a7e64d88cd5a32c472d64
+      width: 28
+      height: 12
+    spriteID: 094220d505ea010428f0f52a0a5d1b55
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -145,21 +145,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 1337133659
-    name: destructable_0
+    guid: 1184348162
+    name: proj_bomb
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: destructable_0
+    - name: shop
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 4
-        y: 0
-        width: 26
-        height: 11
-      spriteId: 4b06f544d76a7e64d88cd5a32c472d64
+        x: 18
+        y: 12
+        width: 28
+        height: 12
+      spriteId: 094220d505ea010428f0f52a0a5d1b55
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -202,5 +202,5 @@ ScriptedImporter:
   generatePhysicsShape: 1
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 32, y: 32}
+  canvasSize: {x: 64, y: 64}
   previousTextureSize: {x: 64, y: 32}

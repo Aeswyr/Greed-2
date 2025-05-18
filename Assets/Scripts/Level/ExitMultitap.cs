@@ -23,7 +23,7 @@ public class ExitMultitap : NetworkBehaviour
             taps++;
             nextTap = Time.time + 1f;
             #if UNITY_EDITOR
-                nextTap = Time.time;
+                //nextTap = Time.time;
             #endif
         }
     }

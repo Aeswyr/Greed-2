@@ -44,6 +44,12 @@ public class ShopInteractable : NetworkBehaviour
 			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_CROWN, (int)PickupType.MAX);
 			break;
 		}
+
+		if (gameObject.TryGetComponent(out PurchasableInteractable purchase)) {
+			purchase.PriceByItem(item);
+		} else if (gameObject.TryGetComponent(out AuctionableInteractable auction)) {
+			auction.PriceByItem(item);
+		}
 	}
 
 	public void UpdateMerchandise(PickupType oldvalue, PickupType newValue)

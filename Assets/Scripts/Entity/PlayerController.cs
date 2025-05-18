@@ -176,7 +176,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 	private int weaponId = 0; //0
-	private int skillId = 7; //-1
+	private int skillId = -1; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -410,6 +410,10 @@ public class PlayerController : NetworkBehaviour
 		}
 		if ((!acting || attackCancel) && input.attack.pressed)
 		{
+			if (HasBuff(BuffType.BARRIER)) {
+				EndBuff(BuffType.BARRIER);
+			}
+
 			if (attackCancel)
 				OnAttackCancel();
 
@@ -1638,8 +1642,19 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	public void EndBuff(BuffType type) {
-		buffs[(int)type] = 0;
 		unitVFX.EndChain(type.ToString());
+		if (isServer) {
+			RecieveEndBuff(type);
+		} else {
+			SendEndBuff(type);
+		}
+		[Command] void SendEndBuff(BuffType type) {
+			RecieveEndBuff(type);
+		}
+
+		[ClientRpc] void RecieveEndBuff(BuffType type) {
+			buffs[(int)type] = 0;
+		}
 	}
 
 	public void DoBuffCleanup() {

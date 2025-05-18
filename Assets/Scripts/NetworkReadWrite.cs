@@ -21,4 +21,14 @@ public static class NetworkReadWrite
 	{
 		return default(AttackBuilder).Read(reader);
 	}
+
+	public static void WriteAfterimageData(this NetworkWriter writer, AfterimageData value)
+	{
+		value.Write(writer);
+	}
+
+	public static AfterimageData ReadAfterimageData(this NetworkReader reader)
+	{
+		return default(AfterimageData).Read(reader);
+	}
 }

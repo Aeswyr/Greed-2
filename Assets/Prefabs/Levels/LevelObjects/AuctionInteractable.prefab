@@ -339,6 +339,7 @@ MonoBehaviour:
   syncInterval: 0
   priceTag: {fileID: 2374024659696944636}
   auctionTimeout: {fileID: 3377697043254781358}
+  baseCosts: {fileID: 11400000, guid: 01f79e9104034e442baa1b92020a5a9b, type: 2}
   output:
     m_PersistentCalls:
       m_Calls:

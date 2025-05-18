@@ -264,7 +264,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			yield return new WaitUntil(() => playerController.PlayerID != -1);
 
-			playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position;
+			playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position + 2 * Vector3.up;
 			playerController.EnterLevel();
 			playerController.PingNameplate();
 			levelDisplay.text = levelCount.ToString("D2");
@@ -287,17 +287,39 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			if (isServer)
 			{
+				if (levelObjectSpawn.ShouldCancelSpawn()) {
+					Destroy(levelObjectSpawn.gameObject);
+					continue;
+				}
+
 				GameObject gameObject = Instantiate(levelObjectSpawn.GetSpawn(), levelObjectSpawn.transform.position, levelObjectSpawn.transform.rotation);
 				if (!string.IsNullOrEmpty(levelObjectSpawn.GetExtraData()))
 				{
-					string[] array2 = levelObjectSpawn.GetExtraData().Split(' ');
-					string text = array2[0];
-					string text2 = text;
-					if (text2 == "shop")
-					{
-						gameObject.GetComponent<ShopInteractable>().SetupMerchandise(array2[1]);
+					string[] commands = levelObjectSpawn.GetExtraData().Split(',');
+					foreach (var command in commands) {
+						ParseCommand(command.Split(' '));
 					}
 				}
+				
+				void ParseCommand(string[] components) {
+					switch (components[0]) {
+						case "shop":
+							gameObject.GetComponent<ShopInteractable>().SetupMerchandise(components[1]);
+							break;
+						case "index":
+							if (levelObjectSpawn.GetSpawnedIndex() == int.Parse(components[1])) {
+								string[] command = new string[components.Length - 2];
+								for (int i = 0; i < command.Length; i++)
+									command[i] = components[i + 2];
+								ParseCommand(command);
+							}
+							break;
+						case "flip":
+							gameObject.GetComponent<SpriteRenderer>().flipX = true;
+							break;
+					}
+				}
+
 				NetworkServer.Spawn(gameObject);
 			}
 			Destroy(levelObjectSpawn.gameObject);

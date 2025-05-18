@@ -14,6 +14,8 @@ public class AuctionableInteractable : NetworkBehaviour
 
 	[SerializeField]
 	private TextMeshPro auctionTimeout;
+	[SerializeField]
+	private PickupPriceLibrary baseCosts;
 
 	[SerializeField]
 	private UnityEvent<PlayerController> output;
@@ -21,6 +23,7 @@ public class AuctionableInteractable : NetworkBehaviour
 	private Dictionary<PlayerController, int> bidders = new Dictionary<PlayerController, int>();
 
 	private int baseCost = 10;
+
 
 	private PlayerController localPlayer;
 
@@ -34,12 +37,19 @@ public class AuctionableInteractable : NetworkBehaviour
 	private void Start()
 	{
 		if (isServer)
-		{
-			int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 10);
-			cost = num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num);
-		}
+			CalculateCost();
 		auctionTimeout.text = "10s";
 		auctionTimeout.color = Color.green;
+	}
+
+	public void PriceByItem(PickupType type) {
+		baseCost = baseCosts[type];
+		CalculateCost();
+	}
+
+	private void CalculateCost() {
+		int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 10);
+		cost = num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num);
 	}
 
 	private void FixedUpdate()

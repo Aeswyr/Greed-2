@@ -88,7 +88,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  purchaseLockout: 0
   oneTimePurchase: 1
+  levelPurchasable: 1
 --- !u!114 &-5949783712635622121
 MonoBehaviour:
   m_ObjectHideFlags: 0
