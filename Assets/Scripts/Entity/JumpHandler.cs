@@ -64,7 +64,7 @@ public class JumpHandler : MonoBehaviour
 			if (paused)
 			{
 				paused = false;
-				rbody.velocity = new Vector2(rbody.velocity.x, storedVelocity);
+				rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, storedVelocity);
 				timeStamp += pausedUntil - pauseStarted;
 				rbody.gravityScale = gravity;
 			}
@@ -74,11 +74,11 @@ public class JumpHandler : MonoBehaviour
 			}
 			if (Time.time - timeStamp <= maxTime)
 			{
-				rbody.velocity = new Vector2(rbody.velocity.x, velocityScalar * curve.Evaluate(Time.time - timeStamp));
+				rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, velocityScalar * curve.Evaluate(Time.time - timeStamp));
 			}
-			if (rbody.velocity.y < 0f - currentTerminalVelocity)
+			if (rbody.linearVelocity.y < 0f - currentTerminalVelocity)
 			{
-				rbody.velocity = new Vector2(rbody.velocity.x, 0f - currentTerminalVelocity);
+				rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, 0f - currentTerminalVelocity);
 			}
 		}
 	}
@@ -118,8 +118,8 @@ public class JumpHandler : MonoBehaviour
 		paused = true;
 		pauseStarted = Time.time;
 		pausedUntil = endPause;
-		storedVelocity = rbody.velocity.y;
-		rbody.velocity = new Vector2(rbody.velocity.x, 0f);
+		storedVelocity = rbody.linearVelocity.y;
+		rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, 0f);
 		rbody.gravityScale = 0f;
 	}
 
@@ -140,7 +140,7 @@ public class JumpHandler : MonoBehaviour
 
 	public void ForceVelocity(float velocity)
 	{
-		rbody.velocity = new Vector2(rbody.velocity.x, velocity);
+		rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, velocity);
 	}
 
 	public void SetTerminalVelocity(float val)

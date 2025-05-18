@@ -121,7 +121,7 @@ public struct ProjectileBuilder
 			component.ApplyLifetime(lifetime);
 		}
 		var rbody = gameObject.GetComponent<Rigidbody2D>();
-		rbody.velocity = velocity;
+		rbody.linearVelocity = velocity;
 		rbody.gravityScale = gravity;
 		if (rotateWithVelocity)
 		{

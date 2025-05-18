@@ -8,7 +8,7 @@ ScriptedImporter:
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: 62a9f0aa5b59740cfbadc7e5f9823bb0, type: 3}
-  importerVersion: 1
+  importerVersion: 2
   textureImporterSettings:
     alphaSource: 1
     mipMapMode: 0
@@ -106,6 +106,7 @@ ScriptedImporter:
     pivot: {x: 0, y: 0}
     alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 0
@@ -127,6 +128,7 @@ ScriptedImporter:
     pivot: {x: 0.33333334, y: 1.3333334}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 4
@@ -147,6 +149,7 @@ ScriptedImporter:
     pivot: {x: 0.7857143, y: 0.9411765}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 29
@@ -167,6 +170,7 @@ ScriptedImporter:
     pivot: {x: 0.86666673, y: 0.84210527}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 4
@@ -187,6 +191,7 @@ ScriptedImporter:
     pivot: {x: 0.9333334, y: 0.84210527}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 29
@@ -207,6 +212,7 @@ ScriptedImporter:
     pivot: {x: 0.875, y: 0.84210527}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 4
@@ -227,6 +233,7 @@ ScriptedImporter:
     pivot: {x: 0.88235295, y: 0.8888889}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 4
@@ -247,6 +254,7 @@ ScriptedImporter:
     pivot: {x: 0.9375, y: 0.8888889}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 4
@@ -267,6 +275,7 @@ ScriptedImporter:
     pivot: {x: 10, y: 16}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
     rect:
       serializedVersion: 2
       x: 52
@@ -285,6 +294,11 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
+    uuid:
+      value0: 2707397775
+      value1: 0
+      value2: 0
+      value3: 0
     guid: -1587569521
     name: vfx_dust_roll
     layerFlags: 0

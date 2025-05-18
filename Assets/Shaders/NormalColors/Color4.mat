@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 7
+  version: 9
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -74,3 +74,4 @@ Material:
     - _Tone1: {r: 0.7834455, g: 0.79622644, b: 0.3049697, a: 1}
     - _Tone2: {r: 0.6075471, g: 0.5897963, b: 0.13182618, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

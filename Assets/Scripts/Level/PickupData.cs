@@ -70,11 +70,11 @@ public class PickupData : NetworkBehaviour
 			float num = Time.time - startFloat;
 			if (num < motionCurve[motionCurve.length - 1].time)
 			{
-				rbody.velocity = motionCurve.Evaluate(num) * baseVelocity;
+				rbody.linearVelocity = motionCurve.Evaluate(num) * baseVelocity;
 				return;
 			}
 			floaty = false;
-			rbody.velocity = Vector2.zero;
+			rbody.linearVelocity = Vector2.zero;
 			rbody.gravityScale = 0.1f;
 		}
 	}

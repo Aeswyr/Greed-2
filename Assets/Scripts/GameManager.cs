@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using Mirror.RemoteCalls;
 using Telepathy;
@@ -45,6 +46,8 @@ public class GameManager : NetworkSingleton<GameManager>
 	private GameObject[] shops;
 	[Header("UI")]
 	[SerializeField] private Animator screenWipe;
+	[SerializeField] private GameObject scoreCardPrefab;
+	[SerializeField] private Transform scoreCardParent;
 
 	private int levelCount = 0;
 
@@ -52,14 +55,16 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public Transform PlayerLobbyHolder => playerLobbyHolder;
 
-	public bool IsLocalGame {
+	public bool IsLocalGame
+	{
 		get;
 		private set;
 	}
 
 	private void Start()
 	{
-		if (PlayerInputManager.instance != null) {
+		if (PlayerInputManager.instance != null)
+		{
 			IsLocalGame = true;
 			PlayerInputManager.instance.onPlayerJoined += AddLocalPlayer;
 		}
@@ -72,7 +77,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		return FindObjectsOfType<PlayerController>().Length;
 	}
 
-	public void AddLocalPlayer(PlayerInput input) {
+	public void AddLocalPlayer(PlayerInput input)
+	{
 		Debug.Log("Creating new player");
 
 		var playerObj = Instantiate(playerPrefab);
@@ -97,18 +103,16 @@ public class GameManager : NetworkSingleton<GameManager>
 	public void CheckLobbyReady()
 	{
 		LobbyCardController[] array = FindObjectsOfType<LobbyCardController>();
-		LobbyCardController[] array2 = array;
-		foreach (LobbyCardController lobbyCardController in array2)
+		foreach (LobbyCardController lobbyCardController in array)
 		{
 			if (!lobbyCardController.IsReady())
 			{
 				return;
 			}
 		}
-		LobbyCardController[] array3 = array;
-		foreach (LobbyCardController lobbyCardController2 in array3)
+		foreach (LobbyCardController lobbyCardController in array)
 		{
-			lobbyCardController2.FinalizeReady();
+			lobbyCardController.FinalizeReady();
 		}
 
 		AssignPlayerIds();
@@ -116,7 +120,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		SyncGameStart();
 	}
 
-	private void AssignPlayerIds() {
+	private void AssignPlayerIds()
+	{
 		PlayerController[] array = FindObjectsOfType<PlayerController>();
 		int id = 0;
 		foreach (PlayerController playerController in array)
@@ -129,7 +134,8 @@ public class GameManager : NetworkSingleton<GameManager>
 	[ClientRpc]
 	private void SyncGameStart()
 	{
-		if (IsLocalGame) {
+		if (IsLocalGame)
+		{
 			Destroy(FindObjectOfType<PlayerInputManager>());
 		}
 
@@ -142,6 +148,9 @@ public class GameManager : NetworkSingleton<GameManager>
 			if (playerController.isLocalPlayer)
 			{
 				playerController.SetInputLocked(value: false);
+
+				var card = Instantiate(scoreCardPrefab, scoreCardParent);
+				playerController.SetupScorecard(card.GetComponent<ScoreCard>());
 			}
 		}
 
@@ -170,7 +179,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
 			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
-			component.velocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+			component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
 			if (amount > 10)
 			{
 				gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_LARGE, variant);
@@ -191,11 +200,11 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
 			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
-			component.velocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+			component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
 
 			gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_BONUS, PickupVariant.ALL);
 			amount--;
-			
+
 			NetworkServer.Spawn(gameObject);
 		}
 	}
@@ -236,13 +245,14 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 
 		currentLevel = Instantiate(original).GetComponent<LevelController>();
-		
+
 		LoadLevelObjects();
 
 		HandlePlayerSpawns();
 	}
 
-	private void HandlePlayerSpawns() {
+	private void HandlePlayerSpawns()
+	{
 		PlayerController[] array = FindObjectsOfType<PlayerController>();
 		List<int> playerIds = new();
 
@@ -251,14 +261,16 @@ public class GameManager : NetworkSingleton<GameManager>
 			StartCoroutine(SetupLevel(playerIds, playerController));
 		}
 
-		for (int i = 0; i < currentLevel.SpawnPoints.Count; i++) {
+		for (int i = 0; i < currentLevel.SpawnPoints.Count; i++)
+		{
 			if (!playerIds.Contains(i))
 				currentLevel.SpawnPoints[i].SetActive(false);
 
 		}
 	}
 
-	private IEnumerator SetupLevel(List<int> playerIds, PlayerController playerController) {
+	private IEnumerator SetupLevel(List<int> playerIds, PlayerController playerController)
+	{
 		playerIds.Add(playerController.PlayerID);
 		if (playerController.isLocalPlayer)
 		{
@@ -271,7 +283,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 	}
 
-	public void CompleteLevelTransition() {
+	public void CompleteLevelTransition()
+	{
 		PlayerController[] array = FindObjectsOfType<PlayerController>();
 
 		foreach (PlayerController playerController in array)
@@ -287,7 +300,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			if (isServer)
 			{
-				if (levelObjectSpawn.ShouldCancelSpawn()) {
+				if (levelObjectSpawn.ShouldCancelSpawn())
+				{
 					Destroy(levelObjectSpawn.gameObject);
 					continue;
 				}
@@ -296,18 +310,22 @@ public class GameManager : NetworkSingleton<GameManager>
 				if (!string.IsNullOrEmpty(levelObjectSpawn.GetExtraData()))
 				{
 					string[] commands = levelObjectSpawn.GetExtraData().Split(',');
-					foreach (var command in commands) {
+					foreach (var command in commands)
+					{
 						ParseCommand(command.Split(' '));
 					}
 				}
-				
-				void ParseCommand(string[] components) {
-					switch (components[0]) {
+
+				void ParseCommand(string[] components)
+				{
+					switch (components[0])
+					{
 						case "shop":
 							gameObject.GetComponent<ShopInteractable>().SetupMerchandise(components[1]);
 							break;
 						case "index":
-							if (levelObjectSpawn.GetSpawnedIndex() == int.Parse(components[1])) {
+							if (levelObjectSpawn.GetSpawnedIndex() == int.Parse(components[1]))
+							{
 								string[] command = new string[components.Length - 2];
 								for (int i = 0; i < command.Length; i++)
 									command[i] = components[i + 2];
@@ -352,20 +370,24 @@ public class GameManager : NetworkSingleton<GameManager>
 		NetworkServer.Spawn(data.Apply(projectilePrefab));
 	}
 
-	private IEnumerator StartLevelLoadSequence() {
+	private IEnumerator StartLevelLoadSequence()
+	{
 		screenWipe.SetTrigger("wipeon");
-		
+
 		yield return new WaitForSeconds(0.25f);
-		
+
 		Destroy(currentLevel.gameObject);
 
 		NotifyReadyToLoad();
 	}
 
-	[Command(requiresAuthority = false)] private void NotifyReadyToLoad() {
+	[Command(requiresAuthority = false)]
+	private void NotifyReadyToLoad()
+	{
 		readyPings++;
 
-		if (readyPings >= TotalPlayerCount() || IsLocalGame) {
+		if (readyPings >= TotalPlayerCount() || IsLocalGame)
+		{
 			readyPings = 0;
 
 			int nextLevelId = 0;
@@ -373,18 +395,135 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 	}
 
-	[ClientRpc] private void FinishLoad(int id) {
+	[ClientRpc]
+	private void FinishLoad(int id)
+	{
 		LoadLevel(id);
 
 		StartCoroutine(FinishLevelLoadSequence());
-	} 
-	
-	private IEnumerator FinishLevelLoadSequence() {
+	}
+
+	private IEnumerator FinishLevelLoadSequence()
+	{
 		yield return new WaitForSeconds(0.25f);
 
 		screenWipe.SetTrigger("wipeoff");
 		yield return new WaitForSeconds(0.25f);
 
 		CompleteLevelTransition();
+	}
+
+	public int GetShopRanking(PlayerController player)
+	{
+		List<PlayerController> players = new List<PlayerController>(FindObjectsOfType<PlayerController>());
+
+		players.Sort(delegate(PlayerController a, PlayerController b)
+		{
+			if (a.GetVictoryStats().MoneyHeld > b.GetVictoryStats().MoneyHeld)
+				return -1;
+			else if (a.GetVictoryStats().MoneyHeld < b.GetVictoryStats().MoneyHeld)
+				return 1;
+			else
+				return 0;
+		});
+
+		int index = players.IndexOf(player);
+
+		switch (players.Count)
+		{
+			case 1:
+				return 0;
+			case 2:
+				if (index == 1)
+					return 2;
+				return 0;
+			case 3:
+				switch (index)
+				{
+					case 0:
+						return 0;
+					case 1:
+						return 2;
+					case 2:
+						return 3;
+				}
+				break;
+			case 4:
+				return index;
+			case 5:
+				switch (index)
+				{
+					case 0:
+						return 0;
+					case 1:
+						return 1;
+					case 2:
+						return 2;
+					case 3:
+						return 2;
+					case 4:
+						return 3;
+				}
+				break;
+			case 6:
+				switch (index)
+				{
+					case 0:
+						return 0;
+					case 1:
+						return 1;
+					case 2:
+						return 2;
+					case 3:
+						return 2;
+					case 4:
+						return 3;
+					case 5:
+						return 3;
+				}
+				break;
+			case 7:
+				switch (index)
+				{
+					case 0:
+						return 0;
+					case 1:
+						return 1;
+					case 2:
+						return 1;
+					case 3:
+						return 2;
+					case 4:
+						return 2;
+					case 5:
+						return 3;
+					case 6:
+						return 3;
+				}
+				break;
+			case 8:
+				switch (index)
+				{
+					case 0:
+						return 0;
+					case 1:
+						return 1;
+					case 2:
+						return 1;
+					case 3:
+						return 2;
+					case 4:
+						return 2;
+					case 5:
+						return 2;
+					case 6:
+						return 3;
+					case 7:
+						return 3;
+				}
+				break;
+		}
+
+		return 0;
 	}
 }

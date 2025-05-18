@@ -102,7 +102,7 @@ public class ProjectileData : NetworkBehaviour
 
 		if (uniqueFunction == UniqueProjectile.DRILL) {
 			NotifyVFXStart();
-			rbody.velocity = 20 * rbody.velocity.normalized;
+			rbody.linearVelocity = 20 * rbody.linearVelocity.normalized;
 
 			[ClientRpc] void NotifyVFXStart() {
 				drillVFX.Play();
@@ -126,7 +126,7 @@ public class ProjectileData : NetworkBehaviour
 	[Command(requiresAuthority = false)] public void OnWorldExit() {
 		if (uniqueFunction == UniqueProjectile.DRILL) {
 			NotifyVFXStop();
-			rbody.velocity = 40 * rbody.velocity.normalized;
+			rbody.linearVelocity = 40 * rbody.linearVelocity.normalized;
 
 			[ClientRpc] void NotifyVFXStop() {
 				drillVFX.Stop();

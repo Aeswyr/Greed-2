@@ -59,20 +59,20 @@ public class MovementHandler : MonoBehaviour
 			if (paused)
 			{
 				paused = false;
-				rbody.velocity = new Vector2(storedVelocity, rbody.velocity.y);
+				rbody.linearVelocity = new Vector2(storedVelocity, rbody.linearVelocity.y);
 				timestamp += pausedUntil - pauseStarted;
 			}
 			if (Time.time < timestamp)
 			{
-				rbody.velocity = new Vector2(currentSpeed * dir * currentCurve.Evaluate(Time.time - timestamp + curveTime), rbody.velocity.y);
+				rbody.linearVelocity = new Vector2(currentSpeed * dir * currentCurve.Evaluate(Time.time - timestamp + curveTime), rbody.linearVelocity.y);
 			}
 			else if (moving)
 			{
-				rbody.velocity = new Vector2(maxSpeed * dir, rbody.velocity.y);
+				rbody.linearVelocity = new Vector2(maxSpeed * dir, rbody.linearVelocity.y);
 			}
 			else
 			{
-				rbody.velocity = rbody.velocity.y * Vector2.up;
+				rbody.linearVelocity = rbody.linearVelocity.y * Vector2.up;
 			}
 			maxSpeed = baseSpeed;
 		}
@@ -84,9 +84,9 @@ public class MovementHandler : MonoBehaviour
 		currentCurve = decelerationCurve;
 		curveTime = decelerationTime;
 		currentSpeed = baseSpeed;
-		if (Mathf.Abs(rbody.velocity.x) < currentSpeed)
+		if (Mathf.Abs(rbody.linearVelocity.x) < currentSpeed)
 		{
-			currentSpeed = Mathf.Abs(rbody.velocity.x);
+			currentSpeed = Mathf.Abs(rbody.linearVelocity.x);
 		}
 		timestamp = Time.time + curveTime;
 	}
@@ -120,7 +120,7 @@ public class MovementHandler : MonoBehaviour
 	{
 		moving = false;
 		timestamp = 0f;
-		rbody.velocity = rbody.velocity.y * Vector2.up;
+		rbody.linearVelocity = rbody.linearVelocity.y * Vector2.up;
 	}
 
 	public void OverrideSpeed(float speed)
@@ -153,8 +153,8 @@ public class MovementHandler : MonoBehaviour
 			paused = true;
 			pauseStarted = Time.time;
 			pausedUntil = endPause;
-			storedVelocity = rbody.velocity.x;
-			rbody.velocity = new Vector2(0f, rbody.velocity.y);
+			storedVelocity = rbody.linearVelocity.x;
+			rbody.linearVelocity = new Vector2(0f, rbody.linearVelocity.y);
 		}
 	}
 

@@ -35,8 +35,8 @@ public class ArrowPickupController : NetworkBehaviour
             }
 
             if (chasing) {
-                rbody.velocity = (1 + 2 * Mathf.Min((Time.time - chasingStart) / 3, 1)) * 15 * dif.normalized;
-                transform.localRotation = Quaternion.FromToRotation(Vector2.right, -rbody.velocity);
+                rbody.linearVelocity = (1 + 2 * Mathf.Min((Time.time - chasingStart) / 3, 1)) * 15 * dif.normalized;
+                transform.localRotation = Quaternion.FromToRotation(Vector2.right, -rbody.linearVelocity);
             }
         }
     }

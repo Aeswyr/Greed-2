@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Mirror.BouncyCastle.Security;
@@ -148,9 +149,20 @@ public class PlayerController : NetworkBehaviour
 	private float staminaCooldown => 2.5f - staminaMod - (HasBuff(BuffType.GHOSTFORM) ? 1 : 0);
 	private float skillCooldown => 6f - skillMod;
 
-	private int currentColor;
+	private int currentColor = -1;
 
-	private int money;
+	private int _money;
+	private int money
+	{
+		get { return _money; }
+		set {
+			victoryStats.MoneyHeld = value;
+			if (value > money)
+				victoryStats.MoneyCollected += value - _money;
+
+			_money = value;
+		}
+	}
 	private int crowns;
 
 	private int health;
@@ -195,6 +207,8 @@ public class PlayerController : NetworkBehaviour
 	private bool charging;
 	private float chargeStart;
 
+	private VictoryStats victoryStats;
+
 	private int[] stats = new int[5];
 	private float[] buffs = new float[(int)BuffType.RANDOM];
 	private bool[] buffDirty = new bool[(int)BuffType.RANDOM];
@@ -210,13 +224,15 @@ public class PlayerController : NetworkBehaviour
 	private float speedMult => 1 + (HasBuff(BuffType.SWIFT) ? 0.5f : 0) + (HasBuff(BuffType.GHOSTFORM) ? 0.2f : 0);
 	private int powerMod => 30 * stats[(int)Stat.POWER];
 
+	private ScoreCard scorecard;
+
 	new public bool isLocalPlayer => base.isLocalPlayer || GameManager.Instance.IsLocalGame;
 
 	private void Start()
 	{
 		health = maxHealth;
 		worldMask = LayerMask.GetMask("World");
-		sprite.material = colors[currentColor];
+		sprite.material = colors[0];
 		if (isLocalPlayer)
 		{
 			if (input == null) {
@@ -243,9 +259,30 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	public void SetupInput(InputHandler input) {
-			this.input = input;
-			jump.SetInput(input);
-			GameManager.Instance.AddLobbyCard(this, input);
+		this.input = input;
+		jump.SetInput(input);
+		GameManager.Instance.AddLobbyCard(this, input);
+	}
+
+	public void SetupScorecard(ScoreCard card)
+	{
+		this.scorecard = card;
+		if (currentColor != -1)
+			scorecard.SetColor(currentColor);
+
+		if (isLocalPlayer)
+		{
+			SendName(Utils.GetLocalSteamName());
+		}
+
+		[Command] void SendName(string name) {
+			RecieveName(name);
+		}
+		
+		[ClientRpc] void RecieveName(string name)
+		{
+			scorecard.SetName(name);
+		}
 	}
 
 	[Server] public void AssignId(int id) {
@@ -353,7 +390,6 @@ public class PlayerController : NetworkBehaviour
 			wallHanging = true;
 
 			if (isWallJumping) {
-				Debug.Log("did a lil hop");
 				isWallJumping = false;
 				wallJump = 0;
 				if (!input.move.down)
@@ -992,6 +1028,10 @@ public class PlayerController : NetworkBehaviour
 				VFXManager.Instance.SyncVFX(ParticleType.ARMOR, transform.position, facing == -1);
 				invuln = InvulnState.NONE;
 			}
+			if (invuln == InvulnState.DODGE)
+			{
+				victoryStats.CloseCalls++;
+			}
 			return;
 		}
 
@@ -1234,6 +1274,7 @@ public class PlayerController : NetworkBehaviour
 			[ClientRpc]
 			void RecieveMoney(int val)
 			{
+				scorecard.SetGold(val);
 				if (!isLocalPlayer)
 				{
 					unitUI.UpdateMoney(val);
@@ -1253,6 +1294,7 @@ public class PlayerController : NetworkBehaviour
 			[ClientRpc]
 			void RecieveCrowns(int val)
 			{
+				scorecard.SetCrowns(val);
 				if (!isLocalPlayer)
 				{
 					unitUI.UpdateCrowns(val);
@@ -1467,6 +1509,9 @@ public class PlayerController : NetworkBehaviour
 			{
 				sprite.material = colors[id];
 				currentColor = id;
+
+				if (scorecard != null)
+					scorecard.SetColor(id);
 			}
 		}
 	}
@@ -1536,15 +1581,77 @@ public class PlayerController : NetworkBehaviour
 		{
 			UpdateMoneyDisplay();
 			UpdateMoneyLock(val: true);
+			GetShopReward();
+		}
+	}
+
+	public void GetShopReward()
+	{
+		SendShopReward();
+		[Command] void SendShopReward()
+		{
+			RecieveShopReward();
+		}
+
+		[ClientRpc] void RecieveShopReward()
+		{
+			if (!isLocalPlayer)
+				return;
+
+			StartCoroutine(DelayGiveReward());
+		}
+		
+		IEnumerator DelayGiveReward()
+		{
+			yield return new WaitForSeconds(0.75f);
+			switch (GameManager.Instance.GetShopRanking(this))
+			{
+				case 1:
+					money += 5;
+					UpdateMoneyDisplay();
+					VFXManager.Instance.SendFloatingText("+5g", transform.position + 2 * Vector3.up, Color.yellow);
+					break;
+				case 2:
+					money += 15;
+					UpdateMoneyDisplay();
+					VFXManager.Instance.SendFloatingText("+15g", transform.position + 2 * Vector3.up, Color.yellow);
+					break;
+				case 3:
+					money += 25;
+					UpdateMoneyDisplay();
+					VFXManager.Instance.SendFloatingText("+25g", transform.position + 2 * Vector3.up, Color.yellow);
+					break;
+			}
 		}
 	}
 
 	public void LeaveLevel()
 	{
 		UpdateMoneyLock(val: false);
+		UpdateVictoryStats();
 	}
 
-	public void PingNameplate() {
+	public void UpdateVictoryStats()
+	{
+		SendVictoryStats(victoryStats);
+		[Command] void SendVictoryStats(VictoryStats stats)
+		{
+			RecieveVictoryStats(stats);
+		}
+		
+		[ClientRpc] void RecieveVictoryStats(VictoryStats stats)
+		{
+			victoryStats = stats;
+		}
+	}
+
+	public VictoryStats GetVictoryStats()
+	{
+		return victoryStats;
+	}
+
+	public void PingNameplate()
+	{
 		unitUI.UpdateNameplate();
 	}
 
@@ -1582,9 +1689,6 @@ public class PlayerController : NetworkBehaviour
 			foreach (var s in stats) {
 				currstats += $"{s}\n";
 			}
-			Debug.Log(currstats);
-			Debug.Log($"{maxHealth}, {skillCooldown}, {powerMod}, {speedMod}, {staminaCooldown}");
-
 			move.AdjustBaseSpeed(speedMod, speedMult);
 		}
 	}
