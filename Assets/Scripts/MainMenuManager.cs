@@ -34,7 +34,7 @@ public class MainMenuManager : MonoBehaviour
 	{
 		PlayerInputManager.instance.onPlayerJoined += FirstPlayerJoined;
 
-		if (FindObjectOfType<NetworkAnimator>() == null)
+		if (FindAnyObjectByType<NetworkAnimator>() == null)
 		{
 			Instantiate(networkPrefab);
 		}
@@ -112,7 +112,7 @@ public class MainMenuManager : MonoBehaviour
 	}
 	public void OnHost()
 	{
-		FindObjectOfType<SteamManager>().Host();
+		FindAnyObjectByType<SteamManager>().Host();
 	}
 
 	public void OnJoin() {

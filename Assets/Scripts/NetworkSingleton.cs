@@ -11,7 +11,7 @@ public class NetworkSingleton<T> : NetworkBehaviour where T : Component
 		{
 			if (instance == null)
 			{
-				instance = FindObjectOfType<T>();
+				instance = FindAnyObjectByType<T>();
 			}
 			return instance;
 		}

@@ -236,7 +236,7 @@ public class PlayerController : NetworkBehaviour
 		if (isLocalPlayer)
 		{
 			if (input == null) {
-				SetupInput(FindObjectOfType<InputHandler>());
+				SetupInput(FindAnyObjectByType<InputHandler>());
 			}
 		}
 
@@ -245,7 +245,7 @@ public class PlayerController : NetworkBehaviour
 		}
 
 		[Command(requiresAuthority = false)] void GrantAuthority() {
-			PlayerController[] array = FindObjectsOfType<PlayerController>();
+			PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 			NetworkConnectionToClient conn = null;
 			foreach (var player in array) {
 				if (player.connectionToClient != null) {
@@ -1710,6 +1710,7 @@ public class PlayerController : NetworkBehaviour
 				buffColor = Color.red;
 				break;
 			case BuffType.GREED:
+				unitVFX.SetFXState(PlayerVFX.PICKUP_RANGE, true);
 				buffColor = Color.green;
 				break;
 			case BuffType.GHOSTFORM:
@@ -1747,9 +1748,17 @@ public class PlayerController : NetworkBehaviour
 
 	public void EndBuff(BuffType type) {
 		unitVFX.EndChain(type.ToString());
-		if (isServer) {
+		if (type == BuffType.GREED)
+		{
+			unitVFX.SetFXState(PlayerVFX.PICKUP_RANGE, false);
+		}
+
+		if (isServer)
+		{
 			RecieveEndBuff(type);
-		} else {
+		}
+		else
+		{
 			SendEndBuff(type);
 		}
 		[Command] void SendEndBuff(BuffType type) {
@@ -1768,7 +1777,13 @@ public class PlayerController : NetworkBehaviour
 				if ((BuffType)i == BuffType.SWIFT || (BuffType)i == BuffType.GHOSTFORM)
 					move.AdjustBaseSpeed(speedMod, speedMult);
 				if ((BuffType)i == BuffType.GREED)
+				{
 					pickupBox.radius = 1f;
+					if (isLocalPlayer)
+					{
+						unitVFX.SetFXState(PlayerVFX.PICKUP_RANGE, false);
+					}
+				}
 			}
 		}
 	}

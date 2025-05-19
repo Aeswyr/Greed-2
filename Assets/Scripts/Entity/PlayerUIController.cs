@@ -137,7 +137,7 @@ public class PlayerUIController : MonoBehaviour
 		if (val)
 		{
 			Animator component = interactIcon.GetComponent<Animator>();
-			switch (FindObjectOfType<InputHandler>().activeDevice)
+			switch (FindAnyObjectByType<InputHandler>().activeDevice)
 			{
 			case DeviceType.KEYBOARD:
 				component.Play("keyboard");

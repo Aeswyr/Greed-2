@@ -33,8 +33,8 @@ public class GameManager : NetworkSingleton<GameManager>
 	private GameObject lobbyCardPrefab;
 
 	[Header("levels")]
-	[SerializeField]
-	private TextMeshProUGUI levelDisplay;
+	[SerializeField] private int levelCount;
+	[SerializeField] private int majorLevelModulo;
 
 	[SerializeField]
 	private LevelController currentLevel;
@@ -48,8 +48,13 @@ public class GameManager : NetworkSingleton<GameManager>
 	[SerializeField] private Animator screenWipe;
 	[SerializeField] private GameObject scoreCardPrefab;
 	[SerializeField] private Transform scoreCardParent;
+	[SerializeField] private GameObject levelTickPrefab;
+	[SerializeField] private GameObject majorTickPrefab;
+	[SerializeField] private Transform levelCounterParent;
+	[SerializeField] private GameObject levelPointer;
+	
 
-	private int levelCount = 0;
+	private int levelIndex = 0;
 
 	private int readyPings;
 
@@ -74,7 +79,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int TotalPlayerCount()
 	{
-		return FindObjectsOfType<PlayerController>().Length;
+		return FindObjectsByType<PlayerController>(FindObjectsSortMode.None).Length;
 	}
 
 	public void AddLocalPlayer(PlayerInput input)
@@ -102,7 +107,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void CheckLobbyReady()
 	{
-		LobbyCardController[] array = FindObjectsOfType<LobbyCardController>();
+		LobbyCardController[] array = FindObjectsByType<LobbyCardController>(FindObjectsSortMode.None);
 		foreach (LobbyCardController lobbyCardController in array)
 		{
 			if (!lobbyCardController.IsReady())
@@ -122,7 +127,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void AssignPlayerIds()
 	{
-		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 		int id = 0;
 		foreach (PlayerController playerController in array)
 		{
@@ -136,13 +141,13 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		if (IsLocalGame)
 		{
-			Destroy(FindObjectOfType<PlayerInputManager>());
+			Destroy(FindAnyObjectByType<PlayerInputManager>());
 		}
 
 		HandlePlayerSpawns();
 
 		playerLobby.SetActive(value: false);
-		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 		foreach (PlayerController playerController in array)
 		{
 			if (playerController.isLocalPlayer)
@@ -152,6 +157,14 @@ public class GameManager : NetworkSingleton<GameManager>
 				var card = Instantiate(scoreCardPrefab, scoreCardParent);
 				playerController.SetupScorecard(card.GetComponent<ScoreCard>());
 			}
+		}
+
+		for (int i = 0; i <= levelCount; i++)
+		{
+			if (i % majorLevelModulo == 0)
+				Instantiate(majorTickPrefab, levelCounterParent);
+			else
+				Instantiate(levelTickPrefab, levelCounterParent);
 		}
 
 		CompleteLevelTransition();
@@ -220,7 +233,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void GoNextLevel()
 	{
-		AuctionableInteractable[] array = FindObjectsOfType<AuctionableInteractable>();
+		AuctionableInteractable[] array = FindObjectsByType<AuctionableInteractable>(FindObjectsSortMode.None);
 		foreach (AuctionableInteractable auctionableInteractable in array)
 		{
 			auctionableInteractable.RunAuctionComplete();
@@ -237,7 +250,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void LoadLevel(int id)
 	{
-		levelCount++;
+		levelIndex++;
 		GameObject original = levels[id];
 		if (IsLevelShop())
 		{
@@ -253,7 +266,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void HandlePlayerSpawns()
 	{
-		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 		List<int> playerIds = new();
 
 		foreach (PlayerController playerController in array)
@@ -279,13 +292,20 @@ public class GameManager : NetworkSingleton<GameManager>
 			playerController.transform.position = currentLevel.SpawnPoints[playerController.PlayerID].transform.position + 2 * Vector3.up;
 			playerController.EnterLevel();
 			playerController.PingNameplate();
-			levelDisplay.text = levelCount.ToString("D2");
+
+			UpdateLevelUI();
 		}
+	}
+
+	private void UpdateLevelUI()
+	{
+		Vector3 targetPos = levelCounterParent.GetChild(levelIndex).transform.position;
+		levelPointer.transform.position = targetPos + 32 * Vector3.up;
 	}
 
 	public void CompleteLevelTransition()
 	{
-		PlayerController[] array = FindObjectsOfType<PlayerController>();
+		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 
 		foreach (PlayerController playerController in array)
 			if (playerController.isLocalPlayer)
@@ -295,7 +315,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void LoadLevelObjects()
 	{
-		LevelObjectSpawn[] array = FindObjectsOfType<LevelObjectSpawn>();
+		LevelObjectSpawn[] array = FindObjectsByType<LevelObjectSpawn>(FindObjectsSortMode.None);
 		foreach (LevelObjectSpawn levelObjectSpawn in array)
 		{
 			if (isServer)
@@ -351,12 +371,12 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int GetLevelIndex()
 	{
-		return levelCount;
+		return levelIndex;
 	}
 
 	public bool IsLevelShop()
 	{
-		return levelCount % 3 == 0 && levelCount != 0;
+		return levelIndex % majorLevelModulo == 0 && levelIndex != 0 && levelIndex != levelCount;
 	}
 
 	public LevelController GetCurrentLevel()
@@ -415,7 +435,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int GetShopRanking(PlayerController player)
 	{
-		List<PlayerController> players = new List<PlayerController>(FindObjectsOfType<PlayerController>());
+		List<PlayerController> players = new List<PlayerController>(FindObjectsByType<PlayerController>(FindObjectsSortMode.None));
 
 		players.Sort(delegate(PlayerController a, PlayerController b)
 		{

@@ -47,7 +47,7 @@ public class LobbyCardController : NetworkBehaviour
 			transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
 		}
 		if (input == null) {
-			input = FindObjectOfType<InputHandler>();
+			input = FindAnyObjectByType<InputHandler>();
 		}
 		if (player != null && player.isLocalPlayer)
 		{

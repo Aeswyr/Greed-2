@@ -56,6 +56,8 @@ MonoBehaviour:
   playerLobby: {fileID: 0}
   playerLobbyHolder: {fileID: 0}
   lobbyCardPrefab: {fileID: 7106996525834769821, guid: ecd6907726c02f24093963b6608b6d1d, type: 3}
+  levelCount: 18
+  majorLevelModulo: 3
   levelDisplay: {fileID: 0}
   currentLevel: {fileID: 0}
   levels:
@@ -65,6 +67,9 @@ MonoBehaviour:
   screenWipe: {fileID: 0}
   scoreCardPrefab: {fileID: 4349548052514153799, guid: 0834f34ec6c5bc241ade034659c5267c, type: 3}
   scoreCardParent: {fileID: 0}
+  levelTickPrefab: {fileID: 672331615770248269, guid: 77d5cf3ed95428140be1889796272273, type: 3}
+  majorTickPrefab: {fileID: 672331615770248269, guid: 07e01e15a7d4d6e459ed518b109bece6, type: 3}
+  levelCounterParent: {fileID: 0}
 --- !u!114 &5441077926203003157
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class PauseMenuController : MonoBehaviour
 
 	private void Start()
 	{
-		input = FindObjectOfType<InputHandler>();
+		input = FindAnyObjectByType<InputHandler>();
 		menuParent.SetActive(value: false);
 	}
 
@@ -28,11 +28,11 @@ public class PauseMenuController : MonoBehaviour
 		SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
 		if (NetworkServer.activeHost)
 		{
-			FindObjectOfType<NetworkManager>().StopHost();
+			FindAnyObjectByType<NetworkManager>().StopHost();
 		}
 		else
 		{
-			FindObjectOfType<NetworkManager>().StopClient();
+			FindAnyObjectByType<NetworkManager>().StopClient();
 		}
 	}
 
