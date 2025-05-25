@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
-using Mirror.BouncyCastle.Security;
-using Mirror.RemoteCalls;
+using Steamworks;
 using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
@@ -49,7 +48,7 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private PlayerUIController unitUI;
-	
+
 	[SerializeField]
 	private HurtboxController hurtbox;
 	[SerializeField]
@@ -155,7 +154,8 @@ public class PlayerController : NetworkBehaviour
 	private int money
 	{
 		get { return _money; }
-		set {
+		set
+		{
 			victoryStats.MoneyHeld = value;
 			if (value > money)
 				victoryStats.MoneyCollected += value - _money;
@@ -228,6 +228,10 @@ public class PlayerController : NetworkBehaviour
 
 	new public bool isLocalPlayer => base.isLocalPlayer || GameManager.Instance.IsLocalGame;
 
+	[SyncVar]
+	private ulong? friendId = null;
+	public string playerProfileName;
+
 	private void Start()
 	{
 		health = maxHealth;
@@ -235,30 +239,50 @@ public class PlayerController : NetworkBehaviour
 		sprite.material = colors[0];
 		if (isLocalPlayer)
 		{
-			if (input == null) {
+			if (input == null)
+			{
 				SetupInput(FindAnyObjectByType<InputHandler>());
+			}
+			victoryStats.Luck = Random.Range(0, 100);
+			SyncFriendID(SteamUser.GetSteamID().m_SteamID);
+
+			[Command(requiresAuthority = false)] void SyncFriendID(ulong id)
+			{
+				friendId = id;
 			}
 		}
 
-		if (GameManager.Instance.IsLocalGame && isClient) {
+		if (GameManager.Instance.IsLocalGame && isClient)
+		{
 			GrantAuthority();
 		}
 
-		[Command(requiresAuthority = false)] void GrantAuthority() {
+		[Command(requiresAuthority = false)] void GrantAuthority()
+		{
 			PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 			NetworkConnectionToClient conn = null;
-			foreach (var player in array) {
-				if (player.connectionToClient != null) {
+			foreach (var player in array)
+			{
+				if (player.connectionToClient != null)
+				{
 					conn = player.connectionToClient;
 				}
 			}
 			this.netIdentity.AssignClientAuthority(conn);
 		}
-		
-		unitUI.SetNameplate(Utils.GetLocalSteamName());
+
+		StartCoroutine(SetupNameplate());
+
+		IEnumerator SetupNameplate()
+		{
+			yield return new WaitUntil(() => friendId.HasValue);
+			unitUI.SetNameplate(GetDisplayName());
+		}
+
 	}
 
-	public void SetupInput(InputHandler input) {
+	public void SetupInput(InputHandler input)
+	{
 		this.input = input;
 		jump.SetInput(input);
 		GameManager.Instance.AddLobbyCard(this, input);
@@ -272,27 +296,29 @@ public class PlayerController : NetworkBehaviour
 
 		if (isLocalPlayer)
 		{
-			SendName(Utils.GetLocalSteamName());
+			SyncName();
 		}
 
-		[Command] void SendName(string name) {
-			RecieveName(name);
+		[Command] void SyncName()
+		{
+			RecieveName();
 		}
-		
-		[ClientRpc] void RecieveName(string name)
+
+		[ClientRpc] void RecieveName()
 		{
 			StartCoroutine(WaitUntilCardReady());
-
 			IEnumerator WaitUntilCardReady()
 			{
-				yield return new WaitUntil(() => scorecard != null);
+				yield return new WaitUntil(() => scorecard != null && friendId.HasValue);
 
-				scorecard.SetName(name);
+				scorecard.SetName(GetDisplayName());
 			}
 		}
 	}
 
-	[Server] public void AssignId(int id) {
+	[Server]
+	public void AssignId(int id)
+	{
 		playerId = id;
 	}
 
@@ -396,7 +422,8 @@ public class PlayerController : NetworkBehaviour
 			jump.SetTerminalVelocity(1f);
 			wallHanging = true;
 
-			if (isWallJumping) {
+			if (isWallJumping)
+			{
 				isWallJumping = false;
 				wallJump = 0;
 				if (!input.move.down)
@@ -427,7 +454,8 @@ public class PlayerController : NetworkBehaviour
 			{
 				nextStamina = Time.time + staminaCooldown;
 				UpdateDodgeDisplay(staminaCooldown);
-				if (charging) {
+				if (charging)
+				{
 					InterruptCharge();
 					EndAction();
 					if (input.dir != 0)
@@ -437,7 +465,8 @@ public class PlayerController : NetworkBehaviour
 		}
 		if ((!acting || (charging && Time.time > nextStamina)) && Time.time > nextStamina && grounded && input.dodge.pressed)
 		{
-			if (charging) {
+			if (charging)
+			{
 				InterruptCharge();
 				EndAction();
 			}
@@ -453,7 +482,8 @@ public class PlayerController : NetworkBehaviour
 		}
 		if ((!acting || attackCancel) && input.attack.pressed)
 		{
-			if (HasBuff(BuffType.BARRIER)) {
+			if (HasBuff(BuffType.BARRIER))
+			{
 				EndBuff(BuffType.BARRIER);
 			}
 
@@ -487,7 +517,8 @@ public class PlayerController : NetworkBehaviour
 		animator.SetBool("moving", input.move.down && !acting);
 	}
 
-	private void OnAttackCancel() {
+	private void OnAttackCancel()
+	{
 		EndAction();
 	}
 
@@ -533,7 +564,8 @@ public class PlayerController : NetworkBehaviour
 
 	public void PressAttack()
 	{
-		void StartCharge() {
+		void StartCharge()
+		{
 			charging = true;
 			chargeStart = Time.time;
 		}
@@ -541,47 +573,50 @@ public class PlayerController : NetworkBehaviour
 		attacking = true;
 		switch (weaponId)
 		{
-		case 0: // pickaxe
-			attackId = 0;
-			break;
-		case 1: // sword
-			attackId = 1;
-			if (input.aim.y < 0f)
-			{
-				attackId = 2;
-			}
-			break;
-		case 2: // kick
-			attackId = 3;
-			if (input.aim.y < 0f && !grounded)
-			{
-				attackId = 4;
-			}
-			break;
-		case 3: // shield
-			attackId = 5;
-			if (input.aim.y < 0f)
-			{
-				invuln = InvulnState.PARRY;
-				attackId = 6;
-			}
-			break;
-		case 4: // greatweapon
-			StartCharge();
-			attackId = 7;
-			break;
-		case 5: // bow
-			if (hasAmmo) {
+			case 0: // pickaxe
+				attackId = 0;
+				break;
+			case 1: // sword
+				attackId = 1;
+				if (input.aim.y < 0f)
+				{
+					attackId = 2;
+				}
+				break;
+			case 2: // kick
+				attackId = 3;
+				if (input.aim.y < 0f && !grounded)
+				{
+					attackId = 4;
+				}
+				break;
+			case 3: // shield
+				attackId = 5;
+				if (input.aim.y < 0f)
+				{
+					invuln = InvulnState.PARRY;
+					attackId = 6;
+				}
+				break;
+			case 4: // greatweapon
 				StartCharge();
-				attackId = 8;
-			} else {
-				attackId = 9;
-			}
-			break;
-		case 6: // tome
-			StartCharge();
-			attackId = 10;
-			break;
+				attackId = 7;
+				break;
+			case 5: // bow
+				if (hasAmmo)
+				{
+					StartCharge();
+					attackId = 8;
+				}
+				else
+				{
+					attackId = 9;
+				}
+				break;
+			case 6: // tome
+				StartCharge();
+				attackId = 10;
+				break;
 		}
 		animator.SetInteger("attackId", attackId);
 		animator.SetTrigger("attack");
@@ -591,110 +626,110 @@ public class PlayerController : NetworkBehaviour
 		}
 		switch (attackId)
 		{
-		case 0:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(pickAttackSpeed), pickAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 1:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(swordAttackSpeed), swordAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 2:
-			move.OverrideCurve(CalculateSpeed(swordLungeSpeed), swordLungeCurve, facing);
-			break;
-		case 3:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(unarmedAttackSpeed), unarmedAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.OverrideCurve(CalculateSpeed(unarmedShortSpeed), unarmedShortCurve, facing);
-			}
-			break;
-		case 4:
-			attacking = false;
-			jump.ForceVelocity(0f);
-			jump.ForceLanding();
-			jump.DisableGravity();
-			move.OverrideSpeed(0f);
-			move.ForceStop();
-			break;
-		case 5:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 6:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(shieldParrySpeed), shieldParryCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 7:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(greatweaponAttackSpeed), greatweaponAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 8:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 9:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 10:
-			if (input.dir != 0f)
-			{
-				move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
-			}
-			else if (grounded)
-			{
-				move.StartDeceleration();
-			}
-			jump.SetGravity(0.5f);
-			jump.ForceVelocity(0);
-			jump.SetTerminalVelocity(2);
-			break;
+			case 0:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(pickAttackSpeed), pickAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 1:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(swordAttackSpeed), swordAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 2:
+				move.OverrideCurve(CalculateSpeed(swordLungeSpeed), swordLungeCurve, facing);
+				break;
+			case 3:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(unarmedAttackSpeed), unarmedAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.OverrideCurve(CalculateSpeed(unarmedShortSpeed), unarmedShortCurve, facing);
+				}
+				break;
+			case 4:
+				attacking = false;
+				jump.ForceVelocity(0f);
+				jump.ForceLanding();
+				jump.DisableGravity();
+				move.OverrideSpeed(0f);
+				move.ForceStop();
+				break;
+			case 5:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 6:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(shieldParrySpeed), shieldParryCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 7:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(greatweaponAttackSpeed), greatweaponAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 8:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 9:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(shieldAttackSpeed), shieldAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 10:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				jump.SetGravity(0.5f);
+				jump.ForceVelocity(0);
+				jump.SetTerminalVelocity(2);
+				break;
 		}
 	}
 
@@ -702,39 +737,39 @@ public class PlayerController : NetworkBehaviour
 	{
 		switch (attackId)
 		{
-		case 7:
-			charging = false;
-			animator.SetTrigger("release");
-			if (input.dir != 0f)
-			{
-				UpdateFacing(input.dir);
-				move.OverrideCurve(CalculateSpeed(greatweaponReleaseSpeed), greatweaponReleaseCurve, facing);
-			}
-			else
-			{
-				move.StartDeceleration();
-			}
-			break;
-		case 8:
-			charging = false;
-			animator.SetTrigger("release");
-			CreateAttack();
-			if (input.dir != 0f)
-			{
-				UpdateFacing(input.dir);
-			}
-			move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
-			break;
-		case 10:
-			charging = false;
-			animator.SetTrigger("release");
-			CreateAttack();
-			if (input.dir != 0f)
-			{
-				UpdateFacing(input.dir);
-			}
-			move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
-			break;
+			case 7:
+				charging = false;
+				animator.SetTrigger("release");
+				if (input.dir != 0f)
+				{
+					UpdateFacing(input.dir);
+					move.OverrideCurve(CalculateSpeed(greatweaponReleaseSpeed), greatweaponReleaseCurve, facing);
+				}
+				else
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 8:
+				charging = false;
+				animator.SetTrigger("release");
+				CreateAttack();
+				if (input.dir != 0f)
+				{
+					UpdateFacing(input.dir);
+				}
+				move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
+				break;
+			case 10:
+				charging = false;
+				animator.SetTrigger("release");
+				CreateAttack();
+				if (input.dir != 0f)
+				{
+					UpdateFacing(input.dir);
+				}
+				move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
+				break;
 		}
 	}
 
@@ -742,21 +777,21 @@ public class PlayerController : NetworkBehaviour
 	{
 		switch (skillId)
 		{
-		case 0:
-		case 1:
-		case 7:
-			animator.SetTrigger("skill_self");
-			break;
-		case 3:
-			animator.SetTrigger("skill_self");
-			invuln = InvulnState.GENERIC;
-			break;
-		case 2:
-		case 4:
-		case 5:
-		case 6:
-			animator.SetTrigger("skill_other");
-			break;
+			case 0:
+			case 1:
+			case 7:
+				animator.SetTrigger("skill_self");
+				break;
+			case 3:
+				animator.SetTrigger("skill_self");
+				invuln = InvulnState.GENERIC;
+				break;
+			case 2:
+			case 4:
+			case 5:
+			case 6:
+				animator.SetTrigger("skill_other");
+				break;
 		}
 		move.Pause(Time.time + 0.5f);
 		jump.Pause(Time.time + 0.5f);
@@ -766,13 +801,15 @@ public class PlayerController : NetworkBehaviour
 			VFXManager.Instance.SyncVFX(ParticleType.DUST_SMALL, transform.position, facing == -1);
 		}
 	}
-	public void CreateSkillFX() {
+	public void CreateSkillFX()
+	{
 		if (!isLocalPlayer)
 		{
 			return;
 		}
 
-		switch (skillId) {
+		switch (skillId)
+		{
 			case 3:
 				attackCancel = true;
 				break;
@@ -786,172 +823,172 @@ public class PlayerController : NetworkBehaviour
 		}
 		switch (skillId)
 		{
-		case 0:
-		{
-			unitVFX.SetFXState(PlayerVFX.VACCUM, state: true);
-			RaycastHit2D[] array = Physics2D.BoxCastAll(transform.position, 18f * Vector2.one, 0f, Vector2.right, 0f, LayerMask.GetMask("Pickup"));
-			List<Vector3> list = new List<Vector3>();
-			List<Vector3> list2 = new List<Vector3>();
-			List<Vector3> list3 = new List<Vector3>();
-			List<Vector3> list4 = new List<Vector3>();
-			List<Vector3> list5 = new List<Vector3>();
-			List<Vector3> list6 = new List<Vector3>();
-			List<Vector3> list7 = new List<Vector3>();
-			RaycastHit2D[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
-			{
-				RaycastHit2D raycastHit2D3 = array2[i];
-				PickupData component = raycastHit2D3.transform.GetComponent<PickupData>();
-				switch (component.GetPickupType())
+			case 0:
 				{
-				case PickupType.MONEY_SMALL:
-					switch (component.GetPickupVariant())
+					unitVFX.SetFXState(PlayerVFX.VACCUM, state: true);
+					RaycastHit2D[] array = Physics2D.BoxCastAll(transform.position, 18f * Vector2.one, 0f, Vector2.right, 0f, LayerMask.GetMask("Pickup"));
+					List<Vector3> list = new List<Vector3>();
+					List<Vector3> list2 = new List<Vector3>();
+					List<Vector3> list3 = new List<Vector3>();
+					List<Vector3> list4 = new List<Vector3>();
+					List<Vector3> list5 = new List<Vector3>();
+					List<Vector3> list6 = new List<Vector3>();
+					List<Vector3> list7 = new List<Vector3>();
+					RaycastHit2D[] array2 = array;
+					for (int i = 0; i < array2.Length; i++)
 					{
-					case PickupVariant.GOLD:
-						list.Add(raycastHit2D3.transform.position);
-						break;
-					case PickupVariant.SILVER:
-						list2.Add(raycastHit2D3.transform.position);
-						break;
-					case PickupVariant.COPPER:
-						list3.Add(raycastHit2D3.transform.position);
-						break;
+						RaycastHit2D raycastHit2D3 = array2[i];
+						PickupData component = raycastHit2D3.transform.GetComponent<PickupData>();
+						switch (component.GetPickupType())
+						{
+							case PickupType.MONEY_SMALL:
+								switch (component.GetPickupVariant())
+								{
+									case PickupVariant.GOLD:
+										list.Add(raycastHit2D3.transform.position);
+										break;
+									case PickupVariant.SILVER:
+										list2.Add(raycastHit2D3.transform.position);
+										break;
+									case PickupVariant.COPPER:
+										list3.Add(raycastHit2D3.transform.position);
+										break;
+								}
+								break;
+							case PickupType.MONEY_LARGE:
+								switch (component.GetPickupVariant())
+								{
+									case PickupVariant.GOLD:
+										list4.Add(raycastHit2D3.transform.position);
+										break;
+									case PickupVariant.SILVER:
+										list5.Add(raycastHit2D3.transform.position);
+										break;
+									case PickupVariant.COPPER:
+										list6.Add(raycastHit2D3.transform.position);
+										break;
+								}
+								break;
+							case PickupType.ITEM_CROWN:
+								list7.Add(raycastHit2D3.transform.position);
+								break;
+						}
+						DoPickup(component);
 					}
-					break;
-				case PickupType.MONEY_LARGE:
-					switch (component.GetPickupVariant())
-					{
-					case PickupVariant.GOLD:
-						list4.Add(raycastHit2D3.transform.position);
-						break;
-					case PickupVariant.SILVER:
-						list5.Add(raycastHit2D3.transform.position);
-						break;
-					case PickupVariant.COPPER:
-						list6.Add(raycastHit2D3.transform.position);
-						break;
-					}
-					break;
-				case PickupType.ITEM_CROWN:
-					list7.Add(raycastHit2D3.transform.position);
+					unitVFX.TriggerPickupFX(list, 0);
+					unitVFX.TriggerPickupFX(list2, 1);
+					unitVFX.TriggerPickupFX(list3, 2);
+					unitVFX.TriggerPickupFX(list4, 3);
+					unitVFX.TriggerPickupFX(list5, 4);
+					unitVFX.TriggerPickupFX(list6, 5);
+					unitVFX.TriggerPickupFX(list7, 6);
 					break;
 				}
-				DoPickup(component);
-			}
-			unitVFX.TriggerPickupFX(list, 0);
-			unitVFX.TriggerPickupFX(list2, 1);
-			unitVFX.TriggerPickupFX(list3, 2);
-			unitVFX.TriggerPickupFX(list4, 3);
-			unitVFX.TriggerPickupFX(list5, 4);
-			unitVFX.TriggerPickupFX(list6, 5);
-			unitVFX.TriggerPickupFX(list7, 6);
-			break;
-		}
-		case 1:
-			StartFlight();
-			break;
-		case 2:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(1.5f * (float)Random.Range(16, 23) * (Quaternion.Euler(0f, 0f, Random.Range(-5, -15)) * aim))
-				.SetLifetime(0.29999998f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(1.5f * (float)Random.Range(16, 23) * (Quaternion.Euler(0f, 0f, Random.Range(5, 15)) * aim))
-				.SetLifetime(0.29999998f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(30f * (Quaternion.Euler(0f, 0f, 10f) * aim))
-				.SetLifetime(0.29999998f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(33f * (Quaternion.Euler(0f, 0f, -5f) * aim))
-				.SetLifetime(4f / 15f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(37.5f * aim)
-				.SetLifetime(4f / 15f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position)
-				.SetAnimation(0)
-				.SetVelocity(19.5f * (Quaternion.Euler(0f, 0f, 5f) * aim))
-				.SetLifetime(1f / 3f)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.FIREWORK_POP)
-				.Finish();
-			break;
-		case 3:
-		{
-			Vector3 vector = transform.position + 10f * (Vector3)aim.normalized;
-			RaycastHit2D raycastHit2D = Physics2D.BoxCast(vector, new Vector2(1.5f, 2.5f), 0f, Vector2.right, 0f, worldMask);
-			if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(vector))
-			{
-				transform.position = vector;
-			}
-			else
-			{
-				RaycastHit2D raycastHit2D2 = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, aim, 10f, worldMask);
-				transform.position = raycastHit2D2.centroid;
-			}
-			invuln = InvulnState.NONE;
-			break;
-		}
-		case 4:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(3f, 3f))
-				.MakeProjectile(transform.position + 0.5f * Vector3.down)
-				.SetAnimation(1)
-				.SetVelocity(10f * aim)
-				.SetLifetime(2f)
-				.DisableEntityImpact()
-				.FlipSprite(aim.x < 0f)
-				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-				.Finish();
-			break;
-		case 5:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
-				.MakeProjectile(transform.position + 0.5f * Vector3.down)
-				.SetAnimation(2)
-				.SetVelocity(40f * aim)
-				.DisableWorldImpact()
-				.SetLifetime(5)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-				.SetUnique(UniqueProjectile.DRILL)
-				.Finish();
-			break;
-		case 6:
-			ProjectileBuilder.GetProjectile(transform.position)
-				.SetOwner(transform)
-				.SetAnimation(4)
-				.SetVelocity(30f * (Vector2)aim + (aim.y >= 0 ? 20 * Vector2.up : Vector2.zero))
-				.SetGravity(10f)
-				.DisableEntityImpact()
-				.SetUnique(UniqueProjectile.BOMB)
-				.Finish();
-			break;
-		case 7:
-			GiveBuff(BuffType.RANDOM);
-			break;
+			case 1:
+				StartFlight();
+				break;
+			case 2:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(1.5f * (float)Random.Range(16, 23) * (Quaternion.Euler(0f, 0f, Random.Range(-5, -15)) * aim))
+					.SetLifetime(0.29999998f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(1.5f * (float)Random.Range(16, 23) * (Quaternion.Euler(0f, 0f, Random.Range(5, 15)) * aim))
+					.SetLifetime(0.29999998f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(30f * (Quaternion.Euler(0f, 0f, 10f) * aim))
+					.SetLifetime(0.29999998f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(33f * (Quaternion.Euler(0f, 0f, -5f) * aim))
+					.SetLifetime(4f / 15f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(37.5f * aim)
+					.SetLifetime(4f / 15f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position)
+					.SetAnimation(0)
+					.SetVelocity(19.5f * (Quaternion.Euler(0f, 0f, 5f) * aim))
+					.SetLifetime(1f / 3f)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.FIREWORK_POP)
+					.Finish();
+				break;
+			case 3:
+				{
+					Vector3 vector = transform.position + 10f * (Vector3)aim.normalized;
+					RaycastHit2D raycastHit2D = Physics2D.BoxCast(vector, new Vector2(1.5f, 2.5f), 0f, Vector2.right, 0f, worldMask);
+					if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(vector))
+					{
+						transform.position = vector;
+					}
+					else
+					{
+						RaycastHit2D raycastHit2D2 = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, aim, 10f, worldMask);
+						transform.position = raycastHit2D2.centroid;
+					}
+					invuln = InvulnState.NONE;
+					break;
+				}
+			case 4:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(3f, 3f))
+					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+					.SetAnimation(1)
+					.SetVelocity(10f * aim)
+					.SetLifetime(2f)
+					.DisableEntityImpact()
+					.FlipSprite(aim.x < 0f)
+					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+					.Finish();
+				break;
+			case 5:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+					.SetAnimation(2)
+					.SetVelocity(40f * aim)
+					.DisableWorldImpact()
+					.SetLifetime(5)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+					.SetUnique(UniqueProjectile.DRILL)
+					.Finish();
+				break;
+			case 6:
+				ProjectileBuilder.GetProjectile(transform.position)
+					.SetOwner(transform)
+					.SetAnimation(4)
+					.SetVelocity(30f * (Vector2)aim + (aim.y >= 0 ? 20 * Vector2.up : Vector2.zero))
+					.SetGravity(10f)
+					.DisableEntityImpact()
+					.SetUnique(UniqueProjectile.BOMB)
+					.Finish();
+				break;
+			case 7:
+				GiveBuff(BuffType.RANDOM);
+				break;
 		}
 	}
 
@@ -959,22 +996,35 @@ public class PlayerController : NetworkBehaviour
 	{
 	}
 
-	public void OnHitTrigger(Transform source) {
+	public void OnHitTrigger(Transform source, bool playerHit = false)
+	{
 
-		if (isServer) {
-			RecieveTrigger(source.position);
-		} else {
-			SendTrigger(source.position);
+		if (isServer)
+		{
+			RecieveTrigger(source.position, playerHit);
+		}
+		else
+		{
+			SendTrigger(source.position, playerHit);
 		}
 
-		[Command] void SendTrigger(Vector3 pos) {
-			RecieveTrigger(pos);
+		[Command] void SendTrigger(Vector3 pos, bool playerHit)
+		{
+			RecieveTrigger(pos, playerHit);
 		}
 
-		[ClientRpc] void RecieveTrigger(Vector3 pos) {
-			if (isLocalPlayer) {
-				if (HasBuff(BuffType.GREED)) {
+		[ClientRpc] void RecieveTrigger(Vector3 pos, bool playerHit)
+		{
+			if (isLocalPlayer)
+			{
+				if (HasBuff(BuffType.GREED))
+				{
 					GameManager.Instance.SpawnGemBurst(pos, Random.Range(1, 6));
+				}
+
+				if (playerHit)
+				{
+					victoryStats.HitsLanded++;
 				}
 			}
 		}
@@ -1014,8 +1064,10 @@ public class PlayerController : NetworkBehaviour
 			return;
 		}
 
-		if (source != null && source.TryGetComponent<ProjectileData>(out var p)) {
-			if (hurtbox.HasSeenHitbox(source)) {
+		if (source != null && source.TryGetComponent<ProjectileData>(out var p))
+		{
+			if (hurtbox.HasSeenHitbox(source))
+			{
 				return;
 			}
 			hurtbox.MarkHitboxSeen(source);
@@ -1042,7 +1094,8 @@ public class PlayerController : NetworkBehaviour
 			return;
 		}
 
-		if (HasBuff(BuffType.BARRIER)) {
+		if (HasBuff(BuffType.BARRIER))
+		{
 			VFXManager.Instance.SyncVFX(ParticleType.ARMOR, transform.position, facing == -1);
 			EndBuff(BuffType.BARRIER);
 			return;
@@ -1061,12 +1114,19 @@ public class PlayerController : NetworkBehaviour
 		jump.ForceLanding();
 		jump.ForceVelocity(30f);
 		DoHitstop(0.15f);
+
+		PlayerController attackingPlayer = null;
+		if (owner != null)
+			owner.TryGetComponent(out attackingPlayer);
+
+		attackingPlayer.OnHitTrigger(source, true);
+
 		if (money > 0)
 		{
 			int num = Mathf.CeilToInt((float)money / 2f);
-			if (owner != null 
-				&& owner.TryGetComponent<PlayerController>(out var player) 
-				&& player.HasBuff(BuffType.BLOODLUST)) {
+			if (attackingPlayer != null
+				&& attackingPlayer.HasBuff(BuffType.BLOODLUST))
+			{
 				num = money;
 			}
 			DropLoot(num);
@@ -1075,16 +1135,20 @@ public class PlayerController : NetworkBehaviour
 		}
 		if (health > 0 && crowns > 0)
 		{
-			if (owner != null && owner.TryGetComponent<PlayerController>(out var player)) {
-				
-				if (player.HasBuff(BuffType.BLOODLUST)) {
-					health = 0;
-				} else {
-					health -= 50 + player.powerMod;
-				}
+			if (attackingPlayer != null)
+			{
 
-				player.OnHitTrigger(source);
-			} else {
+				if (attackingPlayer.HasBuff(BuffType.BLOODLUST))
+				{
+					health = 0;
+				}
+				else
+				{
+					health -= 50 + attackingPlayer.powerMod;
+				}
+			}
+			else
+			{
 				health -= 50;
 			}
 			UpdateHealthDisplay(health, maxHealth);
@@ -1128,6 +1192,7 @@ public class PlayerController : NetworkBehaviour
 		}
 		money -= amt;
 		UpdateMoneyDisplay();
+		victoryStats.MoneySpent += amt;
 		return true;
 	}
 
@@ -1175,6 +1240,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isLocalPlayer && invuln != InvulnState.HITSTUN && pickup.CanPickup())
 		{
+			victoryStats.ThingsCollected++;
 			GetItem(pickup.GetPickupType());
 			pickup.OnPickup();
 		}
@@ -1184,91 +1250,91 @@ public class PlayerController : NetworkBehaviour
 	{
 		switch (type)
 		{
-		case PickupType.MONEY_SMALL:
-			money++;
-			UpdateMoneyDisplay();
-			break;
-		case PickupType.MONEY_LARGE:
-			money += 10;
-			UpdateMoneyDisplay();
-			break;
-		case PickupType.MONEY_BONUS:
-			money += 5;
-			UpdateMoneyDisplay();
-			break;
-		case PickupType.ITEM_CROWN:
-			health = maxHealth;
-			UpdateHealthDisplay(health, maxHealth);
-			crowns++;
-			victoryStats.CrownsHeld++;
-			UpdateCrownDisplay();
-			break;
-		case PickupType.ITEM_POTION_HEALTH:
-			VFXManager.Instance.SyncFloatingText("Health +1", transform.position + 3 * Vector3.up, Color.red);
-			IncreaseStat(Stat.HEALTH);
-			break;
-		case PickupType.ITEM_POTION_POWER:
-			VFXManager.Instance.SyncFloatingText("Power +1", transform.position + 3 * Vector3.up, Color.green);
-			IncreaseStat(Stat.POWER);
-			break;
-		case PickupType.ITEM_POTION_SKILL:
-			VFXManager.Instance.SyncFloatingText("Skill +1", transform.position + 3 * Vector3.up, Color.blue);
-			IncreaseStat(Stat.SKILL);
-			break;
-		case PickupType.ITEM_POTION_SPEED:
-			VFXManager.Instance.SyncFloatingText("Speed +1", transform.position + 3 * Vector3.up, Color.cyan);
-			IncreaseStat(Stat.SPEED);
-			break;
-		case PickupType.ITEM_POTION_STAMINA:
-			VFXManager.Instance.SyncFloatingText("Stamina +1", transform.position + 3 * Vector3.up, Color.yellow);
-			IncreaseStat(Stat.STAMINA);
-			break;
-		case PickupType.WEAPON_PICK:
-			weaponId = 0;
-			break;
-		case PickupType.WEAPON_SWORD:
-			weaponId = 1;
-			break;
-		case PickupType.WEAPON_UNARMED:
-			weaponId = 2;
-			break;
-		case PickupType.WEAPON_SHIELD:
-			weaponId = 3;
-			break;
-		case PickupType.WEAPON_CLUB:
-			weaponId = 4;
-			break;
-		case PickupType.WEAPON_BOW:
-			hasAmmo = true;
-			weaponId = 5;
-			break;
-		case PickupType.WEAPON_TOME:
-			weaponId = 6;
-			break;
-		case PickupType.SKILL_MAGNET:
-			skillId = 0;
-			break;
-		case PickupType.SKILL_FLIGHT:
-			skillId = 1;
-			break;
-		case PickupType.SKILL_SHOTGUN:
-			skillId = 2;
-			break;
-		case PickupType.SKILL_TELEPORT:
-			skillId = 3;
-			break;
-		case PickupType.SKILL_SHOT:
-			skillId = 4;
-			break;
-		case PickupType.SKILL_DRILL:
-			skillId = 5;
-			break;
-		case PickupType.SKILL_BOMB:
-			skillId = 6;
-			break;
-		case PickupType.SKILL_FLASK:
-			skillId = 7;
-			break;
+			case PickupType.MONEY_SMALL:
+				money++;
+				UpdateMoneyDisplay();
+				break;
+			case PickupType.MONEY_LARGE:
+				money += 10;
+				UpdateMoneyDisplay();
+				break;
+			case PickupType.MONEY_BONUS:
+				money += 5;
+				UpdateMoneyDisplay();
+				break;
+			case PickupType.ITEM_CROWN:
+				health = maxHealth;
+				UpdateHealthDisplay(health, maxHealth);
+				crowns++;
+				victoryStats.CrownsHeld++;
+				UpdateCrownDisplay();
+				break;
+			case PickupType.ITEM_POTION_HEALTH:
+				VFXManager.Instance.SyncFloatingText("Health +1", transform.position + 3 * Vector3.up, Color.red);
+				IncreaseStat(Stat.HEALTH);
+				break;
+			case PickupType.ITEM_POTION_POWER:
+				VFXManager.Instance.SyncFloatingText("Power +1", transform.position + 3 * Vector3.up, Color.green);
+				IncreaseStat(Stat.POWER);
+				break;
+			case PickupType.ITEM_POTION_SKILL:
+				VFXManager.Instance.SyncFloatingText("Skill +1", transform.position + 3 * Vector3.up, Color.blue);
+				IncreaseStat(Stat.SKILL);
+				break;
+			case PickupType.ITEM_POTION_SPEED:
+				VFXManager.Instance.SyncFloatingText("Speed +1", transform.position + 3 * Vector3.up, Color.cyan);
+				IncreaseStat(Stat.SPEED);
+				break;
+			case PickupType.ITEM_POTION_STAMINA:
+				VFXManager.Instance.SyncFloatingText("Stamina +1", transform.position + 3 * Vector3.up, Color.yellow);
+				IncreaseStat(Stat.STAMINA);
+				break;
+			case PickupType.WEAPON_PICK:
+				weaponId = 0;
+				break;
+			case PickupType.WEAPON_SWORD:
+				weaponId = 1;
+				break;
+			case PickupType.WEAPON_UNARMED:
+				weaponId = 2;
+				break;
+			case PickupType.WEAPON_SHIELD:
+				weaponId = 3;
+				break;
+			case PickupType.WEAPON_CLUB:
+				weaponId = 4;
+				break;
+			case PickupType.WEAPON_BOW:
+				hasAmmo = true;
+				weaponId = 5;
+				break;
+			case PickupType.WEAPON_TOME:
+				weaponId = 6;
+				break;
+			case PickupType.SKILL_MAGNET:
+				skillId = 0;
+				break;
+			case PickupType.SKILL_FLIGHT:
+				skillId = 1;
+				break;
+			case PickupType.SKILL_SHOTGUN:
+				skillId = 2;
+				break;
+			case PickupType.SKILL_TELEPORT:
+				skillId = 3;
+				break;
+			case PickupType.SKILL_SHOT:
+				skillId = 4;
+				break;
+			case PickupType.SKILL_DRILL:
+				skillId = 5;
+				break;
+			case PickupType.SKILL_BOMB:
+				skillId = 6;
+				break;
+			case PickupType.SKILL_FLASK:
+				skillId = 7;
+				break;
 		}
 	}
 
@@ -1382,127 +1448,132 @@ public class PlayerController : NetworkBehaviour
 	{
 		switch (attackId)
 		{
-		case 4:
-			attacking = true;
-			jump.SetTerminalVelocity(10000f);
-			jump.ForceVelocity(-60f);
-			move.OverrideSpeed(6f);
-			break;
-		case 6:
-			invuln = InvulnState.NONE;
-			break;
-		case 7:
-			invuln = InvulnState.ARMOR;
-			break;
-		case 10:
-			InterruptCharge();
-			break;
+			case 4:
+				attacking = true;
+				jump.SetTerminalVelocity(10000f);
+				jump.ForceVelocity(-60f);
+				move.OverrideSpeed(6f);
+				break;
+			case 6:
+				invuln = InvulnState.NONE;
+				break;
+			case 7:
+				invuln = InvulnState.ARMOR;
+				break;
+			case 10:
+				InterruptCharge();
+				break;
 		}
 	}
 
-	private void InterruptCharge() {
-		switch (attackId) {
+	private void InterruptCharge()
+	{
+		switch (attackId)
+		{
 			case 10:
 				jump.ResetGravity();
 				jump.ResetTerminalVelocity();
 				break;
 		}
 
-	} 
+	}
 
 	public void CreateAttack()
 	{
 		switch (attackId)
 		{
-		case 0:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
-				.SetPosition(new Vector3((float)facing * 1.75f, 0f, 0f))
-				.SetSize(new Vector2(3.5f, 5f))
-				.Finish();
-			break;
-		case 1:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
-				.SetSize(new Vector2(4f, 2.5f))
-				.Finish();
-			break;
-		case 2:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
-				.SetSize(new Vector2(4f, 2.5f))
-				.Finish();
-			break;
-		case 3:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
-				.SetPosition(new Vector3(facing, -0.5f, 0f))
-				.SetSize(new Vector2(4f, 3f))
-				.Finish();
-			break;
-		case 4:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(Vector3.down)
-				.SetSize(new Vector2(2f, 3f))
-				.Finish();
-			break;
-		case 5:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(new Vector3(facing * 2, -1f, 0f))
-				.SetSize(new Vector2(2f, 2f))
-				.Finish();
-			break;
-		case 6:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(Vector3.zero)
-				.SetSize(new Vector2(6f, 6f))
-				.Finish();
-			break;
-		case 7:
-			invuln = InvulnState.NONE;
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
-				.SetPosition(new Vector3(1f, 1f, 0f))
-				.SetSize(new Vector2(6f, 6f))
-				.Finish();
-			break;
-		case 8:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
-				.MakeProjectile(transform.position + 0.5f * Vector3.down)
-				.SetAnimation(3)
-				.SetVelocity(40f * aim)
-				.RotateWithVelocity()
-				.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-				.SetUnique(UniqueProjectile.ARROW)
-				.Finish();
-			hasAmmo = false;
-			break;
-		case 9:
-			AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-				.SetPosition(new Vector3(facing * 1.5f, -1f, 0f))
-				.SetSize(new Vector2(2f, 2f))
-				.Finish();
-			break;
-		case 10:
-			if (Time.time - chargeStart > 0.5f) {
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(12f, 1f)).SetDuration(0.2f)
-					.MakeProjectile(transform.position + 0.5f * Vector3.down + 6 * aim)
-					.SetAnimation(6)
-					.SetVelocity(0.1f * aim)
-					.DisableEntityImpact()
-					.DisableWorldImpact()
-					.RotateWithVelocity()
-					.SetLifetime(0.5f)
+			case 0:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
+					.SetPosition(new Vector3((float)facing * 1.75f, 0f, 0f))
+					.SetSize(new Vector2(3.5f, 5f))
 					.Finish();
-			} else {
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 2f)).SetDuration(0.2f)
-					.MakeProjectile(transform.position + 0.5f * Vector3.down + 3 * aim)
-					.SetAnimation(7)
-					.SetVelocity(0.1f * aim)
-					.RotateWithVelocity()
-					.DisableEntityImpact()
-					.DisableWorldImpact()
-					.SetLifetime(0.55f)
+				break;
+			case 1:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
+					.SetSize(new Vector2(4f, 2.5f))
 					.Finish();
-			}
-			break;
+				break;
+			case 2:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
+					.SetSize(new Vector2(4f, 2.5f))
+					.Finish();
+				break;
+			case 3:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
+					.SetPosition(new Vector3(facing, -0.5f, 0f))
+					.SetSize(new Vector2(4f, 3f))
+					.Finish();
+				break;
+			case 4:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(Vector3.down)
+					.SetSize(new Vector2(2f, 3f))
+					.Finish();
+				break;
+			case 5:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(new Vector3(facing * 2, -1f, 0f))
+					.SetSize(new Vector2(2f, 2f))
+					.Finish();
+				break;
+			case 6:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(Vector3.zero)
+					.SetSize(new Vector2(6f, 6f))
+					.Finish();
+				break;
+			case 7:
+				invuln = InvulnState.NONE;
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
+					.SetPosition(new Vector3(1f, 1f, 0f))
+					.SetSize(new Vector2(6f, 6f))
+					.Finish();
+				break;
+			case 8:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
+					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+					.SetAnimation(3)
+					.SetVelocity(40f * aim)
+					.RotateWithVelocity()
+					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+					.SetUnique(UniqueProjectile.ARROW)
+					.Finish();
+				hasAmmo = false;
+				break;
+			case 9:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(new Vector3(facing * 1.5f, -1f, 0f))
+					.SetSize(new Vector2(2f, 2f))
+					.Finish();
+				break;
+			case 10:
+				if (Time.time - chargeStart > 0.5f)
+				{
+					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(12f, 1f)).SetDuration(0.2f)
+						.MakeProjectile(transform.position + 0.5f * Vector3.down + 6 * aim)
+						.SetAnimation(6)
+						.SetVelocity(0.1f * aim)
+						.DisableEntityImpact()
+						.DisableWorldImpact()
+						.RotateWithVelocity()
+						.SetLifetime(0.5f)
+						.Finish();
+				}
+				else
+				{
+					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 2f)).SetDuration(0.2f)
+						.MakeProjectile(transform.position + 0.5f * Vector3.down + 3 * aim)
+						.SetAnimation(7)
+						.SetVelocity(0.1f * aim)
+						.RotateWithVelocity()
+						.DisableEntityImpact()
+						.DisableWorldImpact()
+						.SetLifetime(0.55f)
+						.Finish();
+				}
+				break;
 		}
 	}
 
@@ -1609,7 +1680,7 @@ public class PlayerController : NetworkBehaviour
 
 			StartCoroutine(DelayGiveReward());
 		}
-		
+
 		IEnumerator DelayGiveReward()
 		{
 			yield return new WaitForSeconds(0.75f);
@@ -1634,9 +1705,11 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	public void LeaveLevel()
+	public void LeaveLevel(bool first)
 	{
-		UpdateMoneyLock(val: false);
+		UpdateMoneyLock(false);
+		if (first)
+			victoryStats.DoorsEntered++;
 		UpdateVictoryStats();
 	}
 
@@ -1647,7 +1720,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			RecieveVictoryStats(stats);
 		}
-		
+
 		[ClientRpc] void RecieveVictoryStats(VictoryStats stats)
 		{
 			victoryStats = stats;
@@ -1664,51 +1737,66 @@ public class PlayerController : NetworkBehaviour
 		unitUI.UpdateNameplate();
 	}
 
-	public void RefreshAmmo() {
-		if (isServer) {
+	public void RefreshAmmo()
+	{
+		if (isServer)
+		{
 			RecieveAmmoRefresh();
-		} else {
+		}
+		else
+		{
 			SendAmmoRefresh();
 		}
 
-		[Command] void SendAmmoRefresh() {
+		[Command] void SendAmmoRefresh()
+		{
 			RecieveAmmoRefresh();
 		}
 
-		[ClientRpc] void RecieveAmmoRefresh() {
+		[ClientRpc] void RecieveAmmoRefresh()
+		{
 			hasAmmo = true;
 		}
 	}
 
-	private void IncreaseStat(Stat stat) {
-		if (isServer) {
+	private void IncreaseStat(Stat stat)
+	{
+		if (isServer)
+		{
 			RecieveStatIncrease(stat);
-		} else {
+		}
+		else
+		{
 			SendStatIncrease(stat);
 		}
 
-		[Command] void SendStatIncrease(Stat stat) {
+		[Command] void SendStatIncrease(Stat stat)
+		{
 			RecieveStatIncrease(stat);
 		}
 
-		[ClientRpc] void RecieveStatIncrease(Stat stat) {
+		[ClientRpc] void RecieveStatIncrease(Stat stat)
+		{
 			stats[(int)stat]++;
 
 			string currstats = "Stats:\n";
-			foreach (var s in stats) {
+			foreach (var s in stats)
+			{
 				currstats += $"{s}\n";
 			}
 			move.AdjustBaseSpeed(speedMod, speedMult);
 		}
 	}
 
-	public void GiveBuff(BuffType type) {
+	public void GiveBuff(BuffType type)
+	{
 		var buffColor = Color.magenta;
 
 		if (type == BuffType.RANDOM)
 			type = (BuffType)Random.Range(0, (int)BuffType.RANDOM);
 
-		switch (type) {
+		switch (type)
+		{
 			case BuffType.BARRIER:
 				buffColor = Color.gray;
 				break;
@@ -1729,18 +1817,20 @@ public class PlayerController : NetworkBehaviour
 
 		unitVFX.SetFXState(PlayerVFX.POWERUP_GENERIC, true);
 		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, buffColor);
-		
+
 		buffColor.a = 0.5f;
 		unitVFX.EndChain(type.ToString());
 		unitVFX.StartAfterImageChain(10f, 0.05f, 0.2f, false, buffColor, type.ToString());
 
 		SendBuff(type);
 
-		[Command(requiresAuthority = false)] void SendBuff(BuffType type) {
+		[Command(requiresAuthority = false)] void SendBuff(BuffType type)
+		{
 			RecieveBuff(type);
 		}
 
-		[ClientRpc] void RecieveBuff(BuffType type) {
+		[ClientRpc] void RecieveBuff(BuffType type)
+		{
 			buffs[(int)type] = Time.time + 10f;
 			buffDirty[(int)type] = true;
 
@@ -1751,11 +1841,13 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	public bool HasBuff(BuffType type) {
+	public bool HasBuff(BuffType type)
+	{
 		return Time.time < buffs[(int)type];
 	}
 
-	public void EndBuff(BuffType type) {
+	public void EndBuff(BuffType type)
+	{
 		unitVFX.EndChain(type.ToString());
 		if (type == BuffType.GREED)
 		{
@@ -1770,18 +1862,23 @@ public class PlayerController : NetworkBehaviour
 		{
 			SendEndBuff(type);
 		}
-		[Command] void SendEndBuff(BuffType type) {
+		[Command] void SendEndBuff(BuffType type)
+		{
 			RecieveEndBuff(type);
 		}
 
-		[ClientRpc] void RecieveEndBuff(BuffType type) {
+		[ClientRpc] void RecieveEndBuff(BuffType type)
+		{
 			buffs[(int)type] = 0;
 		}
 	}
 
-	public void DoBuffCleanup() {
-		for (int i = 0; i < (int)BuffType.RANDOM; i++) {
-			if (buffDirty[i] && Time.time > buffs[i]) {
+	public void DoBuffCleanup()
+	{
+		for (int i = 0; i < (int)BuffType.RANDOM; i++)
+		{
+			if (buffDirty[i] && Time.time > buffs[i])
+			{
 				buffDirty[i] = false;
 				if ((BuffType)i == BuffType.SWIFT || (BuffType)i == BuffType.GHOSTFORM)
 					move.AdjustBaseSpeed(speedMod, speedMult);
@@ -1797,11 +1894,29 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	private float CalculateSpeed(float baseSpeed) {
+	private float CalculateSpeed(float baseSpeed)
+	{
 		return (baseSpeed + speedMod) * speedMult;
 	}
 
-	public int GetCurrentColor() {
+	public int GetCurrentColor()
+	{
 		return currentColor;
+	}
+
+	public string GetDisplayName()
+	{
+		if (GameManager.Instance.IsLocalGame)
+		{
+			return playerProfileName;
+		}
+		if (friendId.HasValue)
+			return Utils.GetSteamName(friendId.Value);
+		return null;
+	}
+
+	public void UpdateProfileName(string name)
+	{
+		playerProfileName = name;
 	}
 }

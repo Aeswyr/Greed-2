@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -59,6 +59,11 @@ TagManager:
   - name: World
     uniqueID: 1227820961
     locked: 0
-  - name: UI
+  - name: WorldUI
     uniqueID: 758291363
     locked: 0
+  - name: UI
+    uniqueID: 2072898831
+    locked: 0
+  m_RenderingLayers:
+  - Default

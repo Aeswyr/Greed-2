@@ -8,5 +8,5 @@ public struct VictoryStats
     public int DoorsEntered;
     public int CloseCalls;
     public int ThingsCollected;
-    public int ItemsSpawned;
+    public int Luck;
 }

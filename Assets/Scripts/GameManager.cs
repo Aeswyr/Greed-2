@@ -310,7 +310,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	private void UpdateLevelUI()
 	{
 		Vector3 targetPos = levelCounterParent.GetChild(levelIndex).transform.position;
-		levelPointer.transform.position = targetPos + 32 * Vector3.up;
+		levelPointer.transform.position = targetPos + 1.25f * Vector3.up;
 	}
 
 	public void CompleteLevelTransition()
@@ -363,7 +363,7 @@ public class GameManager : NetworkSingleton<GameManager>
 							}
 							break;
 						case "flip":
-							gameObject.GetComponent<SpriteRenderer>().flipX = true;
+							gameObject.GetComponent<SyncSpriteFlip>().SetFlipX(true);
 							break;
 					}
 				}
@@ -600,6 +600,11 @@ public class GameManager : NetworkSingleton<GameManager>
 			[Command(requiresAuthority = false)] void NotifyNextStep()
 			{
 				readyPings++;
+
+				if (IsLocalGame)
+				{
+					readyPings = TotalPlayerCount();
+				}
 			}
 		}
 		

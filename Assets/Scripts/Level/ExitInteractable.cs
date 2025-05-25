@@ -21,7 +21,7 @@ public class ExitInteractable : NetworkBehaviour
 	public void OnInteract(PlayerController owner)
 	{
 		owner.SetStasis(value: true);
-		owner.LeaveLevel();
+		owner.LeaveLevel(playerCount == 0);
 		owner.transform.position = 200f * Vector3.down;
 		NextLevelReady();
 	}

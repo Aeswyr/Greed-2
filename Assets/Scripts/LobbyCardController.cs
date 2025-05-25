@@ -83,6 +83,10 @@ public class LobbyCardController : NetworkBehaviour
 		void SendCardName(ulong id)
 		{
 			playerName.text = Utils.GetSteamName(id);
+			if (GameManager.Instance.IsLocalGame)
+			{
+				playerName.text = $"Player {input.GetComponent<PlayerInput>().playerIndex + 1}";
+			}
 		}
 	}
 
@@ -163,6 +167,7 @@ public class LobbyCardController : NetworkBehaviour
 		{
 			input.GetComponent<PlayerInput>().actions.RemoveAllBindingOverrides();
 			profileName.text = "Default Profile";
+			player.UpdateProfileName($"Player {input.GetComponent<PlayerInput>().playerIndex + 1}");
 		}
 		else
 		{
@@ -176,6 +181,7 @@ public class LobbyCardController : NetworkBehaviour
 				input.GetComponent<PlayerInput>().actions.LoadBindingOverridesFromJson(profile.settings);
 			}
 			profileName.text = profile.name;
+			player.UpdateProfileName(profile.name);
 		}
 	}
 }

@@ -840,8 +840,8 @@ Canvas:
   m_GameObject: {fileID: 1097478498}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 2105773518}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -851,7 +851,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 2072898831
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &1097478502
@@ -1501,10 +1501,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.54149663
     y: 0
-    width: 1
-    height: 1
+    width: 0.82857144
+    height: 0.9824561
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
