@@ -12,6 +12,8 @@ public class MainMenuManager : MonoBehaviour
 	private GameObject joinMenu;
 	[SerializeField]
 	private GameObject mainMenu;
+	[SerializeField]
+	private GameObject inputsMenu;
 
 	[SerializeField]
 	private GameObject joinPrefab;
@@ -32,6 +34,8 @@ public class MainMenuManager : MonoBehaviour
 
 	private void Start()
 	{
+		SaveDataManager.Load();
+
 		PlayerInputManager.instance.onPlayerJoined += FirstPlayerJoined;
 
 		if (FindAnyObjectByType<NetworkAnimator>() == null)
@@ -42,9 +46,11 @@ public class MainMenuManager : MonoBehaviour
 
 		mainMenu.SetActive(true);
 		joinMenu.SetActive(false);
+		inputsMenu.SetActive(false);
 	}
 
-	private void FirstPlayerJoined(PlayerInput player) {
+	private void FirstPlayerJoined(PlayerInput player)
+	{
 		PlayerInputManager.instance.DisableJoining();
 		PlayerInputManager.instance.onPlayerJoined -= FirstPlayerJoined;
 	}
@@ -103,7 +109,8 @@ public class MainMenuManager : MonoBehaviour
 		Application.Quit();
 	}
 
-	public void OnLocal() {
+	public void OnLocal()
+	{
 		PlayerInputManager.instance.EnableJoining();
 		DontDestroyOnLoad(PlayerInputManager.instance.gameObject);
 
@@ -115,13 +122,24 @@ public class MainMenuManager : MonoBehaviour
 		FindAnyObjectByType<SteamManager>().Host();
 	}
 
-	public void OnJoin() {
+	public void OnJoin()
+	{
 		mainMenu.SetActive(false);
 		joinMenu.SetActive(true);
+		inputsMenu.SetActive(false);
 	}
 
-	public void OnBack() {
+	public void OnBack()
+	{
 		mainMenu.SetActive(true);
 		joinMenu.SetActive(false);
+		inputsMenu.SetActive(false);
+	}
+
+	public void OnSettings()
+	{
+		mainMenu.SetActive(false);
+		joinMenu.SetActive(false);
+		inputsMenu.SetActive(true);
 	}
 }

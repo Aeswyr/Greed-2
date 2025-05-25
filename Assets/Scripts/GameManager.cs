@@ -44,15 +44,18 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	[SerializeField]
 	private GameObject[] shops;
+	[SerializeField]
+	private GameObject[] finalLevels;
 	[Header("UI")]
 	[SerializeField] private Animator screenWipe;
+	[SerializeField] private VictoryScreenController victoryScreen;
 	[SerializeField] private GameObject scoreCardPrefab;
 	[SerializeField] private Transform scoreCardParent;
 	[SerializeField] private GameObject levelTickPrefab;
 	[SerializeField] private GameObject majorTickPrefab;
 	[SerializeField] private Transform levelCounterParent;
 	[SerializeField] private GameObject levelPointer;
-	
+
 
 	private int levelIndex = 0;
 
@@ -68,6 +71,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void Start()
 	{
+		victoryScreen.gameObject.SetActive(false);
 		if (PlayerInputManager.instance != null)
 		{
 			IsLocalGame = true;
@@ -154,9 +158,9 @@ public class GameManager : NetworkSingleton<GameManager>
 			{
 				playerController.SetInputLocked(value: false);
 
-				var card = Instantiate(scoreCardPrefab, scoreCardParent);
-				playerController.SetupScorecard(card.GetComponent<ScoreCard>());
 			}
+			var card = Instantiate(scoreCardPrefab, scoreCardParent);
+			playerController.SetupScorecard(card.GetComponent<ScoreCard>());
 		}
 
 		for (int i = 0; i <= levelCount; i++)
@@ -248,6 +252,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 	}
 
+
+
 	private void LoadLevel(int id)
 	{
 		levelIndex++;
@@ -255,6 +261,10 @@ public class GameManager : NetworkSingleton<GameManager>
 		if (IsLevelShop())
 		{
 			original = shops[id];
+		}
+		if (levelIndex == levelCount)
+		{
+			original = finalLevels[id];
 		}
 
 		currentLevel = Instantiate(original).GetComponent<LevelController>();
@@ -437,7 +447,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		List<PlayerController> players = new List<PlayerController>(FindObjectsByType<PlayerController>(FindObjectsSortMode.None));
 
-		players.Sort(delegate(PlayerController a, PlayerController b)
+		players.Sort(delegate (PlayerController a, PlayerController b)
 		{
 			if (a.GetVictoryStats().MoneyHeld > b.GetVictoryStats().MoneyHeld)
 				return -1;
@@ -545,5 +555,63 @@ public class GameManager : NetworkSingleton<GameManager>
 		}
 
 		return 0;
+	}
+
+	public void FireVictorySequence()
+	{
+		StartVictorySequence();
+		StartCoroutine(PrepForVictory());
+
+		IEnumerator PrepForVictory()
+		{
+			yield return new WaitUntil(() => { return readyPings >= TotalPlayerCount(); });
+
+			readyPings = 0;
+			EndVictorySequence();
+
+			[ClientRpc] void EndVictorySequence() {
+				StartCoroutine(EndSequence());
+			}
+		}
+
+		[ClientRpc] void StartVictorySequence()
+		{
+			StartCoroutine(StartSequence());
+		}
+
+		IEnumerator StartSequence()
+		{
+			screenWipe.SetTrigger("wipeon");
+
+			foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
+			{
+				if (player.isLocalPlayer)
+				{
+					player.SetStasis(true);
+					player.UpdateVictoryStats();
+				}	
+			}
+
+			yield return new WaitForSeconds(0.75f);
+
+			Destroy(currentLevel.gameObject);
+			NotifyNextStep();
+
+			[Command(requiresAuthority = false)] void NotifyNextStep()
+			{
+				readyPings++;
+			}
+		}
+		
+		IEnumerator EndSequence()
+		{
+			victoryScreen.gameObject.SetActive(true);
+			screenWipe.SetTrigger("wipeoff");
+
+			yield return new WaitForSeconds(0.25f);
+
+			var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+			victoryScreen.StartVictorySequence(players);
+		}
 	}
 }

@@ -5,6 +5,7 @@ using Mirror.RemoteCalls;
 using Steamworks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class LobbyCardController : NetworkBehaviour
@@ -17,6 +18,8 @@ public class LobbyCardController : NetworkBehaviour
 
 	[SerializeField]
 	private Image characterDisplay;
+	[SerializeField] private TextMeshProUGUI profileName;
+	[SerializeField] private GameObject playerProfile;
 
 	[SerializeField]
 	private MaterialLibrary colors;
@@ -34,6 +37,7 @@ public class LobbyCardController : NetworkBehaviour
 	private ulong? friendId = null;
 
 	private InputHandler input;
+	private int controlScheme = 0;
 
 	public void Init(PlayerController player)
 	{
@@ -46,7 +50,8 @@ public class LobbyCardController : NetworkBehaviour
 		{
 			transform.SetParent(GameManager.Instance.PlayerLobbyHolder);
 		}
-		if (input == null) {
+		if (input == null)
+		{
 			input = FindAnyObjectByType<InputHandler>();
 		}
 		if (player != null && player.isLocalPlayer)
@@ -56,6 +61,16 @@ public class LobbyCardController : NetworkBehaviour
 		else if (friendId.HasValue)
 		{
 			playerName.text = Utils.GetSteamName(friendId.Value);
+		}
+
+		if (player != null && (GameManager.Instance.IsLocalGame || player.isLocalPlayer))
+		{
+			NextControlScheme(0);
+			playerProfile.SetActive(true);
+		}
+		else
+		{
+			playerProfile.SetActive(false);
 		}
 	}
 
@@ -125,6 +140,42 @@ public class LobbyCardController : NetworkBehaviour
 		if (!(player == null) && player.isLocalPlayer)
 		{
 			player.SetColor(currentColor);
+		}
+	}
+
+	public void NextControlScheme(int dir)
+	{
+		
+		controlScheme += dir;
+
+		var profiles = SaveDataManager.GetProfiles();
+
+		if (controlScheme < 0)
+		{
+			controlScheme += profiles.Count + 1;
+		}
+		else
+		{
+			controlScheme %= profiles.Count + 1;
+		}
+
+		if (controlScheme == 0)
+		{
+			input.GetComponent<PlayerInput>().actions.RemoveAllBindingOverrides();
+			profileName.text = "Default Profile";
+		}
+		else
+		{
+			var profile = profiles[controlScheme - 1];
+			if (string.IsNullOrEmpty(profile.settings))
+			{
+				input.GetComponent<PlayerInput>().actions.RemoveAllBindingOverrides();
+			}
+			else
+			{
+				input.GetComponent<PlayerInput>().actions.LoadBindingOverridesFromJson(profile.settings);
+			}
+			profileName.text = profile.name;
 		}
 	}
 }

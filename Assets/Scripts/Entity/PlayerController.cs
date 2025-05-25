@@ -281,7 +281,14 @@ public class PlayerController : NetworkBehaviour
 		
 		[ClientRpc] void RecieveName(string name)
 		{
-			scorecard.SetName(name);
+			StartCoroutine(WaitUntilCardReady());
+
+			IEnumerator WaitUntilCardReady()
+			{
+				yield return new WaitUntil(() => scorecard != null);
+
+				scorecard.SetName(name);
+			}
 		}
 	}
 
@@ -1086,6 +1093,7 @@ public class PlayerController : NetworkBehaviour
 				healthEmptied = true;
 				DropCrown();
 				crowns--;
+				victoryStats.CrownsHeld--;
 				UpdateCrownDisplay();
 			}
 		}
@@ -1192,6 +1200,7 @@ public class PlayerController : NetworkBehaviour
 			health = maxHealth;
 			UpdateHealthDisplay(health, maxHealth);
 			crowns++;
+			victoryStats.CrownsHeld++;
 			UpdateCrownDisplay();
 			break;
 		case PickupType.ITEM_POTION_HEALTH:
@@ -1790,5 +1799,9 @@ public class PlayerController : NetworkBehaviour
 
 	private float CalculateSpeed(float baseSpeed) {
 		return (baseSpeed + speedMod) * speedMult;
+	}
+
+	public int GetCurrentColor() {
+		return currentColor;
 	}
 }

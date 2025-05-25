@@ -1,5 +1,6 @@
 public struct VictoryStats
 {
+    public int CrownsHeld;
     public int MoneyHeld;
     public int MoneyCollected;
     public int MoneySpent;
