@@ -72,6 +72,11 @@ public class LobbyCardController : NetworkBehaviour
 		{
 			playerProfile.SetActive(false);
 		}
+
+		transform.localScale = Vector3.one;
+		var pos = transform.localPosition;
+		pos.z = 0;
+		transform.localPosition = pos;
 	}
 
 	[Command(requiresAuthority = false)]

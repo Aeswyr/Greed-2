@@ -5255,6 +5255,40 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  pickMineSpeed: 6
+  pickMineCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -5
+      outSlope: -5
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.2
+      value: 0
+      inSlope: -0.0016700309
+      outSlope: -0.0016700309
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.80780905
+    - serializedVersion: 3
+      time: 1.1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   swordAttackSpeed: 12
   swordAttackCurve:
     serializedVersion: 2
@@ -5523,6 +5557,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  playerProfileName: 
 --- !u!114 &7056287893420437668
 MonoBehaviour:
   m_ObjectHideFlags: 0

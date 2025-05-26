@@ -84,6 +84,11 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve pickAttackCurve;
+	[SerializeField]
+	private float pickMineSpeed;
+
+	[SerializeField]
+	private AnimationCurve pickMineCurve;
 
 	[SerializeField]
 	private float swordAttackSpeed;
@@ -575,6 +580,10 @@ public class PlayerController : NetworkBehaviour
 		{
 			case 0: // pickaxe
 				attackId = 0;
+				if (input.aim.y < 0f)
+				{
+					attackId = 11;
+				}
 				break;
 			case 1: // sword
 				attackId = 1;
@@ -729,6 +738,16 @@ public class PlayerController : NetworkBehaviour
 				jump.SetGravity(0.5f);
 				jump.ForceVelocity(0);
 				jump.SetTerminalVelocity(2);
+				break;
+			case 11:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(pickMineSpeed), pickMineCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
 				break;
 		}
 	}
@@ -999,13 +1018,15 @@ public class PlayerController : NetworkBehaviour
 	public void OnHitTrigger(Transform source, bool playerHit = false)
 	{
 
+		Vector3 position = source == null ? transform.position : source.position;
+
 		if (isServer)
 		{
-			RecieveTrigger(source.position, playerHit);
+			RecieveTrigger(position, playerHit);
 		}
 		else
 		{
-			SendTrigger(source.position, playerHit);
+			SendTrigger(position, playerHit);
 		}
 
 		[Command] void SendTrigger(Vector3 pos, bool playerHit)
@@ -1462,6 +1483,27 @@ public class PlayerController : NetworkBehaviour
 				break;
 			case 10:
 				InterruptCharge();
+				break;
+			case 11:
+				if (GameManager.Instance.IsLevelShop() || GameManager.Instance.GetLevelIndex() == 0)
+				{
+					VFXManager.Instance.SyncPrefabVFX(ParticlePrefabType.DUST_PUFF, transform.position + new Vector3(facing * 2f, -2f, 0));
+					return;
+				}
+
+				int roll = Random.Range(0, 100);
+				if (roll < 5)
+				{
+					GameManager.Instance.SpawnGemBurst(transform.position + new Vector3(facing * 2f, -2.5f, 0), 1);
+				}
+				else if (roll < 35)
+				{
+					GameManager.Instance.SpawnGoldBurst(transform.position + new Vector3(facing * 2f, -2.5f, 0), 2);
+				}
+				else
+				{
+					GameManager.Instance.SpawnGoldBurst(transform.position + new Vector3(facing * 2f, -2.5f, 0), 1);
+				}
 				break;
 		}
 	}
