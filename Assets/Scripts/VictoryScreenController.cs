@@ -171,14 +171,6 @@ public class VictoryScreenController : MonoBehaviour
 
     public void ToTitle()
     {
-        SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
-        if (NetworkServer.activeHost)
-        {
-            FindAnyObjectByType<NetworkManager>().StopHost();
-        }
-        else
-        {
-            FindAnyObjectByType<NetworkManager>().StopClient();
-        }
+        GameManager.Instance.CleanupGame();
     }
 }

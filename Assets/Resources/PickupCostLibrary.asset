@@ -29,8 +29,8 @@ MonoBehaviour:
     price: 10
   - type: 10
     price: 10
-  - type: 11
-    price: 15
+  - type: 24
+    price: 20
   - type: 12
     price: 15
   - type: 13
@@ -46,7 +46,7 @@ MonoBehaviour:
   - type: 18
     price: 15
   - type: 19
-    price: 20
+    price: 15
   - type: 20
     price: 20
   - type: 21
@@ -54,4 +54,6 @@ MonoBehaviour:
   - type: 22
     price: 20
   - type: 23
+    price: 20
+  - type: 24
     price: 20

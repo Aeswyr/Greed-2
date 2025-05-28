@@ -1,13 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Mirror;
-using Mirror.RemoteCalls;
-using Telepathy;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
+using Steamworks;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
@@ -95,7 +91,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		playerObj.GetComponent<PlayerController>().SetupInput(input.GetComponent<InputHandler>());
 	}
 
-	public void AddLobbyCard(PlayerController player, InputHandler input)
+	public void AddLobbyCard(PlayerController player)
 	{
 		player.SetInputLocked(value: true);
 		SyncCard(player.transform);
@@ -569,7 +565,8 @@ public class GameManager : NetworkSingleton<GameManager>
 			readyPings = 0;
 			EndVictorySequence();
 
-			[ClientRpc] void EndVictorySequence() {
+			[ClientRpc] void EndVictorySequence()
+			{
 				StartCoroutine(EndSequence());
 			}
 		}
@@ -589,7 +586,7 @@ public class GameManager : NetworkSingleton<GameManager>
 				{
 					player.SetStasis(true);
 					player.UpdateVictoryStats();
-				}	
+				}
 			}
 
 			yield return new WaitForSeconds(0.75f);
@@ -607,7 +604,7 @@ public class GameManager : NetworkSingleton<GameManager>
 				}
 			}
 		}
-		
+
 		IEnumerator EndSequence()
 		{
 			victoryScreen.gameObject.SetActive(true);
@@ -617,6 +614,34 @@ public class GameManager : NetworkSingleton<GameManager>
 
 			var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 			victoryScreen.StartVictorySequence(players);
+		}
+	}
+
+	public void RemovePlayer(PlayerController player)
+	{
+		Destroy(player.GetInput().gameObject);
+		Destroy(player.gameObject);
+	}
+
+	public void CleanupGame()
+	{
+		PlayerInputManager.instance.onPlayerJoined -= AddLocalPlayer;
+		SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
+		if (NetworkServer.activeHost)
+		{
+			FindAnyObjectByType<NetworkManager>().StopHost();
+		}
+		else
+		{
+			FindAnyObjectByType<NetworkManager>().StopClient();
+		}
+
+		if (IsLocalGame)
+		{
+			foreach (var input in FindObjectsByType<PlayerInput>(FindObjectsSortMode.None))
+			{
+				Destroy(input.gameObject);
+			}
 		}
 	}
 }

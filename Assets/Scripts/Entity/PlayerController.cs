@@ -149,6 +149,33 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve bowReleaseCurve;
+	[SerializeField]
+	private float tomeAttackSpeed;
+
+	[SerializeField]
+	private AnimationCurve tomeAttackCurve;
+
+	[SerializeField]
+	private float tomeReleaseSpeed;
+
+	[SerializeField]
+	private AnimationCurve tomeReleaseCurve;
+	[SerializeField]
+	private float chainAttackSpeed;
+
+	[SerializeField]
+	private AnimationCurve chainAttackCurve;
+
+	[SerializeField]
+	private float chainReleaseSpeed;
+
+	[SerializeField]
+	private AnimationCurve chainReleaseCurve;
+	[SerializeField]
+	private float chainAltReleaseSpeed;
+
+	[SerializeField]
+	private AnimationCurve chainAltReleaseCurve;
 
 	private float staminaCooldown => 2.5f - staminaMod - (HasBuff(BuffType.GHOSTFORM) ? 1 : 0);
 	private float skillCooldown => 6f - skillMod;
@@ -192,7 +219,7 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 0; //0
+	private int weaponId = 7; //0
 	private int skillId = -1; //-1
 
 	private bool stasis;
@@ -211,6 +238,8 @@ public class PlayerController : NetworkBehaviour
 
 	private bool charging;
 	private float chargeStart;
+	private float tomeChargeLength = 0.5f;
+	private float chainChargeLength = 0.75f;
 
 	private VictoryStats victoryStats;
 
@@ -235,7 +264,7 @@ public class PlayerController : NetworkBehaviour
 
 	[SyncVar]
 	private ulong? friendId = null;
-	public string playerProfileName;
+	private string playerProfileName;
 
 	private void Start()
 	{
@@ -290,7 +319,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		this.input = input;
 		jump.SetInput(input);
-		GameManager.Instance.AddLobbyCard(this, input);
+		GameManager.Instance.AddLobbyCard(this);
 	}
 
 	public void SetupScorecard(ScoreCard card)
@@ -626,6 +655,10 @@ public class PlayerController : NetworkBehaviour
 				StartCharge();
 				attackId = 10;
 				break;
+			case 7: // chain
+				StartCharge();
+				attackId = 12;
+				break;
 		}
 		animator.SetInteger("attackId", attackId);
 		animator.SetTrigger("attack");
@@ -729,7 +762,7 @@ public class PlayerController : NetworkBehaviour
 			case 10:
 				if (input.dir != 0f)
 				{
-					move.OverrideCurve(CalculateSpeed(bowAttackSpeed), bowAttackCurve, facing);
+					move.OverrideCurve(CalculateSpeed(tomeAttackSpeed), tomeAttackCurve, facing);
 				}
 				else if (grounded)
 				{
@@ -748,6 +781,19 @@ public class PlayerController : NetworkBehaviour
 				{
 					move.StartDeceleration();
 				}
+				break;
+			case 12:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(chainAttackSpeed), chainAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				jump.SetGravity(0.5f);
+				jump.ForceVelocity(0);
+				jump.SetTerminalVelocity(2);
 				break;
 		}
 	}
@@ -787,7 +833,28 @@ public class PlayerController : NetworkBehaviour
 				{
 					UpdateFacing(input.dir);
 				}
-				move.OverrideCurve(CalculateSpeed(bowReleaseSpeed), bowReleaseCurve, -facing);
+				move.OverrideCurve(CalculateSpeed(tomeReleaseSpeed), tomeReleaseCurve, -facing);
+				break;
+			case 12:
+				charging = false;
+
+				if (input.dir != 0f)
+				{
+					UpdateFacing(input.dir);
+				}
+				CreateAttack();
+
+				if (Time.time - chargeStart > chainChargeLength)
+				{
+					animator.SetTrigger("releaseAlt");
+					move.OverrideCurve(CalculateSpeed(chainAltReleaseSpeed), chainAltReleaseCurve, facing);
+				}
+				else
+				{
+
+					animator.SetTrigger("release");
+					move.OverrideCurve(CalculateSpeed(chainReleaseSpeed), chainReleaseCurve, facing);
+				}
 				break;
 		}
 	}
@@ -1332,6 +1399,9 @@ public class PlayerController : NetworkBehaviour
 			case PickupType.WEAPON_TOME:
 				weaponId = 6;
 				break;
+			case PickupType.WEAPON_CHAIN:
+				weaponId = 7;
+				break;
 			case PickupType.SKILL_MAGNET:
 				skillId = 0;
 				break;
@@ -1505,6 +1575,9 @@ public class PlayerController : NetworkBehaviour
 					GameManager.Instance.SpawnGoldBurst(transform.position + new Vector3(facing * 2f, -2.5f, 0), 1);
 				}
 				break;
+			case 12:
+				InterruptCharge();
+				break;
 		}
 	}
 
@@ -1513,9 +1586,11 @@ public class PlayerController : NetworkBehaviour
 		switch (attackId)
 		{
 			case 10:
+			case 12:
 				jump.ResetGravity();
 				jump.ResetTerminalVelocity();
 				break;
+			
 		}
 
 	}
@@ -1591,7 +1666,7 @@ public class PlayerController : NetworkBehaviour
 					.Finish();
 				break;
 			case 10:
-				if (Time.time - chargeStart > 0.5f)
+				if (Time.time - chargeStart > tomeChargeLength)
 				{
 					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(12f, 1f)).SetDuration(0.2f)
 						.MakeProjectile(transform.position + 0.5f * Vector3.down + 6 * aim)
@@ -1613,6 +1688,27 @@ public class PlayerController : NetworkBehaviour
 						.DisableEntityImpact()
 						.DisableWorldImpact()
 						.SetLifetime(0.55f)
+						.Finish();
+				}
+				break;
+			case 12:
+				if (Time.time - chargeStart > chainChargeLength)
+				{
+					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
+						.MakeProjectile(transform.position + 0.5f * Vector3.down)
+						.SetAnimation(3)
+						.SetLifetime(0.2f)
+						.SetVelocity(60f * aim)
+						.RotateWithVelocity()
+						.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+						.SetUnique(UniqueProjectile.CHAIN)
+						.Finish();
+				}
+				else
+				{
+					AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+						.SetPosition(new Vector3((float)facing * 4.5f, 0f, 0f))
+						.SetSize(new Vector2(3f, 4f))
 						.Finish();
 				}
 				break;
@@ -1960,5 +2056,10 @@ public class PlayerController : NetworkBehaviour
 	public void UpdateProfileName(string name)
 	{
 		playerProfileName = name;
+	}
+
+	public InputHandler GetInput()
+	{
+		return input;
 	}
 }

@@ -1,5 +1,3 @@
-using Mirror;
-using Steamworks;
 using UnityEngine;
 
 public class PauseMenuController : MonoBehaviour
@@ -25,15 +23,7 @@ public class PauseMenuController : MonoBehaviour
 
 	public void ReturnToMenu()
 	{
-		SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
-		if (NetworkServer.activeHost)
-		{
-			FindAnyObjectByType<NetworkManager>().StopHost();
-		}
-		else
-		{
-			FindAnyObjectByType<NetworkManager>().StopClient();
-		}
+		GameManager.Instance.CleanupGame();
 	}
 
 	public void Quit()

@@ -36,12 +36,13 @@ public class LobbyCardController : NetworkBehaviour
 	[SyncVar]
 	private ulong? friendId = null;
 
-	private InputHandler input;
+	[SerializeField] private InputHandler input;
 	private int controlScheme = 0;
 
 	public void Init(PlayerController player)
 	{
 		this.player = player;
+		this.input = player.GetInput();
 	}
 
 	private void Start()
@@ -79,6 +80,11 @@ public class LobbyCardController : NetworkBehaviour
 		transform.localPosition = pos;
 	}
 
+	public void SetInputs(InputHandler input)
+	{
+		this.input = input;
+	}
+
 	[Command(requiresAuthority = false)]
 	private void SyncCardName(ulong id)
 	{
@@ -107,6 +113,11 @@ public class LobbyCardController : NetworkBehaviour
 			if (input.jump.pressed)
 			{
 				ToggleReady();
+			}
+			if (GameManager.Instance.IsLocalGame && input.item.pressed)
+			{
+				GameManager.Instance.RemovePlayer(player);
+				Destroy(gameObject);
 			}
 		}
 	}

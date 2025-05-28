@@ -13,6 +13,7 @@ public class ProjectileData : NetworkBehaviour
 	[SerializeField] private Rigidbody2D rbody;
 	[SerializeField]
 	private ParticleSystem drillVFX;
+	[SerializeField] LineRenderer chainFX;
 	[SerializeField] private GameObject[] spawnablePrefabs;
 
 	[SyncVar]
@@ -41,7 +42,7 @@ public class ProjectileData : NetworkBehaviour
 	private bool destroyAfterDelay = false;
 
 	private float destroyDelay;
-	
+
 
 	private void Start()
 	{
@@ -50,6 +51,11 @@ public class ProjectileData : NetworkBehaviour
 		animatorOverrideController["projectile"] = anims[animIndex];
 		animator.runtimeAnimatorController = animatorOverrideController;
 		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
+		
+		if (uniqueFunction != UniqueProjectile.CHAIN)
+		{
+			chainFX.gameObject.SetActive(false);
+		}
 	}
 
 	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, int uniqueFunction, ParticleType particleType, Transform owner)
@@ -77,6 +83,11 @@ public class ProjectileData : NetworkBehaviour
 			destroyAfterDelay = false;
 			NetworkServer.Destroy(gameObject);
 			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
+		}
+
+		if (uniqueFunction == UniqueProjectile.CHAIN)
+		{
+			chainFX.SetPositions(new [] { owner.transform.position - Vector3.up, transform.position });
 		}
 	}
 
@@ -151,5 +162,5 @@ public class ProjectileData : NetworkBehaviour
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB, ARROW
+	DEFAULT, DRILL, BOMB, ARROW, CHAIN
 }
