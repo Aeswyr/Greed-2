@@ -18,8 +18,8 @@ public class ShopInteractable : NetworkBehaviour
 	[SerializeField]
 	private bool singleUse;
 
-	public Action<PickupType, PickupType> _Mirror_SyncVarHookDelegate_item;
-
+	private ToolTip currentToolTip;
+	
 	private void Start()
 	{
 	}
@@ -59,12 +59,26 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
+		ToolTipManager.Instance.ClearTooltip(currentToolTip);
 		owner.GetItem(item);
 	
 		if (singleUse)
 		{
 			Cleanup();
 		}
+	}
+
+	public void ShowTooltip(float offset)
+	{
+		foreach (var shop in FindObjectsByType<ShopInteractable>(FindObjectsSortMode.None))
+			shop.HideTooltip();
+		currentToolTip = ToolTipManager.Instance.CreateTooltip(item, transform.position + offset * Vector3.up);
+	}
+
+	public void HideTooltip()
+	{
+		ToolTipManager.Instance.ClearTooltip(currentToolTip);
+		currentToolTip = null;
 	}
 
 	[Command(requiresAuthority = false)]

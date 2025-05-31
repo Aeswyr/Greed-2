@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class AuctionableInteractable : NetworkBehaviour
+public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 {
 	[SerializeField]
 	private TextMeshPro priceTag;
@@ -33,6 +33,8 @@ public class AuctionableInteractable : NetworkBehaviour
 
 	[SyncVar(hook = nameof(UpdatePrice))]
 	private int cost;
+	[SerializeField] private bool confirmPurchase;
+	[SerializeField] private UnityEvent<float> onConfirm;
 
 	private void Start()
 	{
@@ -80,6 +82,17 @@ public class AuctionableInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
+		if (TryGetComponent(out ShopInteractable shop))
+			shop.HideTooltip();
+		
+		if (confirmPurchase && !owner.IsShopConfirmed(this))
+		{
+			onConfirm?.Invoke(10);
+			owner.ConfirmShop(this);
+			return;
+		}
+		owner.ConfirmShop(null);
+
 		if (owner.TrySpendMoney(cost - localBid))
 		{
 			localPlayer = owner;
@@ -127,24 +140,26 @@ public class AuctionableInteractable : NetworkBehaviour
 		[ClientRpc]
 		void CompleteAuction(PlayerController winner)
 		{
-		if (!(localPlayer == null))
-		{
-			if (winner == localPlayer)
+			if (TryGetComponent(out ShopInteractable shop))
+				shop.HideTooltip();
+			if (!(localPlayer == null))
 			{
-				output.Invoke(localPlayer);
-				Cleanup();
+				if (winner == localPlayer)
+				{
+					output.Invoke(localPlayer);
+					Cleanup();
+				}
+				else
+				{
+					localPlayer.TryAddMoney(localBid);
+				}
 			}
-			else
-			{
-				localPlayer.TryAddMoney(localBid);
-			}
-		}
 
-		[Command(requiresAuthority = false)]
-		void Cleanup()
-		{
-			NetworkServer.Destroy(gameObject);
-		}
+			[Command(requiresAuthority = false)]
+			void Cleanup()
+			{
+				NetworkServer.Destroy(gameObject);
+			}
 		}
 	}
 }

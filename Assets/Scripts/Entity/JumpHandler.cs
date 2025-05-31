@@ -49,12 +49,14 @@ public class JumpHandler : MonoBehaviour
 
 	[SerializeField]
 	private float gravity;
+	private float currentGravity;
 
 	private void Start()
 	{
 		risingTime = risingCurve[risingCurve.length - 1].time;
 		fallingTime = fallingCurve[fallingCurve.length - 1].time;
 		currentTerminalVelocity = terminalVelocity;
+		currentGravity = gravity;
 	}
 
 	private void FixedUpdate()
@@ -66,7 +68,7 @@ public class JumpHandler : MonoBehaviour
 				paused = false;
 				rbody.linearVelocity = new Vector2(rbody.linearVelocity.x, storedVelocity);
 				timeStamp += pausedUntil - pauseStarted;
-				rbody.gravityScale = gravity;
+				rbody.gravityScale = currentGravity;
 			}
 			if (starting && (((input.jump.released || !input.jump.down) && Time.time - timeStamp > minJumpTime) || Time.time - timeStamp > risingTime))
 			{
@@ -130,12 +132,14 @@ public class JumpHandler : MonoBehaviour
 
 	public void SetGravity(float gravity)
 	{
-		rbody.gravityScale = gravity;
+		currentGravity = gravity;
+		rbody.gravityScale = currentGravity;
 	}
 
 	public void ResetGravity()
 	{
-		rbody.gravityScale = gravity;
+		currentGravity = gravity;
+		rbody.gravityScale = currentGravity;
 	}
 
 	public void ForceVelocity(float velocity)

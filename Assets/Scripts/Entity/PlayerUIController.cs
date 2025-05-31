@@ -85,6 +85,10 @@ public class PlayerUIController : MonoBehaviour
 			staminaBar.fillAmount = ratio;
 			staminaFade = Time.time + 0.2f;
 		}
+		else
+		{
+			staminaBar.fillAmount = ratio;
+		}
 	}
 
 	public void UpdateSkill(float ratio)

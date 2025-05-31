@@ -141,7 +141,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		if (IsLocalGame)
 		{
-			Destroy(FindAnyObjectByType<PlayerInputManager>());
+			FindAnyObjectByType<PlayerInputManager>().DisableJoining();
 		}
 
 		HandlePlayerSpawns();
@@ -403,6 +403,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		yield return new WaitForSeconds(0.25f);
 
 		Destroy(currentLevel.gameObject);
+		ToolTipManager.Instance.ClearTooltips();
 
 		NotifyReadyToLoad();
 	}
@@ -591,6 +592,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 			yield return new WaitForSeconds(0.75f);
 
+			ToolTipManager.Instance.ClearTooltips();
 			Destroy(currentLevel.gameObject);
 			NotifyNextStep();
 
@@ -625,6 +627,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void CleanupGame()
 	{
+		FindAnyObjectByType<PlayerInputManager>().EnableJoining();
 		PlayerInputManager.instance.onPlayerJoined -= AddLocalPlayer;
 		SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
 		if (NetworkServer.activeHost)

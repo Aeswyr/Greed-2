@@ -13,47 +13,47 @@ MonoBehaviour:
   m_Name: PickupCostLibrary
   m_EditorClassIdentifier: 
   prices:
-  - type: 3
+  - type: ITEM_CROWN
     price: 25
-  - type: 4
+  - type: WEAPON_PICK
     price: 10
-  - type: 5
+  - type: WEAPON_SWORD
     price: 10
-  - type: 6
+  - type: WEAPON_CLUB
     price: 10
-  - type: 7
+  - type: WEAPON_UNARMED
     price: 10
-  - type: 8
+  - type: WEAPON_SHIELD
     price: 10
-  - type: 9
+  - type: WEAPON_BOW
     price: 10
-  - type: 10
+  - type: WEAPON_TOME
     price: 10
-  - type: 24
+  - type: WEAPON_CHAIN
+    price: 10
+  - type: SKILL_MAGNET
+    price: 15
+  - type: SKILL_FLIGHT
+    price: 15
+  - type: SKILL_SHOTGUN
+    price: 15
+  - type: SKILL_TELEPORT
+    price: 15
+  - type: SKILL_SHOT
+    price: 15
+  - type: SKILL_DRILL
+    price: 15
+  - type: SKILL_BOMB
+    price: 15
+  - type: SKILL_FLASK
+    price: 15
+  - type: ITEM_POTION_HEALTH
     price: 20
-  - type: 12
-    price: 15
-  - type: 13
-    price: 15
-  - type: 14
-    price: 15
-  - type: 15
-    price: 15
-  - type: 16
-    price: 15
-  - type: 17
-    price: 15
-  - type: 18
-    price: 15
-  - type: 19
-    price: 15
-  - type: 20
+  - type: ITEM_POTION_POWER
     price: 20
-  - type: 21
+  - type: ITEM_POTION_SPEED
     price: 20
-  - type: 22
+  - type: ITEM_POTION_SKILL
     price: 20
-  - type: 23
-    price: 20
-  - type: 24
+  - type: ITEM_POTION_STAMINA
     price: 20

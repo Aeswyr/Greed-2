@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PurchasableInteractable : NetworkBehaviour
+public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 {
 	[SerializeField]
 	private TextMeshPro priceTag;
@@ -27,8 +27,8 @@ public class PurchasableInteractable : NetworkBehaviour
 
 	[SyncVar(hook = nameof(UpdatePrice))]
 	private int cost;
-
-	public Action<int, int> _Mirror_SyncVarHookDelegate_cost;
+	[SerializeField] private bool confirmPurchase;
+	[SerializeField] private UnityEvent<float> onConfirm;
 
 	private void Start()
 	{
@@ -36,12 +36,14 @@ public class PurchasableInteractable : NetworkBehaviour
 			CalculateCost();
 	}
 
-	public void PriceByItem(PickupType type) {
+	public void PriceByItem(PickupType type)
+	{
 		baseCost = baseCosts[type];
 		CalculateCost();
 	}
 
-	private void CalculateCost() {
+	private void CalculateCost()
+	{
 		int num = Mathf.Min(GameManager.Instance.GetLevelIndex(), 15);
 		cost = (int)((num * (int)(2f + 0.25f * (float)num) + baseCost - UnityEngine.Random.Range(0, 2 * num)) * (levelPurchasable ? 0.5f : 1f));
 	}
@@ -53,6 +55,14 @@ public class PurchasableInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
+		if (confirmPurchase && !owner.IsShopConfirmed(this))
+		{
+			onConfirm?.Invoke(6f);
+			owner.ConfirmShop(this);
+			return;
+		}
+		owner.ConfirmShop(null);
+
 		if (PurchaseUnlocked() && owner.TrySpendMoney(cost))
 		{
 			output.Invoke(owner);
@@ -61,20 +71,28 @@ public class PurchasableInteractable : NetworkBehaviour
 				SendActivation();
 		}
 
-		[Command(requiresAuthority = false)] void SendActivation() {
-            RecieveActivation();
-        }
+		[Command(requiresAuthority = false)] void SendActivation()
+		{
+			RecieveActivation();
+		}
 
-        [ClientRpc] void RecieveActivation() {
-            priceTag.transform.parent.gameObject.SetActive(false);
-            interactBox.enabled = false;
+		[ClientRpc] void RecieveActivation()
+		{
+			priceTag.transform.parent.gameObject.SetActive(false);
+			interactBox.enabled = false;
 			lastPurchase = Time.time + purchaseLockout;
-        }
+		}
 	}
 
-	private bool PurchaseUnlocked() {
+	private bool PurchaseUnlocked()
+	{
 		return purchaseLockout == 0 || Time.time > lastPurchase;
 	}
 
 
+}
+
+public interface PurchaseInterface
+{
+	
 }

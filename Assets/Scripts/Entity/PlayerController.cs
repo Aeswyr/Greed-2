@@ -56,6 +56,8 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private InteractboxController interactBox;
+	[SerializeField]
+	private Animator chargeGlintAnimator;
 
 	[SerializeField]
 	private MaterialLibrary colors;
@@ -113,6 +115,19 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve unarmedShortCurve;
+	[SerializeField]
+	private float unarmedStanceSpeed;
+
+	[SerializeField]
+	private AnimationCurve unarmedStanceCurve;
+	[SerializeField]
+	private float unarmedBlinkSpeed;
+	[SerializeField]
+	private AnimationCurve unarmedBlinkCurve;
+	[SerializeField]
+	private float unarmedUpperSpeed;
+	[SerializeField]
+	private AnimationCurve unarmedUpperCurve;
 
 	[SerializeField]
 	private float shieldAttackSpeed;
@@ -219,7 +234,7 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 7; //0
+	private int weaponId = 2; //0
 	private int skillId = -1; //-1
 
 	private bool stasis;
@@ -238,6 +253,7 @@ public class PlayerController : NetworkBehaviour
 
 	private bool charging;
 	private float chargeStart;
+	private bool chargeGlintReady;
 	private float tomeChargeLength = 0.5f;
 	private float chainChargeLength = 0.75f;
 
@@ -250,6 +266,7 @@ public class PlayerController : NetworkBehaviour
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
 	private bool hasAmmo = true;
+	private int unarmedInstall;
 
 	private int healthMod => 25 * stats[(int)Stat.HEALTH];
 	private float skillMod => Mathf.Min(0.5f * stats[(int)Stat.SKILL], 3f);
@@ -265,6 +282,8 @@ public class PlayerController : NetworkBehaviour
 	[SyncVar]
 	private ulong? friendId = null;
 	private string playerProfileName;
+
+	private PurchaseInterface confirmedShop;
 
 	private void Start()
 	{
@@ -391,6 +410,29 @@ public class PlayerController : NetworkBehaviour
 		if (flying && Time.time > endFlight)
 		{
 			EndFlight();
+		}
+		if (charging && chargeGlintReady)
+		{
+			switch (weaponId)
+			{
+				case 6:
+					if (Time.time - chargeStart > tomeChargeLength)
+					{
+						chargeGlintReady = false;
+						chargeGlintAnimator.Play("sparkle", -1, 0);
+					}
+					break;
+				case 7:
+					if (Time.time - chargeStart > chainChargeLength)
+					{
+						chargeGlintReady = false;
+						chargeGlintAnimator.Play("sparkle", -1, 0);
+					}
+					break;
+				default:
+					break;
+
+			}
 		}
 		HandleInputs();
 	}
@@ -578,12 +620,12 @@ public class PlayerController : NetworkBehaviour
 		attackCancel = false;
 		if (attacking)
 		{
-			int num = attackId;
-			int num2 = num;
-			if (num2 == 4)
+			switch (attackId)
 			{
-				jump.ResetGravity();
-				jump.ResetTerminalVelocity();
+				case 14:
+					jump.ResetGravity();
+					jump.ResetTerminalVelocity();
+					break;
 			}
 		}
 		attacking = false;
@@ -602,6 +644,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			charging = true;
 			chargeStart = Time.time;
+			chargeGlintReady = true;
 		}
 
 		attacking = true;
@@ -622,10 +665,25 @@ public class PlayerController : NetworkBehaviour
 				}
 				break;
 			case 2: // kick
-				attackId = 3;
-				if (input.aim.y < 0f && !grounded)
+
+				if (input.aim.y < 0f)
 				{
 					attackId = 4;
+				}
+				else
+				{
+					attackId = 3;
+					switch (unarmedInstall)
+					{
+						case 1:
+							attackId = 13;
+							break;
+						case 2:
+							attackId = 14;
+							invuln = InvulnState.ARMOR;
+							break;
+					}
+					unarmedInstall = 0;
 				}
 				break;
 			case 3: // shield
@@ -702,12 +760,7 @@ public class PlayerController : NetworkBehaviour
 				}
 				break;
 			case 4:
-				attacking = false;
-				jump.ForceVelocity(0f);
-				jump.ForceLanding();
-				jump.DisableGravity();
-				move.OverrideSpeed(0f);
-				move.ForceStop();
+				move.OverrideCurve(CalculateSpeed(unarmedStanceSpeed), unarmedStanceCurve, facing);
 				break;
 			case 5:
 				if (input.dir != 0f)
@@ -794,6 +847,12 @@ public class PlayerController : NetworkBehaviour
 				jump.SetGravity(0.5f);
 				jump.ForceVelocity(0);
 				jump.SetTerminalVelocity(2);
+				break;
+			case 13:
+				move.OverrideCurve(CalculateSpeed(unarmedBlinkSpeed), unarmedBlinkCurve, facing);
+				break;
+			case 14:
+				move.OverrideCurve(CalculateSpeed(unarmedUpperSpeed), unarmedUpperCurve, facing);
 				break;
 		}
 	}
@@ -1330,6 +1389,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			victoryStats.ThingsCollected++;
 			GetItem(pickup.GetPickupType());
+			unitVFX.SetFXState(PlayerVFX.PICKUP, true);
 			pickup.OnPickup();
 		}
 	}
@@ -1452,13 +1512,13 @@ public class PlayerController : NetworkBehaviour
 	private void UpdateCrownDisplay()
 	{
 		unitUI.UpdateCrowns(crowns);
-		SendCrowns(crowns);
+		SendCrownsDisplay(crowns);
 		[Command(requiresAuthority = false)]
-		void SendCrowns(int val)
+		void SendCrownsDisplay(int val)
 		{
-			RecieveCrowns(val);
+			RecieveCrownDisplay(val);
 			[ClientRpc]
-			void RecieveCrowns(int val)
+			void RecieveCrownDisplay(int val)
 			{
 				scorecard.SetCrowns(val);
 				if (!isLocalPlayer)
@@ -1540,10 +1600,14 @@ public class PlayerController : NetworkBehaviour
 		switch (attackId)
 		{
 			case 4:
-				attacking = true;
-				jump.SetTerminalVelocity(10000f);
-				jump.ForceVelocity(-60f);
-				move.OverrideSpeed(6f);
+				unarmedInstall = (unarmedInstall + 1) % 3;
+				if (unarmedInstall == 0)
+				{
+					health = maxHealth;
+					UpdateHealthDisplay(health, maxHealth);
+					nextStamina = Time.time;
+					UpdateDodgeDisplay(0);
+				}
 				break;
 			case 6:
 				invuln = InvulnState.NONE;
@@ -1590,7 +1654,7 @@ public class PlayerController : NetworkBehaviour
 				jump.ResetGravity();
 				jump.ResetTerminalVelocity();
 				break;
-			
+
 		}
 
 	}
@@ -1618,15 +1682,9 @@ public class PlayerController : NetworkBehaviour
 					.Finish();
 				break;
 			case 3:
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
-					.SetPosition(new Vector3(facing, -0.5f, 0f))
-					.SetSize(new Vector2(4f, 3f))
-					.Finish();
-				break;
-			case 4:
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
-					.SetPosition(Vector3.down)
-					.SetSize(new Vector2(2f, 3f))
+					.SetPosition(new Vector3(1.5f * facing, -0.5f, 0f))
+					.SetSize(new Vector2(3.5f, 2f))
 					.Finish();
 				break;
 			case 5:
@@ -1712,6 +1770,33 @@ public class PlayerController : NetworkBehaviour
 						.Finish();
 				}
 				break;
+			case 13:
+				RaycastHit2D raycastHit2D = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, facing * Vector2.right, 7f, worldMask);
+				if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(transform.position + facing * 7f * Vector3.right))
+				{
+					transform.position = transform.position + facing * 7f * Vector3.right;
+				}
+				else
+				{
+					transform.position = raycastHit2D.centroid;
+				}
+
+
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
+					.SetPosition(new Vector3(1.5f * facing, -0.5f, 0f))
+					.SetSize(new Vector2(3.5f, 2f))
+					.Finish();
+				break;
+			case 14:
+				jump.ForceLanding();
+				jump.ForceVelocity(20);
+				jump.SetGravity(6f);
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
+					.SetPosition(new Vector3(1f * facing, 0f, 0f))
+					.SetSize(new Vector2(2f, 4f))
+					.Finish();
+				break;
+
 		}
 	}
 
@@ -2061,5 +2146,16 @@ public class PlayerController : NetworkBehaviour
 	public InputHandler GetInput()
 	{
 		return input;
+	}
+
+
+	public bool IsShopConfirmed(PurchaseInterface shop)
+	{
+		return confirmedShop == shop;
+	}
+
+	public void ConfirmShop(PurchaseInterface shop)
+	{
+		confirmedShop = shop;
 	}
 }

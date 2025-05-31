@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8fcb50812c256f4eb1096732eb0fe72, type: 3}
+  m_Name: ItemDescriptionLibrary
+  m_EditorClassIdentifier: 
+  items:
+  - type: ITEM_CROWN
+    name: Crown
+    desc: A glittering crown, hold enough of these and you win!
+  - type: WEAPON_PICK
+    name: Pickaxe
+    desc: A weapon that also allows you to dig up treasure.
+  - type: WEAPON_SWORD
+    name: Needle
+    desc: A weapon which can also execute a lunging attack.
+  - type: WEAPON_UNARMED
+    name: Hand Wraps
+    desc: A weapon which can cycle through a variety of powerful unarmed strikes.
+  - type: WEAPON_SHIELD
+    name: Cap and Blade
+    desc: A weapon which can also deflect blows.
+  - type: WEAPON_CLUB
+    name: Greatclub
+    desc: A weapon which can ignore an attack while charging.
+  - type: WEAPON_BOW
+    name: Bow
+    desc: A weapon which launches arrows. Make sure to retieve them.
+  - type: WEAPON_TOME
+    name: Tome
+    desc: A weapon which can be charged to increase range and fire through walls.
+  - type: WEAPON_CHAIN
+    name: Chainshot
+    desc: A weapon which can be charged to grapple to objects.
+  - type: SKILL_MAGNET
+    name: Mystic Magnet
+    desc: A relic which allows you to grab items in a large radius.
+  - type: SKILL_FLIGHT
+    name: Mistfeather Bottle
+    desc: A relic which grants temporary flight.
+  - type: SKILL_SHOTGUN
+    name: Firework Bundle
+    desc: A relic which launches a large number of fireworks.
+  - type: SKILL_TELEPORT
+    name: Traveler's Compass
+    desc: A relic which allows you to teleport, phasing through attacks and the environment.
+  - type: SKILL_SHOT
+    name: Buster Wand
+    desc: A relic which launches a large, slow moving orb of destruction.
+  - type: SKILL_DRILL
+    name: Molten Drill
+    desc: A relic which launches a drill which can tunnel through the earth.
+  - type: SKILL_BOMB
+    name: Bomb
+    desc: A relic which lobs a bomb, exploding on contact with terrain.
+  - type: SKILL_FLASK
+    name: Crystal Flask
+    desc: A relic which grants a random temporary buff on use.
+  - type: ITEM_POTION_HEALTH
+    name: Potion of Health
+    desc: Permanently increases your health, making it harder to drop crowns.
+  - type: ITEM_POTION_POWER
+    name: Potion of Power
+    desc: Permanently increases your power, dealing more damage to opponents.
+  - type: ITEM_POTION_SPEED
+    name: Potion of Speed
+    desc: Permanently increases your movement speed.
+  - type: ITEM_POTION_SKILL
+    name: Potion of Skill
+    desc: Permanently reduces the cooldown of your relics.
+  - type: ITEM_POTION_STAMINA
+    name: Potion of Stamina
+    desc: Permanently improves the recovery rate of your dash and double jump.
