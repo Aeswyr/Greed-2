@@ -14,6 +14,25 @@ public class ToolTipManager : Singleton<ToolTipManager>
         toolTip.SetTitleText(itemDescriptions.GetName(type));
         toolTip.SetBodyText(itemDescriptions.GetDesc(type));
 
+        /*
+        RectTransform rect = (RectTransform)toolTip.transform;
+        Vector3[] corners = new Vector3[4];
+        rect.GetLocalCorners(corners);
+        float width = ((RectTransform)transform).rect.width;
+        foreach (var corner in corners)
+        {
+            if (corner.x < 200)
+            {
+                toolTip.transform.localPosition += -corner.x * Vector3.right;
+            }
+            else if (corner.x > width)
+            {
+                toolTip.transform.localPosition += (width - corner.x) * Vector3.right;
+            }
+        }
+        toolTip.UpdatePointerPosition(position.x);
+        */
+
         toolTips.Add(toolTip);
 
         return toolTip;

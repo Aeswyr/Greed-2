@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using DG.Tweening;
 using Mirror;
 using TMPro;
 using UnityEngine;
@@ -57,7 +58,7 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 	{
 		if (confirmPurchase && !owner.IsShopConfirmed(this))
 		{
-			onConfirm?.Invoke(6f);
+			onConfirm?.Invoke(7f);
 			owner.ConfirmShop(this);
 			return;
 		}
@@ -69,6 +70,12 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 			lastPurchase = Time.time + purchaseLockout;
 			if (oneTimePurchase)
 				SendActivation();
+		}
+		else
+		{
+			priceTag.transform.DOShakePosition(0.5f, randomness: 20);
+			priceTag.color = Color.red;
+			priceTag.DOColor(Color.white, 0.5f);
 		}
 
 		[Command(requiresAuthority = false)] void SendActivation()

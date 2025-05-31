@@ -5,6 +5,7 @@ public class ToolTip : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI title;
     [SerializeField] private TextMeshProUGUI body;
+    [SerializeField] private GameObject pointer;
 
     public void SetBodyText(string text)
     {
@@ -14,5 +15,12 @@ public class ToolTip : MonoBehaviour
     public void SetTitleText(string text)
     {
         title.text = text;
+    }
+
+    public void UpdatePointerPosition(float xPos)
+    {
+        Vector3 pos = pointer.transform.position;
+        pos.x = xPos;
+        pointer.transform.position = pos;
     }
 }

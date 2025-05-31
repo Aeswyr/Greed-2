@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using DG.Tweening;
 using Mirror;
 using Mirror.RemoteCalls;
 using UnityEngine;
@@ -61,10 +62,14 @@ public class ShopInteractable : NetworkBehaviour
 	{
 		ToolTipManager.Instance.ClearTooltip(currentToolTip);
 		owner.GetItem(item);
-	
+
 		if (singleUse)
 		{
 			Cleanup();
+		}
+		else
+		{
+			sprite.transform.DOJump(sprite.transform.position, 0.5f, 2, 0.5f);
 		}
 	}
 
