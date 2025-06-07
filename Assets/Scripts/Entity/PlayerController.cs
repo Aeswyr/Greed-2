@@ -192,6 +192,12 @@ public class PlayerController : NetworkBehaviour
 	[SerializeField]
 	private AnimationCurve chainAltReleaseCurve;
 
+	[SerializeField]
+	private float chainPullSpeed;
+
+	[SerializeField]
+	private AnimationCurve chainPullCurve;
+
 	private float staminaCooldown => 2.5f - staminaMod - (HasBuff(BuffType.GHOSTFORM) ? 1 : 0);
 	private float skillCooldown => 6f - skillMod;
 
@@ -234,7 +240,7 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 2; //0
+	private int weaponId = 7; //0
 	private int skillId = -1; //-1
 
 	private bool stasis;
@@ -623,9 +629,11 @@ public class PlayerController : NetworkBehaviour
 			switch (attackId)
 			{
 				case 14:
+				case 15:
 					jump.ResetGravity();
 					jump.ResetTerminalVelocity();
 					break;
+				
 			}
 		}
 		attacking = false;
@@ -1754,7 +1762,7 @@ public class PlayerController : NetworkBehaviour
 				{
 					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
 						.MakeProjectile(transform.position + 0.5f * Vector3.down)
-						.SetAnimation(3)
+						.SetAnimation(8)
 						.SetLifetime(0.2f)
 						.SetVelocity(60f * aim)
 						.RotateWithVelocity()
@@ -2157,5 +2165,39 @@ public class PlayerController : NetworkBehaviour
 	public void ConfirmShop(PurchaseInterface shop)
 	{
 		confirmedShop = shop;
+	}
+
+	public void GrapplePull(Vector3 pos)
+	{
+		SendPull(pos);
+		[Command] void SendPull(Vector3 pos)
+		{
+			RecievePull(pos);
+		}
+		
+		[ClientRpc] void RecievePull(Vector3 pos)
+		{
+			if (!isLocalPlayer)
+				return;
+
+			Vector3 dir = (pos - transform.position).normalized;
+
+			OnAttackCancel();
+			StartAction();
+			UpdateFacing(input.dir);
+
+			attackCancel = true;
+			attacking = true;
+
+			attackId = 15;
+			
+			animator.SetInteger("attackId", attackId);
+			animator.SetTrigger("attack");
+
+			move.OverrideCurve(Mathf.Abs(dir.x) * chainPullSpeed, chainPullCurve, Mathf.Sign(dir.x));
+			jump.SetGravity(0);
+			jump.SetTerminalVelocity(chainPullSpeed);
+			jump.ForceVelocity(dir.y * chainPullSpeed);
+		}
 	}
 }

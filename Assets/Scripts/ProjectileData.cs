@@ -101,7 +101,8 @@ public class ProjectileData : NetworkBehaviour
 				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 
-		if (uniqueFunction == UniqueProjectile.BOMB) {
+		if (uniqueFunction == UniqueProjectile.BOMB)
+		{
 			AttackBuilder.GetAttack(owner).SetParent(transform).SetSize(new Vector2(10f, 10f)).SetDuration(0.2f)
 				.MakeProjectile(transform.position)
 				.DisableWorldImpact()
@@ -111,17 +112,25 @@ public class ProjectileData : NetworkBehaviour
 				.Finish();
 		}
 
-		if (uniqueFunction == UniqueProjectile.DRILL) {
+		if (uniqueFunction == UniqueProjectile.DRILL)
+		{
 			NotifyVFXStart();
 			rbody.linearVelocity = 20 * rbody.linearVelocity.normalized;
 
-			[ClientRpc] void NotifyVFXStart() {
+			[ClientRpc] void NotifyVFXStart()
+			{
 				drillVFX.Play();
 			}
 		}
 
-		if (uniqueFunction == UniqueProjectile.ARROW) {
+		if (uniqueFunction == UniqueProjectile.ARROW)
+		{
 			CreateArrowPickup();
+		}
+		
+		if (uniqueFunction == UniqueProjectile.CHAIN)
+		{
+			TriggerHookshot();
 		}
 	}
 
@@ -132,6 +141,11 @@ public class ProjectileData : NetworkBehaviour
 		arrow.SetOwner(owner);
 
 		NetworkServer.Spawn(arrowSpawn);
+	}
+
+	private void TriggerHookshot()
+	{
+		owner.GetComponent<PlayerController>().GrapplePull(transform.position);
 	}
 
 	[Command(requiresAuthority = false)] public void OnWorldExit() {
@@ -155,8 +169,14 @@ public class ProjectileData : NetworkBehaviour
 				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
 
-		if (uniqueFunction == UniqueProjectile.ARROW) {
+		if (uniqueFunction == UniqueProjectile.ARROW)
+		{
 			CreateArrowPickup();
+		}
+
+		if (uniqueFunction == UniqueProjectile.CHAIN)
+		{
+			TriggerHookshot();
 		}
 	}
 }
