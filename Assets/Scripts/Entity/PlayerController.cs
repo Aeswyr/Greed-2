@@ -240,7 +240,7 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 7; //0
+	private int weaponId = 0; //0
 	private int skillId = -1; //-1
 
 	private bool stasis;
@@ -2087,18 +2087,18 @@ public class PlayerController : NetworkBehaviour
 
 		if (isServer)
 		{
-			RecieveEndBuff(type);
+			RecieveBuffEnd(type);
 		}
 		else
 		{
-			SendEndBuff(type);
+			SendBuffEnd(type);
 		}
-		[Command] void SendEndBuff(BuffType type)
+		[Command] void SendBuffEnd(BuffType type)
 		{
-			RecieveEndBuff(type);
+			RecieveBuffEnd(type);
 		}
 
-		[ClientRpc] void RecieveEndBuff(BuffType type)
+		[ClientRpc] void RecieveBuffEnd(BuffType type)
 		{
 			buffs[(int)type] = 0;
 		}

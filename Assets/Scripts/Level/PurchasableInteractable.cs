@@ -31,10 +31,14 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 	[SerializeField] private bool confirmPurchase;
 	[SerializeField] private UnityEvent<float> onConfirm;
 
+	private Vector3 pricePos;
+
 	private void Start()
 	{
 		if (isServer)
 			CalculateCost();
+
+		pricePos = priceTag.transform.position;
 	}
 
 	public void PriceByItem(PickupType type)
@@ -66,6 +70,10 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 
 		if (PurchaseUnlocked() && owner.TrySpendMoney(cost))
 		{
+			priceTag.transform.DOJump(pricePos, 0.5f, 2, 0.5f);
+			priceTag.color = Color.green;
+			priceTag.DOColor(Color.white, 0.5f);
+
 			output.Invoke(owner);
 			lastPurchase = Time.time + purchaseLockout;
 			if (oneTimePurchase)
@@ -73,7 +81,10 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 		}
 		else
 		{
-			priceTag.transform.DOShakePosition(0.5f, randomness: 20);
+			priceTag.transform.DOShakePosition(0.5f, randomness: 20).onComplete += () =>
+			{
+				priceTag.transform.position = pricePos;
+			};
 			priceTag.color = Color.red;
 			priceTag.DOColor(Color.white, 0.5f);
 		}

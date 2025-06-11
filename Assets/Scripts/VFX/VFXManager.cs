@@ -110,6 +110,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 		else
 		{
 			GameObject gameObject = Instantiate(particles[(int)type], pos, Quaternion.identity);
+			gameObject.transform.SetParent(GameManager.Instance.GetLevelObjectRoot());
 		}
 	}
 

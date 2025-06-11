@@ -10,7 +10,14 @@ public class FountainInteractable : NetworkBehaviour
     public void OnInteract(PlayerController owner) {
         
         SendActivation();
-        owner.GiveBuff(BuffType.RANDOM);
+        if (Random.Range(0, 100) > 25)
+        {
+            owner.GiveBuff(BuffType.RANDOM);
+        }
+        else
+        {
+            owner.GetItem((PickupType)Random.Range((int)PickupType.ITEM_POTION_HEALTH, (int)PickupType.MAX));
+        }
 
         [Command(requiresAuthority = false)] void SendActivation() {
             RecieveActivation();

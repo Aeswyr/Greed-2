@@ -6,6 +6,7 @@ using Mirror.RemoteCalls;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using DG.Tweening;
 
 public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 {
@@ -36,12 +37,16 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 	[SerializeField] private bool confirmPurchase;
 	[SerializeField] private UnityEvent<float> onConfirm;
 
+	private Vector3 pricePos;
+
 	private void Start()
 	{
 		if (isServer)
 			CalculateCost();
 		auctionTimeout.text = "10s";
 		auctionTimeout.color = Color.green;
+
+		pricePos = priceTag.transform.position;
 	}
 
 	public void PriceByItem(PickupType type) {
@@ -84,7 +89,7 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 	{
 		if (TryGetComponent(out ShopInteractable shop))
 			shop.HideTooltip();
-		
+
 		if (confirmPurchase && !owner.IsShopConfirmed(this))
 		{
 			onConfirm?.Invoke(10);
@@ -98,6 +103,19 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 			localPlayer = owner;
 			localBid = cost;
 			AddBid(localPlayer, localBid);
+
+			priceTag.transform.DOJump(pricePos, 0.5f, 2, 0.5f);
+			priceTag.color = Color.green;
+			priceTag.DOColor(Color.white, 0.5f);
+		}
+		else
+		{
+			priceTag.transform.DOShakePosition(0.5f, randomness: 20).onComplete += () =>
+			{
+				priceTag.transform.position = pricePos;
+			};
+			priceTag.color = Color.red;
+			priceTag.DOColor(Color.white, 0.5f);
 		}
 	}
 

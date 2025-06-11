@@ -14,12 +14,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10
@@ -63,7 +71,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -88,12 +96,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 16
@@ -137,7 +153,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -31186,12 +31202,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -20
@@ -31235,7 +31259,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -31350,12 +31374,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10
@@ -31399,7 +31431,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -31510,12 +31542,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20
@@ -31559,7 +31599,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -31584,12 +31624,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: spawnables.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: 'spawnables.Array.data[0]'
       value: 
-      objectReference: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
+      objectReference: {fileID: 812106739925938187, guid: 5ff24c021f14bc441a79fdc2df534aec, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 3855214167983979909, guid: 8be5b789a78bb1849bee0d35d7ba9031, type: 3}
+    - target: {fileID: 5771488684370062812, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
+      propertyPath: 'spawnables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1841291039033220676, guid: 830dd9c6fcf46da4fadfae775055a862, type: 3}
     - target: {fileID: 8288739538224939471, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -16
@@ -31633,7 +31681,7 @@ PrefabInstance:
     - target: {fileID: 8500203977687522162, guid: a841ad9d79746e748aef4ae4e239804d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 9030263211876814073, guid: 3dfa9173bc2b9c34f820628890ccd39f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

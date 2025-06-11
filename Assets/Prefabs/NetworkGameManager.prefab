@@ -99,6 +99,7 @@ MonoBehaviour:
   - {fileID: 779891979630494364, guid: 0cf8c3b436c5d5d4093782064d44178e, type: 3}
   particles:
   - {fileID: 8323227717208924649, guid: f2a540b221370de429baef05e6cb996c, type: 3}
+  - {fileID: 5535793718235568289, guid: 2308a569a6e2e204b88344559812c851, type: 3}
   textPrefab: {fileID: 2846854720826849674, guid: fe785566b0b6a1f4da993151579fdbcf, type: 3}
   afterimagePrefab: {fileID: 1040999792124794, guid: b5e8f0ed6ed5ff942aa6c9aef7b7531e, type: 3}
 --- !u!114 &409371972932917634
