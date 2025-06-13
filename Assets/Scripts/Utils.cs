@@ -1,5 +1,6 @@
 using UnityEngine;
 using Steamworks;
+using System;
 
 public class Utils
 {
@@ -24,11 +25,18 @@ public class Utils
 		return result;
 	}
 
-	public static string GetSteamName(ulong id) {
+	public static string GetSteamName(ulong id)
+	{
 		return SteamFriends.GetFriendPersonaName(new CSteamID(id));
 	}
 
-	public static string GetLocalSteamName() {
+	public static string GetLocalSteamName()
+	{
 		return SteamFriends.GetFriendPersonaName(new CSteamID(SteamUser.GetSteamID().m_SteamID));
+	}
+
+	public static float LogisticFunc(float x, float asym, float k = 1, float midpoint = 0, float offset = 0)
+	{
+		return asym / (1 + Mathf.Pow((float)Math.E, -k * (x - midpoint))) - offset;
 	}
 }

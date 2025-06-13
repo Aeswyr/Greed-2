@@ -7,5 +7,6 @@ public enum ParticleType
 	PROJECTILE_HITSPARK,
 	FIREWORK_POP,
 	ARMOR,
+	TURRET_DESTROY,
 	NONE
 }

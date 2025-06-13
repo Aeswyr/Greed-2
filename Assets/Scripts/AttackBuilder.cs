@@ -14,6 +14,7 @@ public struct AttackBuilder
 	private Transform owner;
 
 	private bool friendlyFire;
+	private Transform immune;
 
 	public AttackBuilder SetPosition(Vector3 pos)
 	{
@@ -47,9 +48,14 @@ public struct AttackBuilder
 
 	public static AttackBuilder GetAttack(Transform owner)
 	{
-		AttackBuilder result = default(AttackBuilder);
+		AttackBuilder result = default;
 		result.owner = owner;
 		return result;
+	}
+	public AttackBuilder AddImmunity(Transform immune)
+	{
+		this.immune = immune;
+		return this;
 	}
 
 	public ProjectileBuilder MakeProjectile(Vector3 startPos)
@@ -68,6 +74,7 @@ public struct AttackBuilder
 		HitboxData component = hitbox.GetComponent<HitboxData>();
 		component.Owner = owner;
 		component.FriendlyFire = friendlyFire;
+		component.Immune = immune;
 	}
 
 	public void Write(NetworkWriter writer)
@@ -78,6 +85,7 @@ public struct AttackBuilder
 		writer.Write(duration);
 		writer.Write(owner);
 		writer.Write(friendlyFire);
+		writer.Write(immune);
 	}
 
 	public AttackBuilder Read(NetworkReader reader)
@@ -88,6 +96,7 @@ public struct AttackBuilder
 		duration = reader.Read<float>();
 		owner = reader.Read<Transform>();
 		friendlyFire = reader.Read<bool>();
+		immune = reader.Read<Transform>();
 		return this;
 	}
 }

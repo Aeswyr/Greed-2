@@ -61,7 +61,8 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private MaterialLibrary colors;
-
+	[SerializeField]
+	private IntegerLibrary cooldowns;
 	[Header("Action data")]
 	[SerializeField]
 	private float wallJumpDuration;
@@ -197,9 +198,11 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve chainPullCurve;
+	[SerializeField]
+	private GameObject turretPrefab;
 
-	private float staminaCooldown => 2.5f - staminaMod - (HasBuff(BuffType.GHOSTFORM) ? 1 : 0);
-	private float skillCooldown => 6f - skillMod;
+	private float staminaCooldown => 2.5f * staminaMod * (HasBuff(BuffType.GHOSTFORM) ? 0.5f : 1);
+	private float skillCooldown => skillId == -1 ? 1 : cooldowns[skillId] * skillMod;
 
 	private int currentColor = -1;
 
@@ -241,7 +244,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 	private int weaponId = 0; //0
-	private int skillId = -1; //-1
+	private int skillId = 8; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -275,8 +278,8 @@ public class PlayerController : NetworkBehaviour
 	private int unarmedInstall;
 
 	private int healthMod => 25 * stats[(int)Stat.HEALTH];
-	private float skillMod => Mathf.Min(0.5f * stats[(int)Stat.SKILL], 3f);
-	private float staminaMod => Mathf.Min(0.1f * stats[(int)Stat.STAMINA], 1);
+	private float skillMod => 1 - Utils.LogisticFunc(stats[(int)Stat.SKILL], 1.5f, 0.4f, 0, 0.75f);
+	private float staminaMod => 1 - Utils.LogisticFunc(stats[(int)Stat.STAMINA], 1f, 0.4f, 0, 0.5f);
 	private float speedMod => 1f * stats[(int)Stat.SPEED];
 	private float speedMult => 1 + (HasBuff(BuffType.SWIFT) ? 0.5f : 0) + (HasBuff(BuffType.GHOSTFORM) ? 0.2f : 0);
 	private int powerMod => 30 * stats[(int)Stat.POWER];
@@ -933,6 +936,7 @@ public class PlayerController : NetworkBehaviour
 			case 0:
 			case 1:
 			case 7:
+			case 8:
 				animator.SetTrigger("skill_self");
 				break;
 			case 3:
@@ -1142,6 +1146,15 @@ public class PlayerController : NetworkBehaviour
 			case 7:
 				GiveBuff(BuffType.RANDOM);
 				break;
+			case 8:
+				CreateTurret();
+				[Command] void CreateTurret()
+				{
+					var turret = Instantiate(turretPrefab, transform.position, Quaternion.identity, GameManager.Instance.GetLevelObjectRoot());
+					turret.GetComponent<TurretController>().SetOwner(transform);
+					NetworkServer.Spawn(turret);
+				}
+				break;
 		}
 	}
 
@@ -1288,6 +1301,7 @@ public class PlayerController : NetworkBehaviour
 			money -= num;
 			UpdateMoneyDisplay();
 		}
+		unarmedInstall = 0;
 		if (health > 0 && crowns > 0)
 		{
 			if (attackingPlayer != null)
@@ -1494,6 +1508,9 @@ public class PlayerController : NetworkBehaviour
 			case PickupType.SKILL_FLASK:
 				skillId = 7;
 				break;
+			case PickupType.SKILL_TURRET:
+				skillId = 8;
+				break;
 		}
 	}
 
@@ -1609,13 +1626,6 @@ public class PlayerController : NetworkBehaviour
 		{
 			case 4:
 				unarmedInstall = (unarmedInstall + 1) % 3;
-				if (unarmedInstall == 0)
-				{
-					health = maxHealth;
-					UpdateHealthDisplay(health, maxHealth);
-					nextStamina = Time.time;
-					UpdateDodgeDisplay(0);
-				}
 				break;
 			case 6:
 				invuln = InvulnState.NONE;

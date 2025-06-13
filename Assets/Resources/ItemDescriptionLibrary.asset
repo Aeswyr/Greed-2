@@ -64,6 +64,9 @@ MonoBehaviour:
   - type: SKILL_FLASK
     name: Crystal Flask
     desc: A relic which grants a random temporary buff on use.
+  - type: SKILL_TURRET
+    name: Guardian Gem
+    desc: A relic which deploys a fragile crystal turret.
   - type: ITEM_POTION_HEALTH
     name: Potion of Health
     desc: Permanently increases your health, making it harder to drop crowns.

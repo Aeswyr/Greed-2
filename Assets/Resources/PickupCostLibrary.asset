@@ -47,6 +47,8 @@ MonoBehaviour:
     price: 15
   - type: SKILL_FLASK
     price: 15
+  - type: SKILL_TURRET
+    price: 15
   - type: ITEM_POTION_HEALTH
     price: 20
   - type: ITEM_POTION_POWER

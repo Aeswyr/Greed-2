@@ -5162,6 +5162,7 @@ MonoBehaviour:
   interactBox: {fileID: 4221439202891782295}
   chargeGlintAnimator: {fileID: 2490278572769368135}
   colors: {fileID: 11400000, guid: 9b1a20cac212b624ea8e2dd8457c30d0, type: 2}
+  cooldowns: {fileID: 11400000, guid: 7a97e76aecfb1f749bce9ed3c24249c3, type: 2}
   wallJumpDuration: 0.5
   knockbackDuration: 2
   knockbackSpeed: 25
@@ -5838,6 +5839,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  turretPrefab: {fileID: 5992425716684802097, guid: ff59e031990efbd4a94ff158d2ee20e0, type: 3}
 --- !u!114 &7056287893420437668
 MonoBehaviour:
   m_ObjectHideFlags: 0

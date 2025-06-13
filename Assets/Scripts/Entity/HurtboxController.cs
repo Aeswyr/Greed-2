@@ -18,6 +18,10 @@ public class HurtboxController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
 	{
 		var data = other.GetComponent<HitboxData>();
+
+		if (data.Immune == transform)
+			return;
+
 		PlayerController player;
 		if (other.transform.parent != null && other.transform.parent.TryGetComponent(out player))
 		{

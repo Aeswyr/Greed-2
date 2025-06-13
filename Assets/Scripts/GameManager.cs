@@ -79,7 +79,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int TotalPlayerCount()
 	{
-		return FindObjectsByType<PlayerController>(FindObjectsSortMode.None).Length;
+		return GetPlayers().Length;
 	}
 
 	public void AddLocalPlayer(PlayerInput input)
@@ -127,7 +127,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void AssignPlayerIds()
 	{
-		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		PlayerController[] array = GetPlayers();
 		int id = 0;
 		foreach (PlayerController playerController in array)
 		{
@@ -147,7 +147,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		HandlePlayerSpawns();
 
 		playerLobby.SetActive(value: false);
-		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		PlayerController[] array = GetPlayers();
 		foreach (PlayerController playerController in array)
 		{
 			if (playerController.isLocalPlayer)
@@ -272,7 +272,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void HandlePlayerSpawns()
 	{
-		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		PlayerController[] array = GetPlayers();
 		List<int> playerIds = new();
 
 		foreach (PlayerController playerController in array)
@@ -311,7 +311,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void CompleteLevelTransition()
 	{
-		PlayerController[] array = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		PlayerController[] array = GetPlayers();
 
 		foreach (PlayerController playerController in array)
 			if (playerController.isLocalPlayer)
@@ -442,7 +442,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public int GetShopRanking(PlayerController player)
 	{
-		List<PlayerController> players = new List<PlayerController>(FindObjectsByType<PlayerController>(FindObjectsSortMode.None));
+		List<PlayerController> players = new List<PlayerController>(GetPlayers());
 
 		players.Sort(delegate (PlayerController a, PlayerController b)
 		{
@@ -581,7 +581,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			screenWipe.SetTrigger("wipeon");
 
-			foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
+			foreach (var player in GetPlayers())
 			{
 				if (player.isLocalPlayer)
 				{
@@ -614,7 +614,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 			yield return new WaitForSeconds(0.25f);
 
-			var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+			var players = GetPlayers();
 			victoryScreen.StartVictorySequence(players);
 		}
 	}
@@ -646,5 +646,10 @@ public class GameManager : NetworkSingleton<GameManager>
 				Destroy(input.gameObject);
 			}
 		}
+	}
+
+	public PlayerController[] GetPlayers()
+	{
+		return FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 	}
 }

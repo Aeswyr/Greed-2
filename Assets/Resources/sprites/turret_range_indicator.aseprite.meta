@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5767d3431f9a07d42931d4100d50025f
+guid: 1ac8e89aea336d54e9725cf40d22357c
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -76,12 +76,12 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
-    generateAnimationClips: 0
+    generateAnimationClips: 1
     addSortingGroup: 1
     addShadowCasters: 0
   asepriteImporterSettings:
@@ -89,16 +89,16 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
-    generateAnimationClips: 0
+    generateAnimationClips: 1
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638830070924354887
+  platformSettingsDirtyTick: 638853355235255958
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -123,51 +123,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: destructable_0
+  - name: Frame_0
     originalName: 
-    pivot: {x: 0.4615385, y: 0}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 65
-      y: 4
-      width: 26
-      height: 11
-    spriteID: 4b06f544d76a7e64d88cd5a32c472d64
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 65, y: 4}
-  - name: Frame_1
-    originalName: 
-    pivot: {x: 0.5, y: 0}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 37
-      y: 4
-      width: 20
-      height: 15
-    spriteID: aee744780154cab4aafa512a01437251
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 37, y: 4}
-  - name: Frame_2
-    originalName: 
-    pivot: {x: 0.52, y: 0}
+    pivot: {x: 0.5, y: 0.5}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -175,9 +133,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 25
-      height: 14
-    spriteID: 32ea4ec15651dcb41ade8a435d3d1402
+      width: 160
+      height: 160
+    spriteID: 094220d505ea010428f0f52a0a5d1b55
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -190,43 +148,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 1337133659
+      value0: 1184348162
       value1: 0
       value2: 0
       value3: 0
-    guid: 1337133659
-    name: destructable_0
+    guid: 1184348162
+    name: proj_bomb
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Frame_0
+    - name: turret_range_indicator
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 4
+        x: 0
         y: 0
-        width: 26
-        height: 11
-      spriteId: 4b06f544d76a7e64d88cd5a32c472d64
-    - name: Frame_1
-      frameIndex: 1
-      additiveSortOrder: 0
-      cellRect:
-        x: 6
-        y: 0
-        width: 20
-        height: 15
-      spriteId: aee744780154cab4aafa512a01437251
-    - name: Frame_2
-      frameIndex: 2
-      additiveSortOrder: 0
-      cellRect:
-        x: 3
-        y: 0
-        width: 25
-        height: 14
-      spriteId: 32ea4ec15651dcb41ade8a435d3d1402
+        width: 160
+        height: 160
+      spriteId: 094220d505ea010428f0f52a0a5d1b55
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -269,5 +209,5 @@ ScriptedImporter:
   generatePhysicsShape: 1
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 32, y: 32}
-  previousTextureSize: {x: 128, y: 32}
+  canvasSize: {x: 160, y: 160}
+  previousTextureSize: {x: 256, y: 256}

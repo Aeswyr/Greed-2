@@ -10,31 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8144184453868574940, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: _assetId
-      value: 3713745385
+      value: 1741359717
       objectReference: {fileID: 0}
     - target: {fileID: 2905374150501086227, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9030263211876814073, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
+      objectReference: {fileID: 255685832028526751, guid: 5767d3431f9a07d42931d4100d50025f, type: 3}
     - target: {fileID: 3855214167983979909, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_Name
-      value: Destructable_Gold_M
+      value: Destructable_Copper_M
       objectReference: {fileID: 0}
     - target: {fileID: 6779381782422998083, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_SpriteTilingProperty.pivot.x
-      value: 0.4615385
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 6779381782422998083, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 3.25
+      value: 3.125
       objectReference: {fileID: 0}
     - target: {fileID: 6779381782422998083, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 1.375
+      value: 1.75
       objectReference: {fileID: 0}
     - target: {fileID: 7506993857073691450, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: dropVariant
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7506993857073691450, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: destryParticle
