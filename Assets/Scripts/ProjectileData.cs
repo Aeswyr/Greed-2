@@ -1,6 +1,9 @@
+using System;
 using System.Runtime.InteropServices;
 using Mirror;
 using Mirror.RemoteCalls;
+using Unity.Mathematics;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 
 public class ProjectileData : NetworkBehaviour
@@ -15,6 +18,8 @@ public class ProjectileData : NetworkBehaviour
 	private ParticleSystem drillVFX;
 	[SerializeField] LineRenderer chainFX;
 	[SerializeField] private GameObject[] spawnablePrefabs;
+	[SerializeField] private AnimationCurve boomerangFire;
+	[SerializeField] private AnimationCurve boomerangReturn;
 
 	[SyncVar]
 	private int animIndex;
@@ -43,6 +48,10 @@ public class ProjectileData : NetworkBehaviour
 
 	private float destroyDelay;
 
+	private Vector2 speed;
+	private float startTime;
+	private bool returning;
+
 
 	private void Start()
 	{
@@ -51,11 +60,15 @@ public class ProjectileData : NetworkBehaviour
 		animatorOverrideController["projectile"] = anims[animIndex];
 		animator.runtimeAnimatorController = animatorOverrideController;
 		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
-		
+
 		if (uniqueFunction != UniqueProjectile.CHAIN)
 		{
 			chainFX.gameObject.SetActive(false);
 		}
+
+		speed = rbody.linearVelocity;
+
+		startTime = Time.time;
 	}
 
 	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, int uniqueFunction, ParticleType particleType, Transform owner)
@@ -87,13 +100,50 @@ public class ProjectileData : NetworkBehaviour
 
 		if (uniqueFunction == UniqueProjectile.CHAIN)
 		{
-			chainFX.SetPositions(new [] { owner.transform.position - Vector3.up, transform.position });
+			chainFX.SetPositions(new[] { owner.transform.position - Vector3.up, transform.position });
 		}
+
+		if (isServer && uniqueFunction == UniqueProjectile.BOOMERANG)
+		{
+
+			if (returning)
+			{
+				rbody.linearVelocity = boomerangReturn.Evaluate(Time.time - startTime) * speed;
+
+				if ((owner.transform.position - transform.position).sqrMagnitude < 9f)
+				{
+					owner.GetComponent<PlayerController>().ResetCooldown();
+					NetworkServer.Destroy(gameObject);
+				}
+			}
+			else
+				rbody.linearVelocity = boomerangFire.Evaluate(Time.time - startTime) * speed;
+
+			if (!returning && Time.time > startTime + boomerangFire[boomerangFire.length - 1].time)
+				StartBoomerangReturning();
+			
+		}
+	}
+
+	private void StartBoomerangReturning()
+	{
+		returning = true;
+		startTime = Time.time;
+		speed = speed.magnitude * (owner.transform.position - transform.position).normalized;
+		transform.localRotation = Quaternion.FromToRotation(Vector2.right, speed);
 	}
 
 	[Command(requiresAuthority = false)]
 	public void OnWorldCollide()
 	{
+		if (uniqueFunction == UniqueProjectile.BOOMERANG && !returning)
+		{
+			transform.position += - 0.02f * (Vector3)speed;
+			StartBoomerangReturning();
+			return;
+		}
+
+
 		if (destroyOnWorldImpact)
 		{
 			NetworkServer.Destroy(gameObject);
@@ -182,5 +232,5 @@ public class ProjectileData : NetworkBehaviour
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB, ARROW, CHAIN
+	DEFAULT, DRILL, BOMB, ARROW, CHAIN, BOOMERANG
 }

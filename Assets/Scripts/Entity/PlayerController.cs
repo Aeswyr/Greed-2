@@ -244,7 +244,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 	private int weaponId = 0; //0
-	private int skillId = 8; //-1
+	private int skillId = 9; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -636,7 +636,7 @@ public class PlayerController : NetworkBehaviour
 					jump.ResetGravity();
 					jump.ResetTerminalVelocity();
 					break;
-				
+
 			}
 		}
 		attacking = false;
@@ -947,6 +947,7 @@ public class PlayerController : NetworkBehaviour
 			case 4:
 			case 5:
 			case 6:
+			case 9:
 				animator.SetTrigger("skill_other");
 				break;
 		}
@@ -1154,6 +1155,17 @@ public class PlayerController : NetworkBehaviour
 					turret.GetComponent<TurretController>().SetOwner(transform);
 					NetworkServer.Spawn(turret);
 				}
+				break;
+			case 9:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+					.MakeProjectile(transform.position + 0.5f * Vector3.down)
+					.SetAnimation(10)
+					.SetVelocity(20f * aim)
+					.RotateWithVelocity()
+					.DisableEntityImpact()
+					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
+					.SetUnique(UniqueProjectile.BOOMERANG)
+					.Finish();
 				break;
 		}
 	}
@@ -1485,32 +1497,42 @@ public class PlayerController : NetworkBehaviour
 				weaponId = 7;
 				break;
 			case PickupType.SKILL_MAGNET:
-				skillId = 0;
+				NewSkill(0);
 				break;
 			case PickupType.SKILL_FLIGHT:
-				skillId = 1;
+				NewSkill(1);
 				break;
 			case PickupType.SKILL_SHOTGUN:
-				skillId = 2;
+				NewSkill(2);
 				break;
 			case PickupType.SKILL_TELEPORT:
-				skillId = 3;
+				NewSkill(3);
 				break;
 			case PickupType.SKILL_SHOT:
-				skillId = 4;
+				NewSkill(4);
 				break;
 			case PickupType.SKILL_DRILL:
-				skillId = 5;
+				NewSkill(5);
 				break;
 			case PickupType.SKILL_BOMB:
-				skillId = 6;
+				NewSkill(6);
 				break;
 			case PickupType.SKILL_FLASK:
-				skillId = 7;
+				NewSkill(7);
 				break;
 			case PickupType.SKILL_TURRET:
-				skillId = 8;
+				NewSkill(8);
 				break;
+			case PickupType.SKILL_BOOMERANG:
+				NewSkill(9);
+				break;
+		}
+
+
+		void NewSkill(int id)
+		{
+			ResetCooldown();
+			skillId = id;
 		}
 	}
 
@@ -2184,7 +2206,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			RecievePull(pos);
 		}
-		
+
 		[ClientRpc] void RecievePull(Vector3 pos)
 		{
 			if (!isLocalPlayer)
@@ -2200,7 +2222,7 @@ public class PlayerController : NetworkBehaviour
 			attacking = true;
 
 			attackId = 15;
-			
+
 			animator.SetInteger("attackId", attackId);
 			animator.SetTrigger("attack");
 
@@ -2209,5 +2231,29 @@ public class PlayerController : NetworkBehaviour
 			jump.SetTerminalVelocity(chainPullSpeed);
 			jump.ForceVelocity(dir.y * chainPullSpeed);
 		}
+	}
+
+	public void ResetCooldown()
+	{
+
+		if (isServer)
+			RecieveReset();
+		else
+			SendReset();
+
+		[Command] void SendReset()
+		{
+			RecieveReset();
+		}
+
+
+		[ClientRpc] void RecieveReset()
+		{
+			if (!isLocalPlayer)
+				return;
+			nextSkill = Time.time + 0.05f;
+			UpdateSkillDisplay(0.05f);		
+		}
+
 	}
 }

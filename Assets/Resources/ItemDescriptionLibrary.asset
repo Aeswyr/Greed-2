@@ -67,6 +67,10 @@ MonoBehaviour:
   - type: SKILL_TURRET
     name: Guardian Gem
     desc: A relic which deploys a fragile crystal turret.
+  - type: SKILL_BOOMERANG
+    name: BOOMERANG
+    desc: A relic which launches a returning projectile. If you retrieve it, you
+      can throw it again immediately.
   - type: ITEM_POTION_HEALTH
     name: Potion of Health
     desc: Permanently increases your health, making it harder to drop crowns.
