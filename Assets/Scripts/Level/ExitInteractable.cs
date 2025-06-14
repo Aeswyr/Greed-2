@@ -32,6 +32,7 @@ public class ExitInteractable : NetworkBehaviour
 		playerCount = playerCount + 1;
 		if (playerCount >= GameManager.Instance.TotalPlayerCount())
 		{
+			SFXManager.Instance.PlaySound("descend");
 			GameManager.Instance.GoNextLevel();
 		}
 	}

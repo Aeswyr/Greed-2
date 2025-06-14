@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c9ca05b252d6a64998ed8df327b813b, type: 3}
+  m_Name: AudioLibrary
+  m_EditorClassIdentifier: 
+  clips:
+  - name: bluntswing
+    clip: {fileID: 8300000, guid: 407f4f2852f094c458cb5733c55af1ea, type: 3}
+  - name: swiftswing
+    clip: {fileID: 8300000, guid: b96d7e00b2b6b6543a2cfb2b0ea82d35, type: 3}
+  - name: break
+    clip: {fileID: 8300000, guid: 29f25119104543243804d1b328f56685, type: 3}
+  - name: descend
+    clip: {fileID: 8300000, guid: 6af156cc805d7054d83849965fa365bf, type: 3}
+  - name: knock
+    clip: {fileID: 8300000, guid: f0391ffb8118c3c46b351629be94c961, type: 3}
+  - name: throw
+    clip: {fileID: 8300000, guid: c41c163bd04b0694d97925b111a1934f, type: 3}
+  - name: use
+    clip: {fileID: 8300000, guid: b9d7bcc9cd1600e43a4a694d4982e197, type: 3}
+  - name: jump
+    clip: {fileID: 8300000, guid: 797ec43c3e96fdd42b6b87074cde28ba, type: 3}
+  - name: shopbuy
+    clip: {fileID: 8300000, guid: 2bcabf03861cf1b49924020f19d787e0, type: 3}
+  - name: shopfail
+    clip: {fileID: 8300000, guid: 83d86c7976c35d84c9fccd9e7761c4fd, type: 3}
+  - name: slide
+    clip: {fileID: 8300000, guid: 39c954ecdf770df4d8bcb1db8560ab5a, type: 3}
+  - name: pickup
+    clip: {fileID: 8300000, guid: de0efd9d22d310045a82e19351959ad9, type: 3}

@@ -29,9 +29,11 @@ public class HurtboxController : MonoBehaviour
 		}
 
 		if (data.Owner != null && !isPlayerOwned && data.Owner.TryGetComponent(out player)) {
+			SFXManager.Instance.PlaySound("break");
+			VFXManager.Instance.SyncScreenshake(0.1f , 0.2f);
 			player.OnHitTrigger(data.transform);
 		}
-
+		
 		action?.Invoke(data);
 	}
 

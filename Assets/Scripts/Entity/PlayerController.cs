@@ -244,7 +244,7 @@ public class PlayerController : NetworkBehaviour
 
 	private int attackId = -1;
 	private int weaponId = 0; //0
-	private int skillId = 9; //-1
+	private int skillId = -1; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -527,6 +527,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			jump.StartJump();
 			animator.SetTrigger("jump");
+			SFXManager.Instance.PlaySound("jump");
 			wallJump = 0f;
 			isWallJumping = false;
 			if (Time.time < wallCoyote)
@@ -555,6 +556,7 @@ public class PlayerController : NetworkBehaviour
 				InterruptCharge();
 				EndAction();
 			}
+			SFXManager.Instance.PlaySound("slide");
 			StartAction();
 			nextStamina = Time.time + staminaCooldown;
 			UpdateDodgeDisplay(staminaCooldown);
@@ -675,7 +677,7 @@ public class PlayerController : NetworkBehaviour
 					attackId = 2;
 				}
 				break;
-			case 2: // kick
+			case 2: // unarmed
 
 				if (input.aim.y < 0f)
 				{
@@ -937,9 +939,11 @@ public class PlayerController : NetworkBehaviour
 			case 1:
 			case 7:
 			case 8:
+				SFXManager.Instance.PlaySound("use");
 				animator.SetTrigger("skill_self");
 				break;
 			case 3:
+				SFXManager.Instance.PlaySound("use");
 				animator.SetTrigger("skill_self");
 				invuln = InvulnState.GENERIC;
 				break;
@@ -948,6 +952,7 @@ public class PlayerController : NetworkBehaviour
 			case 5:
 			case 6:
 			case 9:
+				SFXManager.Instance.PlaySound("throw");
 				animator.SetTrigger("skill_other");
 				break;
 		}
@@ -1157,7 +1162,7 @@ public class PlayerController : NetworkBehaviour
 				}
 				break;
 			case 9:
-				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f))
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 1.5f))
 					.MakeProjectile(transform.position + 0.5f * Vector3.down)
 					.SetAnimation(10)
 					.SetVelocity(20f * aim)
@@ -1333,13 +1338,19 @@ public class PlayerController : NetworkBehaviour
 				health -= 50;
 			}
 			UpdateHealthDisplay(health, maxHealth);
+			SFXManager.Instance.PlaySound("break");
 			if (health <= 0)
 			{
+				VFXManager.Instance.SyncScreenshake(0.2f, 0.3f);
 				healthEmptied = true;
 				DropCrown();
 				crowns--;
 				victoryStats.CrownsHeld--;
 				UpdateCrownDisplay();
+			}
+			else
+			{
+				VFXManager.Instance.SyncScreenshake(0.1f, 0.2f);
 			}
 		}
 		VFXManager.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (transform.position + hitPosition), flip: false);
@@ -1421,6 +1432,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isLocalPlayer && invuln != InvulnState.HITSTUN && pickup.CanPickup())
 		{
+			SFXManager.Instance.PlaySound("pickup", SFXManager.AudioMode.SINGLE);
 			victoryStats.ThingsCollected++;
 			GetItem(pickup.GetPickupType());
 			unitVFX.SetFXState(PlayerVFX.PICKUP, true);
@@ -1704,42 +1716,49 @@ public class PlayerController : NetworkBehaviour
 		switch (attackId)
 		{
 			case 0:
+				SFXManager.Instance.PlaySound("bluntswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
 					.SetPosition(new Vector3((float)facing * 1.75f, 0f, 0f))
 					.SetSize(new Vector2(3.5f, 5f))
 					.Finish();
 				break;
 			case 1:
+				SFXManager.Instance.PlaySound("swiftswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
 					.SetSize(new Vector2(4f, 2.5f))
 					.Finish();
 				break;
 			case 2:
+				SFXManager.Instance.PlaySound("swiftswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(new Vector3(facing * 2, -0.5f, 0f))
 					.SetSize(new Vector2(4f, 2.5f))
 					.Finish();
 				break;
 			case 3:
+				SFXManager.Instance.PlaySound("bluntswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(new Vector3(1.5f * facing, -0.5f, 0f))
 					.SetSize(new Vector2(3.5f, 2f))
 					.Finish();
 				break;
 			case 5:
+				SFXManager.Instance.PlaySound("swiftswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(new Vector3(facing * 2, -1f, 0f))
 					.SetSize(new Vector2(2f, 2f))
 					.Finish();
 				break;
 			case 6:
+				SFXManager.Instance.PlaySound("bluntswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(Vector3.zero)
 					.SetSize(new Vector2(6f, 6f))
 					.Finish();
 				break;
 			case 7:
+				SFXManager.Instance.PlaySound("bluntswing");
 				invuln = InvulnState.NONE;
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.2f)
 					.SetPosition(new Vector3(1f, 1f, 0f))
@@ -1747,6 +1766,7 @@ public class PlayerController : NetworkBehaviour
 					.Finish();
 				break;
 			case 8:
+				SFXManager.Instance.PlaySound("swiftswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
 					.MakeProjectile(transform.position + 0.5f * Vector3.down)
 					.SetAnimation(3)
@@ -1758,12 +1778,14 @@ public class PlayerController : NetworkBehaviour
 				hasAmmo = false;
 				break;
 			case 9:
+				SFXManager.Instance.PlaySound("swiftswing");
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetDuration(0.1f)
 					.SetPosition(new Vector3(facing * 1.5f, -1f, 0f))
 					.SetSize(new Vector2(2f, 2f))
 					.Finish();
 				break;
 			case 10:
+				SFXManager.Instance.PlaySound("bluntswing");
 				if (Time.time - chargeStart > tomeChargeLength)
 				{
 					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(12f, 1f)).SetDuration(0.2f)
@@ -1790,6 +1812,7 @@ public class PlayerController : NetworkBehaviour
 				}
 				break;
 			case 12:
+				SFXManager.Instance.PlaySound("swiftswing");
 				if (Time.time - chargeStart > chainChargeLength)
 				{
 					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
@@ -1811,6 +1834,7 @@ public class PlayerController : NetworkBehaviour
 				}
 				break;
 			case 13:
+				SFXManager.Instance.PlaySound("bluntswing");
 				RaycastHit2D raycastHit2D = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, facing * Vector2.right, 7f, worldMask);
 				if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(transform.position + facing * 7f * Vector3.right))
 				{
@@ -1828,6 +1852,7 @@ public class PlayerController : NetworkBehaviour
 					.Finish();
 				break;
 			case 14:
+				SFXManager.Instance.PlaySound("bluntswing");
 				jump.ForceLanding();
 				jump.ForceVelocity(20);
 				jump.SetGravity(6f);

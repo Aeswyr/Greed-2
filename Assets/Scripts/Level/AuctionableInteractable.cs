@@ -100,6 +100,8 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 
 		if (owner.TrySpendMoney(cost - localBid))
 		{
+			SFXManager.Instance.PlaySound("shopbuy");
+
 			localPlayer = owner;
 			localBid = cost;
 			AddBid(localPlayer, localBid);
@@ -110,6 +112,8 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 		}
 		else
 		{
+			SFXManager.Instance.PlaySound("shopfail");
+
 			priceTag.transform.DOShakePosition(0.5f, randomness: 20).onComplete += () =>
 			{
 				priceTag.transform.position = pricePos;

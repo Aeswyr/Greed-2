@@ -70,6 +70,8 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 
 		if (PurchaseUnlocked() && owner.TrySpendMoney(cost))
 		{
+			SFXManager.Instance.PlaySound("shopbuy");
+
 			priceTag.transform.DOJump(pricePos, 0.5f, 2, 0.5f);
 			priceTag.color = Color.green;
 			priceTag.DOColor(Color.white, 0.5f);
@@ -81,6 +83,8 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 		}
 		else
 		{
+			SFXManager.Instance.PlaySound("shopfail");
+
 			priceTag.transform.DOShakePosition(0.5f, randomness: 20).onComplete += () =>
 			{
 				priceTag.transform.position = pricePos;

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Mirror;
 using Mirror.RemoteCalls;
 using UnityEngine;
 
 public class VFXManager : NetworkSingleton<VFXManager>
 {
+	[SerializeField] private Camera camera;
 	[Header("Simple Particles")]
 	[SerializeField]
 	private GameObject template;
@@ -23,6 +25,13 @@ public class VFXManager : NetworkSingleton<VFXManager>
 	[Header("Afterimage")]
 	[SerializeField]
 	private GameObject afterimagePrefab;
+
+	private Vector3 cameraPos;
+
+	void Start()
+	{
+		cameraPos = camera.transform.position;
+	}
 
 	public void SyncVFX(ParticleType type, Vector3 pos, bool flip, bool renderBehind = false)
 	{
@@ -114,10 +123,14 @@ public class VFXManager : NetworkSingleton<VFXManager>
 		}
 	}
 
-	public void SyncFloatingText(string text, Vector3 pos, Color color) {
-		if (isServer) {
+	public void SyncFloatingText(string text, Vector3 pos, Color color)
+	{
+		if (isServer)
+		{
 			RecieveFloatingText(text, pos, color);
-		} else {
+		}
+		else
+		{
 			SendFloatingText(text, pos, color);
 		}
 	}
@@ -144,5 +157,31 @@ public class VFXManager : NetworkSingleton<VFXManager>
 	public GameObject GetAfterimagePrefab()
 	{
 		return afterimagePrefab;
+	}
+
+	public void Screenshake(float intensity, float duration)
+	{
+		camera.transform.DOShakePosition(duration, intensity).onComplete += () =>
+		{
+			camera.transform.position = cameraPos;
+		};
+	}
+
+	public void SyncScreenshake(float intensity, float duration)
+	{
+		if (isServer)
+			RecieveScreenShake(intensity, duration);
+		else
+			SendScreenshake(intensity, duration);
+
+		[Command(requiresAuthority = false)] void SendScreenshake(float intensity, float duration)
+		{
+			RecieveScreenShake(intensity, duration);
+		}
+		
+		[ClientRpc] void RecieveScreenShake(float intensity, float duration)
+		{
+			Screenshake(intensity, duration);
+		}
 	}
 }

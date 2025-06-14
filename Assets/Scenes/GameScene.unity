@@ -891,6 +891,10 @@ PrefabInstance:
       propertyPath: sceneId
       value: 2532332422
       objectReference: {fileID: 0}
+    - target: {fileID: 5441077926203003157, guid: 5dc58d2c1d4936c4491dbeb382721936, type: 3}
+      propertyPath: camera
+      value: 
+      objectReference: {fileID: 2105773518}
     - target: {fileID: 5472148777763103754, guid: 5dc58d2c1d4936c4491dbeb382721936, type: 3}
       propertyPath: screenWipe
       value: 
@@ -1502,10 +1506,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.52870494
-    y: 0
-    width: 0.83311087
-    height: 0.9875371
+    x: 0
+    y: 0.2917933
+    width: 0.47195625
+    height: 0.5592705
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
