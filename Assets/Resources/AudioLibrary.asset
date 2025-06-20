@@ -37,3 +37,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 39c954ecdf770df4d8bcb1db8560ab5a, type: 3}
   - name: pickup
     clip: {fileID: 8300000, guid: de0efd9d22d310045a82e19351959ad9, type: 3}
+  - name: hurt
+    clip: {fileID: 8300000, guid: 656725dc5e7589e408399b8cd66ae577, type: 3}
+  - name: step
+    clip: {fileID: 8300000, guid: a485c8a57367b0740be5bc0594a4fccf, type: 3}

@@ -281,7 +281,7 @@ public class PlayerController : NetworkBehaviour
 	private float skillMod => 1 - Utils.LogisticFunc(stats[(int)Stat.SKILL], 1.5f, 0.4f, 0, 0.75f);
 	private float staminaMod => 1 - Utils.LogisticFunc(stats[(int)Stat.STAMINA], 1f, 0.4f, 0, 0.5f);
 	private float speedMod => 1f * stats[(int)Stat.SPEED];
-	private float speedMult => 1 + (HasBuff(BuffType.SWIFT) ? 0.5f : 0) + (HasBuff(BuffType.GHOSTFORM) ? 0.2f : 0);
+	private float speedMult => 1 + (HasBuff(BuffType.SWIFT) ? 0.5f : 0) + (HasBuff(BuffType.GHOSTFORM) ? 0.2f : 0) - (HasBuff(BuffType.BARRIER) ? 0.15f : 0);
 	private int powerMod => 30 * stats[(int)Stat.POWER];
 
 	private ScoreCard scorecard;
@@ -293,6 +293,8 @@ public class PlayerController : NetworkBehaviour
 	private string playerProfileName;
 
 	private PurchaseInterface confirmedShop;
+
+	private float nextFootstep;
 
 	private void Start()
 	{
@@ -361,7 +363,7 @@ public class PlayerController : NetworkBehaviour
 			SyncName();
 		}
 
-		[Command] void SyncName()
+		[Command(requiresAuthority = false)] void SyncName()
 		{
 			RecieveName();
 		}
@@ -481,6 +483,12 @@ public class PlayerController : NetworkBehaviour
 		{
 			move.UpdateMovement(input.dir);
 			UpdateFacing(input.dir);
+
+			if (Time.time > nextFootstep && grounded)
+			{
+				nextFootstep = Time.time + 0.35f;
+				SFXManager.Instance.PlaySound("step");
+			}
 		}
 		else if (!acting && input.move.released)
 		{
@@ -569,11 +577,6 @@ public class PlayerController : NetworkBehaviour
 		}
 		if ((!acting || attackCancel) && input.attack.pressed)
 		{
-			if (HasBuff(BuffType.BARRIER))
-			{
-				EndBuff(BuffType.BARRIER);
-			}
-
 			if (attackCancel)
 				OnAttackCancel();
 
@@ -626,6 +629,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			return;
 		}
+
 		acting = false;
 		charging = false;
 		attackCancel = false;
@@ -1120,8 +1124,8 @@ public class PlayerController : NetworkBehaviour
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(3f, 3f))
 					.MakeProjectile(transform.position + 0.5f * Vector3.down)
 					.SetAnimation(1)
-					.SetVelocity(10f * aim)
-					.SetLifetime(2f)
+					.SetVelocity(8f * aim)
+					.SetLifetime(4f)
 					.DisableEntityImpact()
 					.FlipSprite(aim.x < 0f)
 					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
@@ -1338,7 +1342,7 @@ public class PlayerController : NetworkBehaviour
 				health -= 50;
 			}
 			UpdateHealthDisplay(health, maxHealth);
-			SFXManager.Instance.PlaySound("break");
+			SFXManager.Instance.PlaySound("hurt");
 			if (health <= 0)
 			{
 				VFXManager.Instance.SyncScreenshake(0.2f, 0.3f);
@@ -1713,6 +1717,11 @@ public class PlayerController : NetworkBehaviour
 
 	public void CreateAttack()
 	{
+		if (HasBuff(BuffType.BARRIER))
+		{
+			EndBuff(BuffType.BARRIER);
+		}
+		
 		switch (attackId)
 		{
 			case 0:
@@ -2168,7 +2177,9 @@ public class PlayerController : NetworkBehaviour
 			if (buffDirty[i] && Time.time > buffs[i])
 			{
 				buffDirty[i] = false;
-				if ((BuffType)i == BuffType.SWIFT || (BuffType)i == BuffType.GHOSTFORM)
+				if ((BuffType)i == BuffType.SWIFT
+				|| (BuffType)i == BuffType.GHOSTFORM
+				|| (BuffType)i == BuffType.BARRIER)
 					move.AdjustBaseSpeed(speedMod, speedMult);
 				if ((BuffType)i == BuffType.GREED)
 				{

@@ -627,8 +627,11 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void CleanupGame()
 	{
-		FindAnyObjectByType<PlayerInputManager>().EnableJoining();
-		PlayerInputManager.instance.onPlayerJoined -= AddLocalPlayer;
+		if (PlayerInputManager.instance != null)
+		{
+			PlayerInputManager.instance.EnableJoining();
+			PlayerInputManager.instance.onPlayerJoined -= AddLocalPlayer;
+		}
 		SteamMatchmaking.LeaveLobby(Singleton<SteamManager>.Instance.LobbyID);
 		if (NetworkServer.activeHost)
 		{
