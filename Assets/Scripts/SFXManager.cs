@@ -10,7 +10,17 @@ public class SFXManager : NetworkSingleton<SFXManager>
 
     public enum AudioMode {
         ONESHOT, SINGLE, MUSIC
-    } 
+    }
+
+    public void Start()
+    {
+        float generalVolume = 1 * SaveDataManager.GetMasterVolume() * SaveDataManager.GetGeneralVolume();
+        foreach (var source in sources)
+            source.volume = generalVolume;
+
+        musicSource.volume = 1 * SaveDataManager.GetMasterVolume() * SaveDataManager.GetMusicVolume();
+    }
+
     public void PlaySound(string name, AudioMode mode = AudioMode.ONESHOT)
     {
         var sound = soundLib[name];
@@ -24,7 +34,7 @@ public class SFXManager : NetworkSingleton<SFXManager>
                 break;
             }
         }
- 
+
         if (sound != null)
         {
             switch (mode)

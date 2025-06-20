@@ -74,10 +74,56 @@ public static class SaveDataManager
         Save();
     }
 
+    public static void UpdateMasterVolume(float amt)
+    {
+        saveData.masterVolume = amt;
+        saveData.masterVolumeDirty = true;
+    }
 
-    [Serializable] private struct SaveData
+    public static void UpdateGeneralVolume(float amt)
+    {
+        saveData.generalVolume = amt;
+        saveData.generalVolumeDirty = true;
+    }
+
+    public static void UpdateMusicVolume(float amt)
+    {
+        saveData.musicVolume = amt;
+        saveData.musicVolumeDirty = true;
+    }
+
+    public static float GetMasterVolume()
+    {
+        if (saveData.masterVolumeDirty)
+            return saveData.masterVolume;
+        return 1;
+    }
+
+    public static float GetGeneralVolume()
+    {
+        if (saveData.generalVolumeDirty)
+            return saveData.generalVolume;
+        return 0.5f;
+    }
+
+    public static float GetMusicVolume()
+    {
+        if (saveData.musicVolumeDirty)
+            return saveData.musicVolume;
+        return 0.5f;
+    }
+
+    [Serializable]
+    private struct SaveData
     {
         public List<ProfileSaveData> profiles;
+
+        public float masterVolume;
+        public bool masterVolumeDirty;
+        public float generalVolume;
+        public bool generalVolumeDirty;
+        public float musicVolume;
+        public bool musicVolumeDirty;
     }
     
     

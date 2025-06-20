@@ -9,10 +9,15 @@ public class SettingsMenuController : MonoBehaviour
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject rebindMenu;
     [SerializeField] private GameObject profilesMenu;
+    [SerializeField] private GameObject audioMenu;
     [SerializeField] private GameObject rebindObjectPrefab;
     [SerializeField] private Transform rebindButtonParent;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private Transform profilesButtonParent;
+    [SerializeField] private Slider masterSlider;
+    [SerializeField] private Slider generalSlider;
+    [SerializeField] private Slider musicSlider;
+
 
     private List<GameObject> menuStack = new();
     private PlayerInput input;
@@ -23,6 +28,7 @@ public class SettingsMenuController : MonoBehaviour
         mainMenu.SetActive(true);
         rebindMenu.SetActive(false);
         profilesMenu.SetActive(false);
+        audioMenu.SetActive(false);
 
         menuStack.Add(mainMenu);
     }
@@ -80,6 +86,8 @@ public class SettingsMenuController : MonoBehaviour
         menuStack[menuStack.Count - 1].SetActive(false);
         menuStack.RemoveAt(menuStack.Count - 1);
         menuStack[menuStack.Count - 1].SetActive(true);
+
+        SaveDataManager.Save();
     }
 
     public void OnSaveRebind()
@@ -144,5 +152,30 @@ public class SettingsMenuController : MonoBehaviour
         var rebinds = FindObjectsByType<RebindObjectController>(FindObjectsSortMode.None);
         foreach (var rebind in rebinds)
             rebind.OnReset();
+    }
+
+    public void OnAudioOptions()
+    {
+        musicSlider.value = SaveDataManager.GetMusicVolume();
+        generalSlider.value = SaveDataManager.GetGeneralVolume();
+        masterSlider.value = SaveDataManager.GetMasterVolume();
+        ToMenu(audioMenu);
+    }
+
+    public void AdjustMasterVolume(float amt)
+    {
+        
+        SaveDataManager.UpdateMasterVolume(amt);
+    }
+
+    public void AdjustGeneralVolume(float amt)
+    {
+
+        SaveDataManager.UpdateGeneralVolume(amt);
+    }
+
+    public void AdjustMusicVolume(float amt) {
+
+        SaveDataManager.UpdateMusicVolume(amt);
     }
 }
