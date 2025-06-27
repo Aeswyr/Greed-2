@@ -166,7 +166,8 @@ public class VictoryScreenController : MonoBehaviour
     {
         card.FireSmallRewardFX();
         var rect = (RectTransform)card.transform;
-        rect.DOSizeDelta(rect.sizeDelta + 75 * Vector2.up, 0.75f);
+        float crownMod =  (20f - Mathf.Max(card.GetCrowns(), 5)) / 15f;
+        rect.DOSizeDelta(rect.sizeDelta + 60 * Mathf.Max(crownMod, 0.25f) * Vector2.up, 0.75f);
     }
 
     public void ToTitle()

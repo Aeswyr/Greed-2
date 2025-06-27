@@ -564,6 +564,7 @@ public class PlayerController : NetworkBehaviour
 				InterruptCharge();
 				EndAction();
 			}
+
 			SFXManager.Instance.PlaySound("slide");
 			StartAction();
 			nextStamina = Time.time + staminaCooldown;
@@ -2269,6 +2270,11 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
+	public void MarkAttackCancellable()
+	{
+		attackCancel = true;
+	}
+
 	public void ResetCooldown()
 	{
 
@@ -2288,7 +2294,7 @@ public class PlayerController : NetworkBehaviour
 			if (!isLocalPlayer)
 				return;
 			nextSkill = Time.time + 0.05f;
-			UpdateSkillDisplay(0.05f);		
+			UpdateSkillDisplay(0.05f);
 		}
 
 	}
