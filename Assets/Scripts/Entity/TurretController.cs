@@ -23,9 +23,6 @@ public class TurretController : NetworkBehaviour
     }
     public void OnHit(HitboxData data)
     {
-        /*if (data.Owner == owner)
-            return;*/// Design change, make it easy to accidentally destory your own gem, rather than the friendly fire angle
-
         VFXManager.Instance.SyncVFX(ParticleType.HITSPARK, 0.5f * (transform.position + data.transform.position), flip: false);
         OnBreak();
 

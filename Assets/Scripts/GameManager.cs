@@ -188,37 +188,69 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public void SpawnGoldBurst(Vector3 position, int amount, PickupVariant variant = PickupVariant.ALL)
 	{
-		while (amount > 0)
+		if (isClient)
 		{
-			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
-			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
-			component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
-			if (amount > 10)
+			SyncSpawnMoney(position, amount, variant);
+		}
+		else
+		{
+			SpawnMoney(position, amount, variant);
+		}
+		[Command(requiresAuthority = false)] void SyncSpawnMoney(Vector3 position, int amount, PickupVariant variant)
+		{
+			SpawnMoney(position, amount, variant);
+		}
+
+		void SpawnMoney(Vector3 position, int amount, PickupVariant variant)
+		{
+			while (amount > 0)
 			{
-				gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_LARGE, variant);
-				amount -= 10;
+				GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
+				Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
+				component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+				if (amount > 10)
+				{
+					gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_LARGE, variant);
+					amount -= 10;
+				}
+				else
+				{
+					gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_SMALL, variant);
+					amount--;
+				}
+				NetworkServer.Spawn(gameObject);
 			}
-			else
-			{
-				gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_SMALL, variant);
-				amount--;
-			}
-			NetworkServer.Spawn(gameObject);
 		}
 	}
 
 	public void SpawnGemBurst(Vector3 position, int amount)
 	{
-		while (amount > 0)
+		if (isClient)
 		{
-			GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
-			Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
-			component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+			SyncSpawnMoney(position, amount);
+		}
+		else
+		{
+			SpawnMoney(position, amount);
+		}
 
-			gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_BONUS, PickupVariant.ALL);
-			amount--;
+		[Command(requiresAuthority = false)] void SyncSpawnMoney(Vector3 position, int amount)
+		{
+			SpawnMoney(position, amount);
+		}
 
-			NetworkServer.Spawn(gameObject);
+		void SpawnMoney(Vector3 position, int amount) {
+			while (amount > 0)
+			{
+				GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
+				Rigidbody2D component = gameObject.GetComponent<Rigidbody2D>();
+				component.linearVelocity = new Vector2(Random.Range(-15, 15), Random.Range(40, 60));
+
+				gameObject.GetComponent<PickupData>().Init(PickupType.MONEY_BONUS, PickupVariant.ALL);
+				amount--;
+
+				NetworkServer.Spawn(gameObject);
+			}
 		}
 	}
 

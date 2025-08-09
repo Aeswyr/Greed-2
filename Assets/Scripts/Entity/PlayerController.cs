@@ -2097,23 +2097,28 @@ public class PlayerController : NetworkBehaviour
 		{
 			case BuffType.BARRIER:
 				buffColor = Color.gray;
+				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_BARRIER);
 				break;
 			case BuffType.SWIFT:
 				buffColor = Color.yellow;
+				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_SWIFT);
 				break;
 			case BuffType.BLOODLUST:
 				buffColor = Color.red;
+				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_BLOODLUST);
 				break;
 			case BuffType.GREED:
 				unitVFX.SetFXState(PlayerVFX.PICKUP_RANGE, true);
 				buffColor = Color.green;
+				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_GREED);
 				break;
 			case BuffType.GHOSTFORM:
 				buffColor = Color.cyan;
+				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_GHOSTFORM);
 				break;
 		}
 
-		unitVFX.SetFXState(PlayerVFX.POWERUP_GENERIC, true);
+		
 		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, buffColor);
 
 		buffColor.a = 0.5f;

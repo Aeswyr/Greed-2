@@ -14,6 +14,8 @@ public class UnitVFXController : NetworkBehaviour
 	[SerializeField]
 	private ParticleSystem[] objectPullers;
 
+	[SerializeField] private Animator[] pickupFX;
+
 	private float afterImageTimer;
 
 	private float afterImageDelay;
@@ -147,6 +149,61 @@ public class UnitVFXController : NetworkBehaviour
 		else
 		{
 			SendFXState(fx, state);
+		}
+	}
+
+	public void PlayAnimationFX(AnimationVFX fx)
+	{
+		if (isServer)
+			RecieveFX(fx);
+		else
+			SendFX(fx);
+
+		[Command] void SendFX(AnimationVFX fx)
+		{
+			RecieveFX(fx);
+		} 
+		[ClientRpc] void RecieveFX(AnimationVFX fx)
+		{
+			switch (fx)
+			{
+				case AnimationVFX.PICKUP_BLOODLUST:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.red;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.red;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+				case AnimationVFX.PICKUP_SWIFT:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.yellow;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.yellow;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+				case AnimationVFX.PICKUP_GHOSTFORM:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.cyan;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.cyan;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+				case AnimationVFX.PICKUP_GREED:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.green;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.green;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+				case AnimationVFX.PICKUP_BARRIER:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.gray;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.gray;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+				case AnimationVFX.PICKUP_GENERIC:
+					pickupFX[0].GetComponent<SpriteRenderer>().color = Color.white;
+					pickupFX[1].GetComponent<SpriteRenderer>().color = Color.white;
+					pickupFX[1].Play(pickupFX[1].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					pickupFX[0].Play(pickupFX[0].GetCurrentAnimatorStateInfo(-1).fullPathHash);
+					break;
+			}
 		}
 	}
 
