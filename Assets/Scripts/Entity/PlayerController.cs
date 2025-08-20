@@ -199,6 +199,9 @@ public class PlayerController : NetworkBehaviour
 	[SerializeField]
 	private AnimationCurve chainPullCurve;
 	[SerializeField]
+	private HitboxData chainHitboxData;
+
+	[SerializeField]
 	private GameObject turretPrefab;
 
 	private float staminaCooldown => 2.5f * staminaMod * (HasBuff(BuffType.GHOSTFORM) ? 0.5f : 1);
@@ -243,8 +246,8 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 0; //0
-	private int skillId = -1; //-1
+	private int weaponId = 7; //0
+	private int skillId = 8; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -862,9 +865,11 @@ public class PlayerController : NetworkBehaviour
 				{
 					move.StartDeceleration();
 				}
+				/*
 				jump.SetGravity(0.5f);
 				jump.ForceVelocity(0);
 				jump.SetTerminalVelocity(2);
+				*/
 				break;
 			case 13:
 				move.OverrideCurve(CalculateSpeed(unarmedBlinkSpeed), unarmedBlinkCurve, facing);
@@ -1825,15 +1830,25 @@ public class PlayerController : NetworkBehaviour
 				SFXManager.Instance.PlaySound("swiftswing");
 				if (Time.time - chargeStart > chainChargeLength)
 				{
-					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(2f, 0.5f))
-						.MakeProjectile(transform.position + 0.5f * Vector3.down)
-						.SetAnimation(8)
-						.SetLifetime(0.2f)
-						.SetVelocity(60f * aim)
-						.RotateWithVelocity()
-						.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
-						.SetUnique(UniqueProjectile.CHAIN)
-						.Finish();
+					Vector3 grapplePoint = transform.position + 12 * aim;
+					RaycastHit2D ray = Physics2D.BoxCast(transform.position + Vector3.down + 5 * aim, Vector2.one, 0, aim, 12, LayerMask.GetMask(new[] { "Hurtbox", "World"}));
+					if (ray)
+					{
+
+						grapplePoint = ray.point;
+						VFXManager.Instance.SyncVFX(ParticleType.PROJECTILE_HITSPARK, grapplePoint, false);
+						GrapplePull(grapplePoint);
+
+						if (ray.collider.transform.TryGetComponent(out HurtboxController hurtbox))
+						{
+							hurtbox.TriggerHurtbox(transform, chainHitboxData);
+						}
+					}
+					else
+					{
+						//grapple.AnimatePullSequence(grapplePoint, 0.5f);
+					}
+					
 				}
 				else
 				{
@@ -1947,7 +1962,7 @@ public class PlayerController : NetworkBehaviour
 
 	private void StartFlight()
 	{
-		endFlight = Time.time + 2.5f;
+		endFlight = Time.time + 5f;
 		flying = true;
 		unitVFX.SetFXState(PlayerVFX.FLIGHT, state: true);
 	}
@@ -1981,7 +1996,7 @@ public class PlayerController : NetworkBehaviour
 
 		IEnumerator DelayGiveReward()
 		{
-			yield return new WaitForSeconds(0.75f);
+			yield return new WaitForSeconds(0.5f);
 			switch (GameManager.Instance.GetShopRanking(this))
 			{
 				case 1:
@@ -2251,6 +2266,7 @@ public class PlayerController : NetworkBehaviour
 
 		[ClientRpc] void RecievePull(Vector3 pos)
 		{
+			//grapple.AnimatePullSequence(pos, 0.75f);
 			if (!isLocalPlayer)
 				return;
 

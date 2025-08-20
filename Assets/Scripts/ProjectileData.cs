@@ -16,7 +16,6 @@ public class ProjectileData : NetworkBehaviour
 	[SerializeField] private Rigidbody2D rbody;
 	[SerializeField]
 	private ParticleSystem drillVFX;
-	[SerializeField] LineRenderer chainFX;
 	[SerializeField] private GameObject[] spawnablePrefabs;
 	[SerializeField] private AnimationCurve boomerangFire;
 	[SerializeField] private AnimationCurve boomerangReturn;
@@ -61,11 +60,6 @@ public class ProjectileData : NetworkBehaviour
 		animator.runtimeAnimatorController = animatorOverrideController;
 		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
 
-		if (uniqueFunction != UniqueProjectile.CHAIN)
-		{
-			chainFX.gameObject.SetActive(false);
-		}
-
 		speed = rbody.linearVelocity;
 
 		startTime = Time.time;
@@ -96,11 +90,6 @@ public class ProjectileData : NetworkBehaviour
 			destroyAfterDelay = false;
 			NetworkServer.Destroy(gameObject);
 			VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
-		}
-
-		if (uniqueFunction == UniqueProjectile.CHAIN)
-		{
-			chainFX.SetPositions(new[] { owner.transform.position - Vector3.up, transform.position });
 		}
 
 		if (isServer && uniqueFunction == UniqueProjectile.BOOMERANG)
@@ -178,10 +167,6 @@ public class ProjectileData : NetworkBehaviour
 			CreateArrowPickup();
 		}
 		
-		if (uniqueFunction == UniqueProjectile.CHAIN)
-		{
-			TriggerHookshot();
-		}
 	}
 
 	private void CreateArrowPickup() {
@@ -191,11 +176,6 @@ public class ProjectileData : NetworkBehaviour
 		arrow.SetOwner(owner);
 
 		NetworkServer.Spawn(arrowSpawn);
-	}
-
-	private void TriggerHookshot()
-	{
-		owner.GetComponent<PlayerController>().GrapplePull(transform.position);
 	}
 
 	[Command(requiresAuthority = false)] public void OnWorldExit() {
@@ -223,14 +203,9 @@ public class ProjectileData : NetworkBehaviour
 		{
 			CreateArrowPickup();
 		}
-
-		if (uniqueFunction == UniqueProjectile.CHAIN)
-		{
-			TriggerHookshot();
-		}
 	}
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB, ARROW, CHAIN, BOOMERANG
+	DEFAULT, DRILL, BOMB, ARROW, BOOMERANG
 }

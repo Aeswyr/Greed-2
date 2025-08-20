@@ -15,15 +15,19 @@ public class HurtboxController : MonoBehaviour
         isPlayerOwned = transform.parent != null && transform.parent.TryGetComponent(out PlayerController owner);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+	private void OnTriggerEnter2D(Collider2D other)
 	{
 		var data = other.GetComponent<HitboxData>();
+		TriggerHurtbox(other.transform.parent, data);
+	}
 
+	public void TriggerHurtbox(Transform source, HitboxData data)
+	{
 		if (data.Immune == transform)
 			return;
 
 		PlayerController player;
-		if (other.transform.parent != null && other.transform.parent.TryGetComponent(out player))
+		if (source != null && source.TryGetComponent(out player))
 		{
 			player.DoHitstop(0.15f);
 		}
@@ -37,10 +41,12 @@ public class HurtboxController : MonoBehaviour
 		action?.Invoke(data);
 	}
 
-	public void MarkHitboxSeen(Transform hitbox) {
+	public void MarkHitboxSeen(Transform hitbox)
+	{
 		seenHitboxes.Add(hitbox);
 
-		while (seenHitboxes.Count > 10) {
+		while (seenHitboxes.Count > 10)
+		{
 			seenHitboxes.RemoveAt(0);
 		}
 	}

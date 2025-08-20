@@ -44,8 +44,8 @@ MonoBehaviour:
     name: Mystic Magnet
     desc: A relic which allows you to grab items in a large radius.
   - type: SKILL_FLIGHT
-    name: Mistfeather Bottle
-    desc: A relic which grants temporary flight.
+    name: Sun Feather
+    desc: A relic which grants temporary flight when holding [UP].
   - type: SKILL_SHOTGUN
     name: Firework Bundle
     desc: A relic which launches a large number of fireworks.
@@ -68,7 +68,7 @@ MonoBehaviour:
     name: Guardian Gem
     desc: A relic which deploys a fragile crystal turret.
   - type: SKILL_BOOMERANG
-    name: BOOMERANG
+    name: Boomerang
     desc: A relic which launches a returning projectile. If you retrieve it, you
       can throw it again immediately.
   - type: ITEM_POTION_HEALTH
