@@ -25,12 +25,16 @@ public class UnitVFXController : NetworkBehaviour
 
 	private void FixedUpdate()
 	{
-		for (int i = 0; i < activeImages.Count; i++) {
+		for (int i = 0; i < activeImages.Count; i++)
+		{
 			var image = activeImages[i];
-			if (Time.time > image.end) {
+			if (Time.time > image.end)
+			{
 				activeImages.RemoveAt(i);
 				i--;
-			} else if (Time.time > image.next) {
+			}
+			else if (Time.time > image.next)
+			{
 				CreateAfterimage(image);
 				image.next = Time.time + image.delay;
 
@@ -41,50 +45,59 @@ public class UnitVFXController : NetworkBehaviour
 
 	public void StartAfterImageChain(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default, string tag = null)
 	{
-		if (color == default) {
+		if (color == default)
+		{
 			color = Color.white;
 		}
 
-		AfterimageData data = new (){
-				end = Time.time + duration,
-				next = Time.time + imageDelay,
-				delay = imageDelay,
-				duration = imageDuration,
-				materialOverride = overrideMaterial,
-				color = color,
-				tag = tag
-			};
+		AfterimageData data = new()
+		{
+			end = Time.time + duration,
+			next = Time.time + imageDelay,
+			delay = imageDelay,
+			duration = imageDuration,
+			materialOverride = overrideMaterial,
+			color = color,
+			tag = tag
+		};
 
-		if (isServer) {
+		if (isServer)
+		{
 			RecieveAfterImage(data);
-		} else {
+		}
+		else
+		{
 			SendAfterImage(data);
 		}
 
-		[Command] void SendAfterImage(AfterimageData data) {
+		[Command] void SendAfterImage(AfterimageData data)
+		{
 			RecieveAfterImage(data);
 		}
-		
-		[ClientRpc] void RecieveAfterImage(AfterimageData data) {
+
+		[ClientRpc] void RecieveAfterImage(AfterimageData data)
+		{
 			activeImages.Add(data);
 		}
 	}
 
 	public void SyncAfterimage(float duration, float imageDelay, float imageDuration = 0.5f, bool overrideMaterial = true, Color color = default)
 	{
-		if (color == default) {
+		if (color == default)
+		{
 			color = Color.white;
 		}
 
-		AfterimageData data = new (){
-				end = Time.time + duration,
-				next = Time.time + imageDelay,
-				delay = imageDelay,
-				duration = imageDuration,
-				materialOverride = overrideMaterial,
-				color = color,
-				tag = null
-			};
+		AfterimageData data = new()
+		{
+			end = Time.time + duration,
+			next = Time.time + imageDelay,
+			delay = imageDelay,
+			duration = imageDuration,
+			materialOverride = overrideMaterial,
+			color = color,
+			tag = null
+		};
 
 		if (isServer)
 		{
@@ -94,7 +107,7 @@ public class UnitVFXController : NetworkBehaviour
 		{
 			SendAfterimage(data);
 		}
-			
+
 		[Command] void SendAfterimage(AfterimageData data)
 		{
 			RecieveAfterimage(data);
@@ -106,33 +119,42 @@ public class UnitVFXController : NetworkBehaviour
 		}
 	}
 
-	private void CreateAfterimage(AfterimageData data) {
+	private void CreateAfterimage(AfterimageData data)
+	{
 		GameObject gameObject = Instantiate(VFXManager.Instance.GetAfterimagePrefab(), transform.position, Quaternion.identity);
 		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
 		SpriteRenderer spriteRenderer = sprite;
 		component.sprite = spriteRenderer.sprite;
 		if (data.materialOverride)
 			component.material = spriteRenderer.material;
-		else 
+		else
 			component.color = data.color;
 		component.flipX = spriteRenderer.flipX;
 		gameObject.GetComponent<DestroyAfterDelay>().Init(data.duration);
 		gameObject.GetComponent<AlphaDecay>().SetDuration(data.duration);
 	}
 
-	public void EndChain(string tag) {
-		if (isServer) {
+	public void EndChain(string tag)
+	{
+		if (isServer)
+		{
 			RecieveTag(tag);
-		} else {
+		}
+		else
+		{
 			SendTag(tag);
 		}
-		[Command] void SendTag(string tag) {
+		[Command] void SendTag(string tag)
+		{
 			RecieveTag(tag);
 		}
 
-		[ClientRpc] void RecieveTag(string tag) {
-			for (int i = 0; i < activeImages.Count; i++) {
-				if (activeImages[i].tag == tag) {
+		[ClientRpc] void RecieveTag(string tag)
+		{
+			for (int i = 0; i < activeImages.Count; i++)
+			{
+				if (activeImages[i].tag == tag)
+				{
 					activeImages.RemoveAt(i);
 					i--;
 				}
@@ -162,7 +184,7 @@ public class UnitVFXController : NetworkBehaviour
 		[Command] void SendFX(AnimationVFX fx)
 		{
 			RecieveFX(fx);
-		} 
+		}
 		[ClientRpc] void RecieveFX(AnimationVFX fx)
 		{
 			switch (fx)
@@ -249,6 +271,24 @@ public class UnitVFXController : NetworkBehaviour
 		else
 		{
 			playerParticles[(int)fx].Stop();
+		}
+	}
+
+	public void ClearParticles()
+	{
+		SendClear();
+
+		[Command(requiresAuthority = false)] void SendClear()
+		{
+			RecieveClear();
+		}
+
+		[ClientRpc] void RecieveClear()
+		{
+			foreach (var particle in playerParticles)
+			{
+				particle.Clear();
+			}
 		}
 	}
 }

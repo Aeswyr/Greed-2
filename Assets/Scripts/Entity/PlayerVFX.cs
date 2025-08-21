@@ -3,7 +3,8 @@ public enum PlayerVFX
 	FLIGHT,
 	VACCUM,
 	PICKUP_RANGE,
-	PICKUP
+	PICKUP,
+	HIT_DUST
 }
 
 public enum AnimationVFX

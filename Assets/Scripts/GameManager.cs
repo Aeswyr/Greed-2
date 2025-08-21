@@ -52,7 +52,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	[SerializeField] private Transform levelCounterParent;
 	[SerializeField] private GameObject levelPointer;
 
-
+	private PlayerController[] players;
 	private int levelIndex = 0;
 
 	private int readyPings;
@@ -89,6 +89,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		var playerObj = Instantiate(playerPrefab);
 		NetworkServer.Spawn(playerObj);
 		playerObj.GetComponent<PlayerController>().SetupInput(input.GetComponent<InputHandler>());
+
+		UpdatePlayers();
 	}
 
 	public void AddLobbyCard(PlayerController player)
@@ -239,7 +241,8 @@ public class GameManager : NetworkSingleton<GameManager>
 			SpawnMoney(position, amount);
 		}
 
-		void SpawnMoney(Vector3 position, int amount) {
+		void SpawnMoney(Vector3 position, int amount)
+		{
 			while (amount > 0)
 			{
 				GameObject gameObject = Instantiate(pickupPrefab, position + Vector3.up, Quaternion.identity);
@@ -685,6 +688,12 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	public PlayerController[] GetPlayers()
 	{
-		return FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		return players;
+	}
+
+	public void UpdatePlayers()
+	{
+		players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+		Debug.Log($"Player Count: {players.Length}");
 	}
 }

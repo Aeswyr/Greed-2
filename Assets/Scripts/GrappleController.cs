@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEditor.U2D.Aseprite;
 
 public class GrappleController : MonoBehaviour
 {
@@ -42,6 +41,10 @@ public class GrappleController : MonoBehaviour
     bool strightLine = true;
     bool retracting = false;
 
+    void Start()
+    {
+        lineRend.enabled = false;   
+    }
     public void AnimatePullSequence(Vector3 anchorPos, float duration)
     {
         this.anchorPos = anchorPos;
@@ -87,7 +90,7 @@ public class GrappleController : MonoBehaviour
 
         if (retracting)
         {
-            anchorPos = player.transform.position + 0.9f * (anchorPos - player.transform.position);
+            anchorPos = player.transform.position + 0.5f * (anchorPos - player.transform.position);
         }
     }
 

@@ -200,6 +200,8 @@ public class PlayerController : NetworkBehaviour
 	private AnimationCurve chainPullCurve;
 	[SerializeField]
 	private HitboxData chainHitboxData;
+	[SerializeField]
+	private GrappleController grapple;
 
 	[SerializeField]
 	private GameObject turretPrefab;
@@ -246,8 +248,8 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 7; //0
-	private int skillId = 8; //-1
+	private int weaponId = 0; //0
+	private int skillId = -1; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -304,6 +306,9 @@ public class PlayerController : NetworkBehaviour
 		health = maxHealth;
 		worldMask = LayerMask.GetMask("World");
 		sprite.material = colors[0];
+
+		GameManager.Instance.UpdatePlayers();
+
 		if (isLocalPlayer)
 		{
 			if (input == null)
@@ -348,7 +353,12 @@ public class PlayerController : NetworkBehaviour
 
 	}
 
-	public void SetupInput(InputHandler input)
+    void OnDestroy()
+    {
+		GameManager.Instance.UpdatePlayers();
+    }
+
+    public void SetupInput(InputHandler input)
 	{
 		this.input = input;
 		jump.SetInput(input);
@@ -1299,6 +1309,8 @@ public class PlayerController : NetworkBehaviour
 		if (charging)
 			InterruptCharge();
 
+		EndAction();
+
 		invuln = InvulnState.HITSTUN;
 		StartAction();
 		UpdateFacing(-knockbackDir);
@@ -1309,6 +1321,7 @@ public class PlayerController : NetworkBehaviour
 		jump.ForceLanding();
 		jump.ForceVelocity(30f);
 		DoHitstop(0.15f);
+		unitVFX.SetFXState(PlayerVFX.HIT_DUST, state: true);
 
 		PlayerController attackingPlayer = null;
 		if (owner != null)
@@ -1846,7 +1859,17 @@ public class PlayerController : NetworkBehaviour
 					}
 					else
 					{
-						//grapple.AnimatePullSequence(grapplePoint, 0.5f);
+						SendGrappleMiss(grapplePoint);
+
+						[Command] void SendGrappleMiss(Vector3 grapplePoint)
+						{
+							RecieveGrappleMiss(grapplePoint);
+						}
+
+						[ClientRpc] void RecieveGrappleMiss(Vector3 grapplePoint)
+						{
+							grapple.AnimatePullSequence(grapplePoint, 0.5f);
+						}
 					}
 					
 				}
@@ -1975,6 +1998,8 @@ public class PlayerController : NetworkBehaviour
 			UpdateMoneyDisplay();
 			UpdateMoneyLock(val: true);
 			GetShopReward();
+			
+			unitVFX.ClearParticles();
 		}
 	}
 
@@ -2266,7 +2291,7 @@ public class PlayerController : NetworkBehaviour
 
 		[ClientRpc] void RecievePull(Vector3 pos)
 		{
-			//grapple.AnimatePullSequence(pos, 0.75f);
+			grapple.AnimatePullSequence(pos, 0.75f);
 			if (!isLocalPlayer)
 				return;
 
