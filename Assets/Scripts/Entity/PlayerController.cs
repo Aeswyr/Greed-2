@@ -304,7 +304,7 @@ public class PlayerController : NetworkBehaviour
 	private PurchaseInterface confirmedShop;
 
 	private float nextFootstep;
-
+	private KeyController heldKey;
 	private void Start()
 	{
 		health = maxHealth;
@@ -357,12 +357,12 @@ public class PlayerController : NetworkBehaviour
 
 	}
 
-    void OnDestroy()
-    {
+	void OnDestroy()
+	{
 		GameManager.Instance.UpdatePlayers();
-    }
+	}
 
-    public void SetupInput(InputHandler input)
+	public void SetupInput(InputHandler input)
 	{
 		this.input = input;
 		jump.SetInput(input);
@@ -1768,7 +1768,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			EndBuff(BuffType.BARRIER);
 		}
-		
+
 		switch (attackId)
 		{
 			case 0:
@@ -1872,7 +1872,7 @@ public class PlayerController : NetworkBehaviour
 				if (Time.time - chargeStart > chainChargeLength)
 				{
 					Vector3 grapplePoint = transform.position + 12 * aim;
-					RaycastHit2D ray = Physics2D.BoxCast(transform.position + Vector3.down + 5 * aim, Vector2.one, 0, aim, 12, LayerMask.GetMask(new[] { "Hurtbox", "World"}));
+					RaycastHit2D ray = Physics2D.BoxCast(transform.position + Vector3.down + 5 * aim, Vector2.one, 0, aim, 12, LayerMask.GetMask(new[] { "Hurtbox", "World" }));
 					if (ray)
 					{
 
@@ -1899,7 +1899,7 @@ public class PlayerController : NetworkBehaviour
 							grapple.AnimatePullSequence(grapplePoint, 0.5f);
 						}
 					}
-					
+
 				}
 				else
 				{
@@ -2026,7 +2026,7 @@ public class PlayerController : NetworkBehaviour
 			UpdateMoneyDisplay();
 			UpdateMoneyLock(val: true);
 			GetShopReward();
-			
+
 			unitVFX.ClearParticles();
 		}
 	}
@@ -2189,7 +2189,7 @@ public class PlayerController : NetworkBehaviour
 				break;
 		}
 
-		
+
 		VFXManager.Instance.SyncFloatingText(type.ToString(), transform.position, buffColor);
 
 		buffColor.a = 0.5f;
@@ -2218,7 +2218,7 @@ public class PlayerController : NetworkBehaviour
 				nextRegency = Time.time + 1f;
 				finalRegency = Time.time + 10f;
 			}
-			
+
 		}
 	}
 
@@ -2393,5 +2393,22 @@ public class PlayerController : NetworkBehaviour
 			UpdateSkillDisplay(0.05f);
 		}
 
+	}
+
+	public void AddKey(KeyController key)
+	{
+		heldKey = key;
+	}
+
+	public bool HasKey()
+	{
+		return heldKey != null;
+	}
+
+	public KeyController UseKey()
+	{
+		KeyController key = heldKey;
+		heldKey = null;
+		return key;
 	}
 }

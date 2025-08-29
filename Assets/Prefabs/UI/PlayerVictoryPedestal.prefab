@@ -83767,11 +83767,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 84890293867091421, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
       propertyPath: m_SortingLayer
-      value: 7
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 84890293867091421, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 84890293867091421, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 2072898831
       objectReference: {fileID: 0}
     - target: {fileID: 815832885612048154, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
       propertyPath: m_SortingLayer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 815832885612048154, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 815832885612048154, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 2072898831
       objectReference: {fileID: 0}
     - target: {fileID: 3705323206747306545, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
       propertyPath: m_Name
@@ -83780,6 +83796,14 @@ PrefabInstance:
     - target: {fileID: 4884274207602010137, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
       propertyPath: m_SortingLayer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884274207602010137, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884274207602010137, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 2072898831
       objectReference: {fileID: 0}
     - target: {fileID: 5136438592346425374, guid: 467c1341fe8ec8541bbafb1f1eda3dd5, type: 3}
       propertyPath: m_Pivot.x
