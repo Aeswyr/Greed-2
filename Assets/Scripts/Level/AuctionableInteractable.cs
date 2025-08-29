@@ -169,7 +169,6 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 				if (winner == localPlayer)
 				{
 					output.Invoke(localPlayer);
-					Cleanup();
 				}
 				else
 				{
@@ -177,10 +176,11 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 				}
 			}
 
-			[Command(requiresAuthority = false)]
-			void Cleanup()
+			transform.GetComponent<BoxCollider2D>().enabled = false;
+			
+			foreach (Transform child in transform)
 			{
-				NetworkServer.Destroy(gameObject);
+				child.gameObject.SetActive(false);
 			}
 		}
 	}
