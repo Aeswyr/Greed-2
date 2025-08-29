@@ -8,5 +8,7 @@ public enum ParticleType
 	FIREWORK_POP,
 	ARMOR,
 	TURRET_DESTROY,
+	BLINK_START,
+	BLINK_END,
 	NONE
 }

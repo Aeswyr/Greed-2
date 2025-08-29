@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Steamworks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
@@ -274,8 +275,11 @@ public class PlayerController : NetworkBehaviour
 	private VictoryStats victoryStats;
 
 	private int[] stats = new int[5];
-	private float[] buffs = new float[(int)BuffType.RANDOM];
-	private bool[] buffDirty = new bool[(int)BuffType.RANDOM];
+	private float[] buffs = new float[(int)BuffType.MAX];
+	private bool[] buffDirty = new bool[(int)BuffType.MAX];
+	private float nextRegency;
+	private float finalRegency;
+	private int regencyCount;
 	private LayerMask worldMask;
 	[SyncVar] private int playerId = -1;
 	public int PlayerID => playerId;
@@ -403,11 +407,23 @@ public class PlayerController : NetworkBehaviour
 	{
 		unitUI.UpdateStamina(1f - (nextStamina - Time.time) / staminaCooldown);
 		unitUI.UpdateSkill(1f - (nextSkill - Time.time) / skillCooldown);
+		if (HasBuff(BuffType.REGENCY))
+		{
+			unitUI.UpdateRegency(10 - (buffs[(int)BuffType.REGENCY] - Time.time), 10);
+		}
 		DoBuffCleanup();
 		if (!isLocalPlayer || inputLocked)
 		{
 			return;
 		}
+
+		if (HasBuff(BuffType.REGENCY) && Time.time > nextRegency)
+		{
+			nextRegency = Time.time + 1f;
+			regencyCount++;
+			TryAddMoney(10);
+		}
+
 		grounded = ground.CheckGrounded();
 		if (hitStun && Time.time > hitStunTime)
 		{
@@ -1121,21 +1137,22 @@ public class PlayerController : NetworkBehaviour
 					.Finish();
 				break;
 			case 3:
+				Debug.Log("blinking!");
+				Vector3 vector = transform.position + 10f * (Vector3)aim.normalized;
+				RaycastHit2D raycastHit2D = Physics2D.BoxCast(vector, new Vector2(1.5f, 2.5f), 0f, Vector2.right, 0f, worldMask);
+				VFXManager.Instance.SyncVFX(ParticleType.BLINK_START, transform.position, false);
+				if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(vector))
 				{
-					Vector3 vector = transform.position + 10f * (Vector3)aim.normalized;
-					RaycastHit2D raycastHit2D = Physics2D.BoxCast(vector, new Vector2(1.5f, 2.5f), 0f, Vector2.right, 0f, worldMask);
-					if (!raycastHit2D && !GameManager.Instance.GetCurrentLevel().IsPointInGeometry(vector))
-					{
-						transform.position = vector;
-					}
-					else
-					{
-						RaycastHit2D raycastHit2D2 = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, aim, 10f, worldMask);
-						transform.position = raycastHit2D2.centroid;
-					}
-					invuln = InvulnState.NONE;
-					break;
+					transform.position = vector;
 				}
+				else
+				{
+					RaycastHit2D raycastHit2D2 = Physics2D.BoxCast(transform.position, new Vector2(1.5f, 2.5f), 0f, aim, 10f, worldMask);
+					transform.position = raycastHit2D2.centroid;
+				}
+				VFXManager.Instance.SyncVFX(ParticleType.BLINK_END, transform.position, facing == -1);
+				invuln = InvulnState.NONE;
+				break;
 			case 4:
 				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(3f, 3f))
 					.MakeProjectile(transform.position + 0.5f * Vector3.down)
@@ -1329,6 +1346,12 @@ public class PlayerController : NetworkBehaviour
 
 		attackingPlayer.OnHitTrigger(source, true);
 
+		if (HasBuff(BuffType.REGENCY))
+		{
+			EndBuff(BuffType.REGENCY);
+			attackingPlayer.GiveBuff(BuffType.REGENCY);
+		}
+
 		if (money > 0)
 		{
 			int num = Mathf.CeilToInt((float)money / 2f);
@@ -1480,11 +1503,7 @@ public class PlayerController : NetworkBehaviour
 				UpdateMoneyDisplay();
 				break;
 			case PickupType.ITEM_CROWN:
-				health = maxHealth;
-				UpdateHealthDisplay(health, maxHealth);
-				crowns++;
-				victoryStats.CrownsHeld++;
-				UpdateCrownDisplay();
+				AddCrown(1);
 				break;
 			case PickupType.ITEM_POTION_HEALTH:
 				VFXManager.Instance.SyncFloatingText("Health +1", transform.position + 3 * Vector3.up, Color.red);
@@ -1569,6 +1588,15 @@ public class PlayerController : NetworkBehaviour
 			ResetCooldown();
 			skillId = id;
 		}
+	}
+
+	public void AddCrown(int amt)
+	{
+		health = maxHealth;
+		UpdateHealthDisplay(health, maxHealth);
+		crowns += amt;
+		victoryStats.CrownsHeld++;
+		UpdateCrownDisplay();
 	}
 
 	private void UpdateMoneyDisplay()
@@ -2156,6 +2184,9 @@ public class PlayerController : NetworkBehaviour
 				buffColor = Color.cyan;
 				unitVFX.PlayAnimationFX(AnimationVFX.PICKUP_GHOSTFORM);
 				break;
+			case BuffType.REGENCY:
+				buffColor = new Color(1, 0.75f, 0, 0.5f);
+				break;
 		}
 
 		
@@ -2181,6 +2212,13 @@ public class PlayerController : NetworkBehaviour
 
 			if (type == BuffType.GREED)
 				pickupBox.radius = 5f;
+
+			if (type == BuffType.REGENCY)
+			{
+				nextRegency = Time.time + 1f;
+				finalRegency = Time.time + 10f;
+			}
+			
 		}
 	}
 
@@ -2218,7 +2256,7 @@ public class PlayerController : NetworkBehaviour
 
 	public void DoBuffCleanup()
 	{
-		for (int i = 0; i < (int)BuffType.RANDOM; i++)
+		for (int i = 0; i < (int)BuffType.MAX; i++)
 		{
 			if (buffDirty[i] && Time.time > buffs[i])
 			{
@@ -2234,6 +2272,18 @@ public class PlayerController : NetworkBehaviour
 					{
 						unitVFX.SetFXState(PlayerVFX.PICKUP_RANGE, false);
 					}
+				}
+				if ((BuffType)i == BuffType.REGENCY)
+				{
+					if (isLocalPlayer && Time.time > finalRegency)
+					{
+						TryAddMoney(10);
+						AddCrown(1);
+						unitVFX.SetFXState(PlayerVFX.REGENCY_REWARD, true);
+					}
+
+					regencyCount = 0;
+					nextRegency = 0;
 				}
 			}
 		}

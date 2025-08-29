@@ -37,6 +37,10 @@ public class PlayerUIController : MonoBehaviour
 	[SerializeField]
 	private TextMeshProUGUI crownCount;
 	[SerializeField]
+	private CanvasGroup regencyGroup;
+	[SerializeField]
+	private Image regencyBar;
+	[SerializeField]
 	private TextMeshProUGUI nameplate;
 
 	private bool moneyLock;
@@ -51,6 +55,7 @@ public class PlayerUIController : MonoBehaviour
 	private float skillFade;
 
 	private float healthFade;
+	private float regencyFade;
 
 	private int currentMoney;
 
@@ -63,6 +68,7 @@ public class PlayerUIController : MonoBehaviour
 		healthGroup.alpha = 0f;
 		skillGroup.alpha = 0f;
 		crownGroup.alpha = 0f;
+		regencyGroup.alpha = 0f;
 		nameplate.alpha = 0f;
 		interactIcon.SetActive(value: false);
 	}
@@ -135,6 +141,13 @@ public class PlayerUIController : MonoBehaviour
 		healthFade = Time.time + 0.2f;
 	}
 
+	public void UpdateRegency(float time, int max)
+	{
+		regencyGroup.alpha = 1f;
+		regencyBar.fillAmount = time / max;
+		regencyFade = Time.time + 0.1f;
+	}
+
 	public void SetInteractActive(bool val)
 	{
 		interactIcon.SetActive(val);
@@ -143,12 +156,12 @@ public class PlayerUIController : MonoBehaviour
 			Animator component = interactIcon.GetComponent<Animator>();
 			switch (FindAnyObjectByType<InputHandler>().activeDevice)
 			{
-			case DeviceType.KEYBOARD:
-				component.Play("keyboard");
-				break;
-			case DeviceType.GAMEPAD:
-				component.Play("controller");
-				break;
+				case DeviceType.KEYBOARD:
+					component.Play("keyboard");
+					break;
+				case DeviceType.GAMEPAD:
+					component.Play("controller");
+					break;
 			}
 		}
 	}
@@ -187,8 +200,12 @@ public class PlayerUIController : MonoBehaviour
 		{
 			healthGroup.alpha -= 0.04f;
 		}
-		if (Time.time > nameplateFade && nameplate.alpha > 0) {
+		if (Time.time > nameplateFade && nameplate.alpha > 0)
+		{
 			nameplate.alpha -= 0.02f;
+		}
+		if (Time.time > regencyFade && regencyGroup.alpha > 0) {
+			regencyGroup.alpha -= 0.05f;
 		}
 	}
 }

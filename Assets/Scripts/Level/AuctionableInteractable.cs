@@ -75,7 +75,7 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 		}
 		else if (timer == 0)
 		{
-			RunAuctionComplete();
+			CompleteAuction();
 			timer--;
 		}
 	}
@@ -142,7 +142,7 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 		}
 	}
 
-	public void RunAuctionComplete()
+	public void CompleteAuction()
 	{
 		if (bidders.Count <= 0)
 		{

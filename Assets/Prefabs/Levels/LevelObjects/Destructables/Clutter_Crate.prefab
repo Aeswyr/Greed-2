@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7506993857073691450, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: destryParticle
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7517026538109149043, guid: 27e27112758548749a440d5f2388d5ca, type: 3}
       propertyPath: m_LocalPosition.x

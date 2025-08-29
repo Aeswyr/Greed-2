@@ -4,7 +4,8 @@ public enum PlayerVFX
 	VACCUM,
 	PICKUP_RANGE,
 	PICKUP,
-	HIT_DUST
+	HIT_DUST,
+	REGENCY_REWARD
 }
 
 public enum AnimationVFX

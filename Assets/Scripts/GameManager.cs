@@ -271,7 +271,7 @@ public class GameManager : NetworkSingleton<GameManager>
 		AuctionableInteractable[] array = FindObjectsByType<AuctionableInteractable>(FindObjectsSortMode.None);
 		foreach (AuctionableInteractable auctionableInteractable in array)
 		{
-			auctionableInteractable.RunAuctionComplete();
+			auctionableInteractable.CompleteAuction();
 		}
 
 		NextLevel();
@@ -415,8 +415,9 @@ public class GameManager : NetworkSingleton<GameManager>
 		return levelIndex;
 	}
 
-	public bool IsLevelShop()
+	public bool IsLevelShop(int offset = 0)
 	{
+		int levelIndex = this.levelIndex + offset;
 		return levelIndex % majorLevelModulo == 0 && levelIndex != 0 && levelIndex != levelCount;
 	}
 
@@ -452,7 +453,15 @@ public class GameManager : NetworkSingleton<GameManager>
 		{
 			readyPings = 0;
 
-			int nextLevelId = 0;
+			int nextLevelId = Random.Range(0, levels.Length);
+			if (IsLevelShop(1))
+			{
+				nextLevelId = Random.Range(0, shops.Length);
+			}
+			else if (levelIndex + 1 == levelCount)
+			{
+				nextLevelId = Random.Range(0, finalLevels.Length);
+			}
 			FinishLoad(nextLevelId);
 		}
 	}

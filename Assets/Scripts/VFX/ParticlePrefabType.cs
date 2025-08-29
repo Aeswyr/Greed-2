@@ -1,4 +1,4 @@
 public enum ParticlePrefabType
 {
-    DUST_PUFF, ROCK_SHATTER, NONE
+    DUST_PUFF, ROCK_SHATTER, WOOD_SHATTER, NONE
 }

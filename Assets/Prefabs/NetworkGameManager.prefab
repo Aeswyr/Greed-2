@@ -453,6 +453,7 @@ MonoBehaviour:
   currentLevel: {fileID: 0}
   levels:
   - {fileID: 8502693885247204858, guid: fa0b8596e01177c4090121a5d5276141, type: 3}
+  - {fileID: 8502693885247204858, guid: d318ad01ad53d1e48a312c5d3af820c6, type: 3}
   shops:
   - {fileID: 8502693885247204858, guid: 0980dde5d6b6694428d87e63fb39a380, type: 3}
   finalLevels:
@@ -491,9 +492,12 @@ MonoBehaviour:
   - {fileID: 6948953308231912870, guid: b04b4379820cdc14d95aceadb7d996b3, type: 3}
   - {fileID: 779891979630494364, guid: 0cf8c3b436c5d5d4093782064d44178e, type: 3}
   - {fileID: -1085918330189906863, guid: 1705a3457401dc14697ae2304095e5a1, type: 3}
+  - {fileID: -5628542616311827276, guid: ccc25c778e22873478d5d99619f1cc76, type: 3}
+  - {fileID: -1051381153138819387, guid: 0c985f7fc29c74e42b1634f1ca8cd8fb, type: 3}
   particles:
   - {fileID: 8323227717208924649, guid: f2a540b221370de429baef05e6cb996c, type: 3}
   - {fileID: 5535793718235568289, guid: 2308a569a6e2e204b88344559812c851, type: 3}
+  - {fileID: 5535793718235568289, guid: 66d2fe8b200e3d64e82d80b3dfb28dbe, type: 3}
   textPrefab: {fileID: 2846854720826849674, guid: fe785566b0b6a1f4da993151579fdbcf, type: 3}
   afterimagePrefab: {fileID: 1040999792124794, guid: b5e8f0ed6ed5ff942aa6c9aef7b7531e, type: 3}
 --- !u!114 &4452811494011943430
