@@ -5,9 +5,10 @@ using UnityEngine;
 public class KeyController : NetworkBehaviour
 {
     [SerializeField] private BoxCollider2D coll;
-    List<Vector3> positions = new();
+    Vector3 targetPos;
     Transform follow;
 
+    private int nextPos;
     void Start()
     {
         follow = transform;
@@ -18,15 +19,10 @@ public class KeyController : NetworkBehaviour
         if (!isServer)
             return;
 
-        positions.Add(follow.position);
-        if (follow != transform)
+        Vector3 dif = follow.position - transform.position;
+        if (dif.sqrMagnitude > 4)
         {
-            transform.position = positions[0];
-        }
-
-        if (positions.Count > 16)
-        {
-            positions.RemoveAt(0);
+            transform.position += Mathf.Max(10, dif.magnitude * 3) * Time.fixedDeltaTime * dif.normalized;
         }
     }
     void OnTriggerEnter2D(Collider2D collision)
