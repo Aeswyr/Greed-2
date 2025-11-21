@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
 {
+	private InputHandler input;
 	[SerializeField]
 	private GameObject interactIcon;
 
@@ -71,6 +72,11 @@ public class PlayerUIController : MonoBehaviour
 		regencyGroup.alpha = 0f;
 		nameplate.alpha = 0f;
 		interactIcon.SetActive(value: false);
+	}
+
+	public void SetInput(InputHandler input) 
+	{
+		this.input = input;
 	}
 
 	public void UpdateMoney(int target)
@@ -154,7 +160,7 @@ public class PlayerUIController : MonoBehaviour
 		if (val)
 		{
 			Animator component = interactIcon.GetComponent<Animator>();
-			switch (FindAnyObjectByType<InputHandler>().activeDevice)
+			switch (input.activeDevice)
 			{
 				case DeviceType.KEYBOARD:
 					component.Play("keyboard");

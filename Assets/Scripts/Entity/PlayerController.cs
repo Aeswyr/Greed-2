@@ -366,6 +366,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		this.input = input;
 		jump.SetInput(input);
+		unitUI.SetInput(input);
 		GameManager.Instance.AddLobbyCard(this);
 	}
 
