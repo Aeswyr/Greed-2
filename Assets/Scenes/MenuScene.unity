@@ -1210,7 +1210,8 @@ PrefabInstance:
       propertyPath: networkManager
       value: 
       objectReference: {fileID: 928625653}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 871691155580187647, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

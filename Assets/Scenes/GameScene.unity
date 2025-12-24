@@ -963,6 +963,10 @@ PrefabInstance:
       propertyPath: camera
       value: 
       objectReference: {fileID: 2105773518}
+    - target: {fileID: 5441077926203003157, guid: 5dc58d2c1d4936c4491dbeb382721936, type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 2105773518}
     - target: {fileID: 5472148777763103754, guid: 5dc58d2c1d4936c4491dbeb382721936, type: 3}
       propertyPath: screenWipe
       value: 

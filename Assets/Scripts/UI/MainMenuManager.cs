@@ -1,4 +1,3 @@
-using HeathenEngineering.SteamworksIntegration;
 using Mirror;
 using Steamworks;
 using TMPro;
@@ -71,7 +70,7 @@ public class MainMenuManager : MonoBehaviour
 		for (int i = 0; i < SteamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate); i++)
 		{
 			CSteamID friendByIndex = SteamFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
-			if (SteamFriends.GetFriendGamePlayed(friendByIndex, out var pFriendGameInfo) && pFriendGameInfo.m_steamIDLobby.IsValid() && pFriendGameInfo.m_gameID.AppID() == SteamSettings.ApplicationId)
+			if (SteamFriends.GetFriendGamePlayed(friendByIndex, out var pFriendGameInfo) && pFriendGameInfo.m_steamIDLobby.IsValid() && pFriendGameInfo.m_gameID.AppID() == (AppId_t)420)
 			{
 				Debug.Log("attempting to add lobby");
 				AddJoinLobby(pFriendGameInfo.m_steamIDLobby, SteamFriends.GetFriendPersonaName(friendByIndex) + "'s Lobby");
@@ -119,7 +118,7 @@ public class MainMenuManager : MonoBehaviour
 	}
 	public void OnHost()
 	{
-		FindAnyObjectByType<SteamManager>().Host();
+		FindAnyObjectByType<SteamHandler>().Host();
 	}
 
 	public void OnJoin()

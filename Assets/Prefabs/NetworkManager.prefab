@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 531100856887610389}
   - component: {fileID: 7535986001148983351}
   - component: {fileID: 5215147418641037790}
-  - component: {fileID: 871691155580187647}
+  - component: {fileID: 1534984669628945669}
   - component: {fileID: 4744449633474581642}
   - component: {fileID: 1711508764781068905}
   m_Layer: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
   offlineScene: Assets/Scenes/MenuScene.unity
   onlineScene: Assets/Scenes/GameScene.unity
   offlineSceneLoadDelay: 0
-  transport: {fileID: 1711508764781068905}
+  transport: {fileID: 4744449633474581642}
   networkAddress: localhost
   maxConnections: 100
   disconnectInactiveConnections: 0
@@ -118,25 +118,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e4c3fb359a00c469bdc27b58d71646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkManager: {fileID: 0}
---- !u!114 &871691155580187647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4882e1f0baaa18a45836edebb1e6b881, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: b114557cb9e501a4b9bb1b1db74583bd, type: 2}
-  evtSteamInitialized:
+  onInit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5215147418641037790}
-        m_TargetAssemblyTypeName: SteamManager, Assembly-CSharp
+      - m_Target: {fileID: 1534984669628945669}
+        m_TargetAssemblyTypeName: SteamHandler, Assembly-CSharp
         m_MethodName: OnInit
         m_Mode: 1
         m_Arguments:
@@ -147,21 +133,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  evtSteamInitializationError:
+  onInitFailed:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5215147418641037790}
-        m_TargetAssemblyTypeName: SteamManager, Assembly-CSharp
-        m_MethodName: OnInitFailed
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+--- !u!114 &1534984669628945669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4138836830922805666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7f8be854660c3469a6183f4bed238e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkManager: {fileID: 7535986001148983351}
 --- !u!114 &4744449633474581642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +156,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6e55fca1f4e4844593a3dd65a3ecb39, type: 3}
   m_Name: 
@@ -185,7 +172,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
   m_Name: 

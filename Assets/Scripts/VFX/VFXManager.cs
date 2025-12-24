@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class VFXManager : NetworkSingleton<VFXManager>
 {
-	[SerializeField] private Camera camera;
+	[SerializeField] private Camera mainCamera;
 	[Header("Simple Particles")]
 	[SerializeField]
 	private GameObject template;
@@ -30,7 +30,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	void Start()
 	{
-		cameraPos = camera.transform.position;
+		cameraPos = mainCamera.transform.position;
 	}
 
 	public void SyncVFX(ParticleType type, Vector3 pos, bool flip, bool renderBehind = false)
@@ -161,9 +161,9 @@ public class VFXManager : NetworkSingleton<VFXManager>
 
 	public void Screenshake(float intensity, float duration)
 	{
-		camera.transform.DOShakePosition(duration, intensity).onComplete += () =>
+		mainCamera.transform.DOShakePosition(duration, intensity).onComplete += () =>
 		{
-			camera.transform.position = cameraPos;
+			mainCamera.transform.position = cameraPos;
 		};
 	}
 
