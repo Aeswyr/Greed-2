@@ -313,34 +313,6 @@ PrefabInstance:
       value: SteamManager
       objectReference: {fileID: 0}
     - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15.213945
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 230.76506
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3.4084904
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020244621193715778, guid: 5369d8741e8d81c4da5bb19b82bf4c10, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
