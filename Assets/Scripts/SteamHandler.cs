@@ -28,6 +28,11 @@ public class SteamHandler : Singleton<SteamHandler>
 		Debug.Log("Steam initialized successfully");
 	}
 
+	public void OnInitFailed()
+	{
+		
+	}
+
 	public void Host()
 	{
 		Debug.Log("trying lobby1");

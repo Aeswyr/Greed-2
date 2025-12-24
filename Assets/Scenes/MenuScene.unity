@@ -1210,6 +1210,34 @@ PrefabInstance:
       propertyPath: networkManager
       value: 
       objectReference: {fileID: 928625653}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 928625656}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnInitFailed
+      objectReference: {fileID: 0}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SteamHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 871691155580187647, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
     m_RemovedGameObjects: []
@@ -1230,6 +1258,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &928625656 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1534984669628945669, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+  m_PrefabInstance: {fileID: 928625648}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928625649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7f8be854660c3469a6183f4bed238e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1005771554
