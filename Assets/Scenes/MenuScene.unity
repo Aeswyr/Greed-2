@@ -1117,44 +1117,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!1 &745953109
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 745953110}
-  m_Layer: 5
-  m_Name: LobbyBlock
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &745953110
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 745953109}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1005771555}
-  - {fileID: 1945663368}
-  m_Father: {fileID: 1233418135}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -87.5}
-  m_SizeDelta: {x: -50, y: -225}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!1001 &928625648
+--- !u!1001 &689326493
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1206,71 +1169,48 @@ PrefabInstance:
       propertyPath: m_Name
       value: NetworkManager
       objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: networkManager
-      value: 
-      objectReference: {fileID: 928625653}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 928625656}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnInitFailed
-      objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: SteamHandler, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 5215147418641037790, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-      propertyPath: onInitFailed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 871691155580187647, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
---- !u!1 &928625649 stripped
+--- !u!1 &745953109
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 4138836830922805666, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-  m_PrefabInstance: {fileID: 928625648}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &928625653 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7535986001148983351, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-  m_PrefabInstance: {fileID: 928625648}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 745953110}
+  m_Layer: 5
+  m_Name: LobbyBlock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &745953110
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 928625649}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &928625656 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1534984669628945669, guid: 06225bb3f13dfb5479a7e50321013100, type: 3}
-  m_PrefabInstance: {fileID: 928625648}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 928625649}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7f8be854660c3469a6183f4bed238e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_GameObject: {fileID: 745953109}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1005771555}
+  - {fileID: 1945663368}
+  m_Father: {fileID: 1233418135}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -87.5}
+  m_SizeDelta: {x: -50, y: -225}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1005771554
 GameObject:
   m_ObjectHideFlags: 0
@@ -2256,8 +2196,6 @@ MonoBehaviour:
   joinParent: {fileID: 1005771555}
   noLobbies: {fileID: 1945663367}
   playButton: {fileID: 1478922280}
-  networkPrefab: {fileID: 928625649}
-  networkManager: {fileID: 928625653}
 --- !u!1 &1817257736
 GameObject:
   m_ObjectHideFlags: 0
@@ -2510,8 +2448,8 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 928625648}
   - {fileID: 2122626544}
   - {fileID: 296676360}
   - {fileID: 1106739117}
   - {fileID: 548871069}
+  - {fileID: 689326493}

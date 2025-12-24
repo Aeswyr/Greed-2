@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 531100856887610389}
   - component: {fileID: 7535986001148983351}
-  - component: {fileID: 5215147418641037790}
-  - component: {fileID: 1534984669628945669}
   - component: {fileID: 4744449633474581642}
   - component: {fileID: 1711508764781068905}
   m_Layer: 0
@@ -106,49 +104,6 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
---- !u!114 &5215147418641037790
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5e4c3fb359a00c469bdc27b58d71646, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onInit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1534984669628945669}
-        m_TargetAssemblyTypeName: SteamHandler, Assembly-CSharp
-        m_MethodName: OnInit
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onInitFailed:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1534984669628945669
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7f8be854660c3469a6183f4bed238e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkManager: {fileID: 7535986001148983351}
 --- !u!114 &4744449633474581642
 MonoBehaviour:
   m_ObjectHideFlags: 0

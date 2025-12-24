@@ -4,6 +4,7 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Steamworks;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
@@ -679,13 +680,12 @@ public class GameManager : NetworkSingleton<GameManager>
 		SteamMatchmaking.LeaveLobby(SteamHandler.Instance.LobbyID);
 		if (NetworkServer.activeHost)
 		{
-			FindAnyObjectByType<NetworkManager>().StopHost();
+			NetworkManager.singleton.StopHost();
 		}
 		else
 		{
-			FindAnyObjectByType<NetworkManager>().StopClient();
+			NetworkManager.singleton.StopClient();
 		}
-
 		if (IsLocalGame)
 		{
 			foreach (var input in FindObjectsByType<PlayerInput>(FindObjectsSortMode.None))

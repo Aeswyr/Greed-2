@@ -26,21 +26,12 @@ public class MainMenuManager : MonoBehaviour
 	[SerializeField]
 	private Button playButton;
 
-	[SerializeField]
-	private GameObject networkPrefab;
-	[SerializeField]
-	private NetworkManager networkManager;
-
 	private void Start()
 	{
 		SaveDataManager.Load();
 
 		PlayerInputManager.instance.onPlayerJoined += FirstPlayerJoined;
 
-		if (FindAnyObjectByType<NetworkAnimator>() == null)
-		{
-			Instantiate(networkPrefab);
-		}
 		GetFriendLobbies();
 
 		mainMenu.SetActive(true);
@@ -113,8 +104,8 @@ public class MainMenuManager : MonoBehaviour
 		PlayerInputManager.instance.EnableJoining();
 		DontDestroyOnLoad(PlayerInputManager.instance.gameObject);
 
-		networkManager.maxConnections = 0;
-		networkManager.StartHost();
+		NetworkManager.singleton.maxConnections = 0;
+		NetworkManager.singleton.StartHost();
 	}
 	public void OnHost()
 	{

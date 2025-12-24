@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class SteamHandler : Singleton<SteamHandler>
 {
-	[SerializeField]
-	private NetworkManager networkManager;
-
 	private Callback<LobbyCreated_t> createCallback;
 
 	private Callback<GameLobbyJoinRequested_t> joinCallback;
@@ -39,7 +36,7 @@ public class SteamHandler : Singleton<SteamHandler>
 		if (initialized)
 		{
 			Debug.Log("trying lobby2");
-			SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, networkManager.maxConnections);
+			SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, NetworkManager.singleton.maxConnections);
 		}
 	}
 
@@ -48,7 +45,7 @@ public class SteamHandler : Singleton<SteamHandler>
 		if (data.m_eResult == EResult.k_EResultOK)
 		{
 			Debug.Log("hosting lobby");
-			networkManager.StartHost();
+			NetworkManager.singleton.StartHost();
 			lobbyId = new CSteamID(data.m_ulSteamIDLobby);
 			SteamMatchmaking.SetLobbyData(lobbyId, "CSID", SteamUser.GetSteamID().ToString());
 		}
@@ -64,8 +61,8 @@ public class SteamHandler : Singleton<SteamHandler>
 		if (!NetworkServer.active)
 		{
 			string lobbyData = SteamMatchmaking.GetLobbyData(new CSteamID(data.m_ulSteamIDLobby), "CSID");
-			networkManager.networkAddress = lobbyData;
-			networkManager.StartClient();
+			NetworkManager.singleton.networkAddress = lobbyData;
+			NetworkManager.singleton.StartClient();
 		}
 	}
 }
