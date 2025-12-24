@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a15747f73790f714ab23843cd4e972e2
+guid: cbd1228e54b913c418d687e90a91e8ed
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -641,7 +641,7 @@ ScriptedImporter:
     layerType: 0
     blendMode: 0
     cells:
-    - name: tileset_brick
+    - name: tileset_stone
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:

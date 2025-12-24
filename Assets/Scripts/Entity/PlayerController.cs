@@ -359,7 +359,7 @@ public class PlayerController : NetworkBehaviour
 
 	void OnDestroy()
 	{
-		GameManager.Instance.UpdatePlayers();
+		GameManager.Instance?.UpdatePlayers();
 	}
 
 	public void SetupInput(InputHandler input)

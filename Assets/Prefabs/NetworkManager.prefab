@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5215147418641037790}
   - component: {fileID: 871691155580187647}
   - component: {fileID: 4744449633474581642}
+  - component: {fileID: 1711508764781068905}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -55,7 +56,7 @@ MonoBehaviour:
   offlineScene: Assets/Scenes/MenuScene.unity
   onlineScene: Assets/Scenes/GameScene.unity
   offlineSceneLoadDelay: 0
-  transport: {fileID: 4744449633474581642}
+  transport: {fileID: 1711508764781068905}
   networkAddress: localhost
   maxConnections: 100
   disconnectInactiveConnections: 0
@@ -87,6 +88,9 @@ MonoBehaviour:
   - {fileID: 6434597776946972388, guid: 27daf5bf06c2cb846bb319e55bc2917f, type: 3}
   - {fileID: 1531077310145882041, guid: d88fe01e317b3b243abd5af323c5d4c4, type: 3}
   - {fileID: 6434597776946972388, guid: 2c63e57084727b441bb69ee972ffdcdb, type: 3}
+  - {fileID: 1841291039033220676, guid: 03121c1d00899f64490f86e52e16f8ec, type: 3}
+  - {fileID: 1841291039033220676, guid: bc4d007e0ec505c489e060d3415c918e, type: 3}
+  - {fileID: 1841291039033220676, guid: f96fe5c05a567504498c45136d801090, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -165,7 +169,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4138836830922805666}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6e55fca1f4e4844593a3dd65a3ecb39, type: 3}
   m_Name: 
@@ -174,3 +178,27 @@ MonoBehaviour:
   Timeout: 25
   AllowSteamRelay: 1
   UseNextGenSteamNetworking: 1
+--- !u!114 &1711508764781068905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4138836830922805666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mirror.Transports::Mirror.TelepathyTransport
+  port: 7777
+  NoDelay: 1
+  SendTimeout: 5000
+  ReceiveTimeout: 30000
+  serverMaxMessageSize: 16384
+  serverMaxReceivesPerTick: 10000
+  serverSendQueueLimitPerConnection: 10000
+  serverReceiveQueueLimitPerConnection: 10000
+  clientMaxMessageSize: 16384
+  clientMaxReceivesPerTick: 1000
+  clientSendQueueLimit: 10000
+  clientReceiveQueueLimit: 10000

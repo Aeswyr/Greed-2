@@ -8,8 +8,6 @@ using Steamworks;
 public class GameManager : NetworkSingleton<GameManager>
 {
 	[SerializeField]
-	private GameObject playerPrefab;
-	[SerializeField]
 	private GameObject hitboxPrefab;
 
 	[SerializeField]
@@ -86,9 +84,11 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		Debug.Log("Creating new player");
 
-		var playerObj = Instantiate(playerPrefab);
+		var playerObj = Instantiate(NetworkManager.singleton.playerPrefab);
 		NetworkServer.Spawn(playerObj);
 		playerObj.GetComponent<PlayerController>().SetupInput(input.GetComponent<InputHandler>());
+		playerObj.GetComponent<NetworkRigidbodyUnreliable2D>().enabled = false;
+		playerObj.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
 
 		UpdatePlayers();
 	}
