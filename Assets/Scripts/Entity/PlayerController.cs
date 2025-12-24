@@ -586,6 +586,17 @@ public class PlayerController : NetworkBehaviour
 						move.StartAcceleration(input.dir);
 				}
 			}
+
+			if (isWallJumping)
+			{
+				VFXManager.Instance.SyncVFX(ParticleType.DUST_WALL, transform.position + facing * -1 * Vector3.right, facing == -1);
+			} else if (grounded)
+			{	
+				VFXManager.Instance.SyncVFX(ParticleType.JUMP, transform.position, facing == -1);
+			} else
+			{
+				VFXManager.Instance.SyncVFX(ParticleType.AIR_JUMP, transform.position + 2 * Vector3.down, facing == -1);
+			}
 		}
 		if ((!acting || (charging && Time.time > nextStamina)) && Time.time > nextStamina && grounded && input.dodge.pressed)
 		{
