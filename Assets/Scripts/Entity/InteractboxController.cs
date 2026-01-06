@@ -34,6 +34,11 @@ public class InteractboxController : MonoBehaviour
 
 	public void FireInteraction()
 	{
+		GetInteractable()?.FireInteraction(owner);
+	}
+
+	public InteractableData GetInteractable()
+	{
 		Collider2D collider2D = null;
 		float num = float.MaxValue;
 		foreach (Collider2D activeCollision in activeCollisions)
@@ -44,6 +49,12 @@ public class InteractboxController : MonoBehaviour
 				collider2D = activeCollision;
 			}
 		}
-		collider2D?.GetComponent<InteractableData>().FireInteraction(owner);
+		return collider2D?.GetComponent<InteractableData>();
+	}
+
+	public bool IsHoldInteract()
+	{
+		InteractableData interactable = GetInteractable();
+		return interactable != null && interactable.IsHoldInteract();
 	}
 }

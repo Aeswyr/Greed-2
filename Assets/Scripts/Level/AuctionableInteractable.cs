@@ -34,8 +34,6 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 
 	[SyncVar(hook = nameof(UpdatePrice))]
 	private int cost;
-	[SerializeField] private bool confirmPurchase;
-	[SerializeField] private UnityEvent<float> onConfirm;
 
 	private Vector3 pricePos;
 
@@ -89,14 +87,6 @@ public class AuctionableInteractable : NetworkBehaviour, PurchaseInterface
 	{
 		if (TryGetComponent(out ShopInteractable shop))
 			shop.HideTooltip();
-
-		if (confirmPurchase && !owner.IsShopConfirmed(this))
-		{
-			onConfirm?.Invoke(10);
-			owner.ConfirmShop(this);
-			return;
-		}
-		owner.ConfirmShop(null);
 
 		if (owner.TrySpendMoney(cost - localBid))
 		{

@@ -55,7 +55,7 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void UpdateMerchandise(PickupType oldvalue, PickupType newValue)
 	{
-		sprite.sprite = iconLibrary[(int)(newValue + 6)];
+		sprite.sprite = iconLibrary[Utils.GetItemIconIndex(newValue)];
 	}
 
 	public void OnInteract(PlayerController owner)
@@ -73,11 +73,11 @@ public class ShopInteractable : NetworkBehaviour
 		}
 	}
 
-	public void ShowTooltip(float offset)
+	public void ShowTooltip()
 	{
 		foreach (var shop in FindObjectsByType<ShopInteractable>(FindObjectsSortMode.None))
 			shop.HideTooltip();
-		currentToolTip = ToolTipManager.Instance.CreateTooltip(item, transform.position + offset * Vector3.up);
+		currentToolTip = ToolTipManager.Instance.CreateTooltip(item, transform.position + 7 * Vector3.up);
 	}
 
 	public void HideTooltip()

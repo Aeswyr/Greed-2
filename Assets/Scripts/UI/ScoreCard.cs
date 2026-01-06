@@ -11,6 +11,33 @@ public class ScoreCard : MonoBehaviour
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI crownText;
     [SerializeField] private TextMeshProUGUI nameplateText;
+    [SerializeField] private Image weaponIcon;
+    [SerializeField] private Image skillIcon;
+    [SerializeField] private SpriteLibrary itemIconLibrary;
+
+    public void SetWeapon(PickupType type)
+    {
+        if (type == PickupType.MAX) {
+            weaponIcon.sprite = null;
+            weaponIcon.color = Color.clear;
+        } else {
+            weaponIcon.sprite = itemIconLibrary[Utils.GetItemIconIndex(type)];
+            weaponIcon.color = Color.white;
+        }
+        skillIcon.SetNativeSize();
+    }
+
+    public void SetSkill(PickupType type)
+    {
+        if (type == PickupType.MAX) {
+            skillIcon.sprite = null;
+            skillIcon.color = Color.clear;
+        } else {
+            skillIcon.sprite = itemIconLibrary[Utils.GetItemIconIndex(type)];
+            skillIcon.color = Color.white;
+        }
+        skillIcon.SetNativeSize();
+    }
 
     public void SetGold(int val)
     {

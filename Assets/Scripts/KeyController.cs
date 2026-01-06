@@ -8,6 +8,8 @@ public class KeyController : NetworkBehaviour
     Vector3 targetPos;
     Transform follow;
 
+    private float pickupLockout;
+
     private int nextPos;
     void Start()
     {
@@ -27,7 +29,20 @@ public class KeyController : NetworkBehaviour
     }
     void OnTriggerEnter2D(Collider2D collision)
     {
+        TryPickupKey(collision);
+    }
+
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        TryPickupKey(collision);
+    }
+
+    private void TryPickupKey(Collider2D collision)
+    {
         if (!isServer)
+            return;
+
+        if (Time.time < pickupLockout)
             return;
             
         var player = collision.transform.parent.GetComponent<PlayerController>();
@@ -45,5 +60,6 @@ public class KeyController : NetworkBehaviour
         coll.enabled = true;
 
         follow = transform;
+        pickupLockout = Time.time + 0.5f;
     }
 }

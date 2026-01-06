@@ -181,6 +181,8 @@ public class PlayerUIController : MonoBehaviour
 		nameplateFade = Time.time + 2f;
 	}
 
+
+
 	private void FixedUpdate()
 	{
 		if (currentMoney != targetMoney)

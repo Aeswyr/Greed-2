@@ -28,8 +28,6 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 
 	[SyncVar(hook = nameof(UpdatePrice))]
 	private int cost;
-	[SerializeField] private bool confirmPurchase;
-	[SerializeField] private UnityEvent<float> onConfirm;
 
 	private Vector3 pricePos;
 
@@ -60,14 +58,6 @@ public class PurchasableInteractable : NetworkBehaviour, PurchaseInterface
 
 	public void OnInteract(PlayerController owner)
 	{
-		if (confirmPurchase && !owner.IsShopConfirmed(this))
-		{
-			onConfirm?.Invoke(7f);
-			owner.ConfirmShop(this);
-			return;
-		}
-		owner.ConfirmShop(null);
-
 		if (PurchaseUnlocked() && owner.TrySpendMoney(cost))
 		{
 			SFXManager.Instance.PlaySound("shopbuy");

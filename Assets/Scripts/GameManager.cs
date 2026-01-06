@@ -67,6 +67,7 @@ public class GameManager : NetworkSingleton<GameManager>
 	private void Start()
 	{
 		victoryScreen.gameObject.SetActive(false);
+		levelPointer.SetActive(false);
 		if (PlayerInputManager.instance != null)
 		{
 			IsLocalGame = true;
@@ -341,6 +342,7 @@ public class GameManager : NetworkSingleton<GameManager>
 
 	private void UpdateLevelUI()
 	{
+		levelPointer.SetActive(true);
 		Vector3 targetPos = levelCounterParent.GetChild(levelIndex).transform.position;
 		levelPointer.transform.position = targetPos + 1.25f * Vector3.up;
 	}

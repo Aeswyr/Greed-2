@@ -249,8 +249,8 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 0; //0
-	private int skillId = -1; //-1
+	private int weaponId = 7; //0
+	private int skillId = 8; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -301,9 +301,10 @@ public class PlayerController : NetworkBehaviour
 	private ulong? friendId = null;
 	private string playerProfileName;
 
-	private PurchaseInterface confirmedShop;
 
 	private float nextFootstep;
+	private float interactDelay;
+	private InteractableData delayedInteractable;
 	private KeyController heldKey;
 	private void Start()
 	{
@@ -379,6 +380,7 @@ public class PlayerController : NetworkBehaviour
 		if (isLocalPlayer)
 		{
 			SyncName();
+			UpdateSkillDisplay(PickupType.MAX);
 		}
 
 		[Command(requiresAuthority = false)] void SyncName()
@@ -493,7 +495,29 @@ public class PlayerController : NetworkBehaviour
 		}
 		if (!acting && input.interact.pressed)
 		{
-			interactBox.FireInteraction();
+			if (interactBox.IsHoldInteract())
+			{
+				interactDelay = Time.time + 0.5f;
+				delayedInteractable = interactBox.GetInteractable();
+				delayedInteractable.ToggleInteractionWheel(true);
+				delayedInteractable.FirePreview(this);
+			} else 
+				interactBox.FireInteraction();
+		} else if (!acting && input.interact.down)
+		{
+			if (delayedInteractable != null) {
+				if (Time.time > interactDelay) {
+					delayedInteractable.FireInteraction(this);
+					delayedInteractable.ToggleInteractionWheel(false);
+					delayedInteractable = null;
+				} else
+					delayedInteractable.UpdateInteractionWheel(1 - (interactDelay - Time.time) / 0.5f);
+			} 
+		} else if (input.interact.released)
+		{
+			interactDelay = 0;
+			delayedInteractable?.ToggleInteractionWheel(false);
+			delayedInteractable = null;
 		}
 		if (!acting && isWallJumping)
 		{
@@ -1377,6 +1401,13 @@ public class PlayerController : NetworkBehaviour
 			UpdateMoneyDisplay();
 		}
 		unarmedInstall = 0;
+		
+		if (HasKey())
+		{
+			heldKey.DetatchKey();
+			heldKey = null;
+		}
+
 		if (health > 0 && crowns > 0)
 		{
 			if (attackingPlayer != null)
@@ -1539,58 +1570,76 @@ public class PlayerController : NetworkBehaviour
 				break;
 			case PickupType.WEAPON_PICK:
 				weaponId = 0;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_SWORD:
 				weaponId = 1;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_UNARMED:
 				weaponId = 2;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_SHIELD:
 				weaponId = 3;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_CLUB:
 				weaponId = 4;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_BOW:
 				hasAmmo = true;
 				weaponId = 5;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_TOME:
 				weaponId = 6;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.WEAPON_CHAIN:
 				weaponId = 7;
+				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.SKILL_MAGNET:
 				NewSkill(0);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_FLIGHT:
 				NewSkill(1);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_SHOTGUN:
 				NewSkill(2);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_TELEPORT:
 				NewSkill(3);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_SHOT:
 				NewSkill(4);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_DRILL:
 				NewSkill(5);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_BOMB:
 				NewSkill(6);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_FLASK:
 				NewSkill(7);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_TURRET:
 				NewSkill(8);
+				UpdateSkillDisplay(type);
 				break;
 			case PickupType.SKILL_BOOMERANG:
 				NewSkill(9);
+				UpdateSkillDisplay(type);
 				break;
 		}
 
@@ -1647,6 +1696,31 @@ public class PlayerController : NetworkBehaviour
 				{
 					unitUI.UpdateCrowns(val);
 				}
+			}
+		}
+	}
+	private void UpdateWeaponDisplay(PickupType type)
+	{
+		SendWeaponDisplay(type);
+		[Command(requiresAuthority = false)] void SendWeaponDisplay(PickupType type)
+		{
+			RecieveWeaponDisplay(type);
+			[ClientRpc] void RecieveWeaponDisplay(PickupType type)
+			{
+				scorecard.SetWeapon(type);
+			}
+		}
+	}
+
+	private void UpdateSkillDisplay(PickupType type)
+	{
+		SendSkillDisplay(type);
+		[Command(requiresAuthority = false)] void SendSkillDisplay(PickupType type)
+		{
+			RecieveSkillDisplay(type);
+			[ClientRpc] void RecieveSkillDisplay(PickupType type)
+			{
+				scorecard.SetSkill(type);
 			}
 		}
 	}
@@ -2330,17 +2404,6 @@ public class PlayerController : NetworkBehaviour
 	public InputHandler GetInput()
 	{
 		return input;
-	}
-
-
-	public bool IsShopConfirmed(PurchaseInterface shop)
-	{
-		return confirmedShop == shop;
-	}
-
-	public void ConfirmShop(PurchaseInterface shop)
-	{
-		confirmedShop = shop;
 	}
 
 	public void GrapplePull(Vector3 pos)

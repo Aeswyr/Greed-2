@@ -25,6 +25,11 @@ public class Utils
 		return result;
 	}
 
+	public static int GetItemIconIndex(PickupType type)
+	{
+		return (int)type + 6;
+	}
+
 	public static string GetSteamName(ulong id)
 	{
 		return SteamFriends.GetFriendPersonaName(new CSteamID(id));
