@@ -40,6 +40,10 @@ MonoBehaviour:
   - type: WEAPON_CHAIN
     name: Chainshot
     desc: A weapon which can be charged to grapple to objects.
+  - type: WEAPON_GUN
+    name: Big Iron
+    desc: A weapon which fires a powerful bullet but must be reloaded between shots.
+      Using its alternate attack allows the bullet to ricochet.
   - type: SKILL_MAGNET
     name: Mystic Magnet
     desc: A relic which allows you to grab items in a large radius.

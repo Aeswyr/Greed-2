@@ -57,7 +57,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   animator: {fileID: 7873907403020578116}
-  detectRadius: {fileID: 3170993354856165829}
+  trigger: {fileID: 4865798538749967026}
 --- !u!114 &-4030937648320807794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,10 +94,6 @@ MonoBehaviour:
   oneTimePurchase: 1
   baseCosts: {fileID: 0}
   levelPurchasable: 1
-  confirmPurchase: 0
-  onConfirm:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &-5949783712635622121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,6 +121,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  isHoldInteract: 0
+  previewAction:
+    m_PersistentCalls:
+      m_Calls: []
+  interactWheel: {fileID: 0}
+  interactWheelBar: {fileID: 0}
 --- !u!114 &-4698068684444125670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,6 +176,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -195,6 +199,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 576692345
   m_SortingLayer: 2
   m_SortingOrder: 0

@@ -23,7 +23,7 @@ public class HurtboxController : MonoBehaviour
 
 	public void TriggerHurtbox(Transform source, HitboxData data)
 	{
-		if (data.Immune == transform)
+		if (data.Immune == transform || data.Nonlethal)
 			return;
 
 		PlayerController player;

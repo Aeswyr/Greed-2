@@ -12,6 +12,7 @@ public struct AttackBuilder
 	private float duration;
 
 	private Transform owner;
+	private bool nonLethal;
 
 	private bool friendlyFire;
 	private Transform immune;
@@ -46,6 +47,12 @@ public struct AttackBuilder
 		return this;
 	}
 
+	public AttackBuilder SetNonlethal()
+	{
+		this.nonLethal = true;
+		return this;
+	}
+
 	public static AttackBuilder GetAttack(Transform owner)
 	{
 		AttackBuilder result = default;
@@ -75,6 +82,7 @@ public struct AttackBuilder
 		component.Owner = owner;
 		component.FriendlyFire = friendlyFire;
 		component.Immune = immune;
+		component.Nonlethal = nonLethal;
 	}
 
 	public void Write(NetworkWriter writer)

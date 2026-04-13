@@ -14,7 +14,7 @@ public class TriggerAction : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (colliding.Contains(other))
+		if (colliding.Contains(other) || !enabled)
 			return;
 		action?.Invoke();
 		colliding.Add(other);
@@ -22,7 +22,7 @@ public class TriggerAction : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other)
 	{
-		if (colliding.Contains(other))
+		if (colliding.Contains(other) || !enabled)
 			return;
 		action?.Invoke();
 		colliding.Add(other);

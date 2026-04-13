@@ -42,7 +42,10 @@ public class ShopInteractable : NetworkBehaviour
 			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_POTION_HEALTH, (int)PickupType.MAX);
 			break;
 		default:
+		if (string.IsNullOrEmpty(type))
 			item = (PickupType)UnityEngine.Random.Range((int)PickupType.ITEM_CROWN, (int)PickupType.MAX);
+		else
+			item = (PickupType)int.Parse(type);
 			break;
 		}
 
@@ -60,7 +63,7 @@ public class ShopInteractable : NetworkBehaviour
 
 	public void OnInteract(PlayerController owner)
 	{
-		ToolTipManager.Instance.ClearTooltip(currentToolTip);
+		HideTooltip();
 		owner.GetItem(item);
 
 		if (singleUse)

@@ -199,6 +199,14 @@ public class PlayerController : NetworkBehaviour
 
 	[SerializeField]
 	private AnimationCurve chainPullCurve;
+	[SerializeField] private float gunAttackSpeed;
+	[SerializeField] private AnimationCurve gunAttackCurve;
+	[SerializeField] private float gunReleaseSpeed;
+	[SerializeField] private AnimationCurve gunReleaseCurve;
+	[SerializeField] private float gunReloadSpeed;
+	[SerializeField] private AnimationCurve gunReloadCurve;
+	[SerializeField] private float gunCoinSpeed;
+	[SerializeField] private AnimationCurve gunCoinCurve;
 	[SerializeField]
 	private HitboxData chainHitboxData;
 	[SerializeField]
@@ -249,8 +257,8 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 7; //0
-	private int skillId = 8; //-1
+	private int weaponId = 8; //0
+	private int skillId = -1; //-1
 
 	private bool stasis;
 	private bool inputLocked;
@@ -800,6 +808,18 @@ public class PlayerController : NetworkBehaviour
 				StartCharge();
 				attackId = 12;
 				break;
+			case 8: // gun
+				if (input.aim.y < 0)
+				{
+					attackId = 18;
+				} else if (hasAmmo) {
+					StartCharge();
+					attackId = 16;
+				} else
+				{
+					attackId = 17;
+				}
+				break;
 		}
 		animator.SetInteger("attackId", attackId);
 		animator.SetTrigger("attack");
@@ -939,6 +959,36 @@ public class PlayerController : NetworkBehaviour
 			case 14:
 				move.OverrideCurve(CalculateSpeed(unarmedUpperSpeed), unarmedUpperCurve, facing);
 				break;
+			case 16:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(gunAttackSpeed), gunAttackCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 17:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(gunAttackSpeed), gunReloadCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
+			case 18:
+				if (input.dir != 0f)
+				{
+					move.OverrideCurve(CalculateSpeed(gunAttackSpeed), gunCoinCurve, facing);
+				}
+				else if (grounded)
+				{
+					move.StartDeceleration();
+				}
+				break;
 		}
 	}
 
@@ -999,6 +1049,19 @@ public class PlayerController : NetworkBehaviour
 					animator.SetTrigger("release");
 					move.OverrideCurve(CalculateSpeed(chainReleaseSpeed), chainReleaseCurve, facing);
 				}
+				break;
+			case 16:
+				charging = false;
+				hasAmmo = false;
+				animator.SetTrigger("release");
+				if (grounded)
+					VFXManager.Instance.SyncVFX(ParticleType.DUST_LARGE, transform.position, facing == 1);
+				if (input.dir != 0f)
+				{
+					UpdateFacing(input.dir);
+				}
+				move.OverrideCurve(CalculateSpeed(gunReleaseSpeed), gunReleaseCurve, -facing);
+				CreateAttack();
 				break;
 		}
 	}
@@ -1227,7 +1290,7 @@ public class PlayerController : NetworkBehaviour
 				break;
 			case 8:
 				CreateTurret();
-				[Command] void CreateTurret()
+				[Command(requiresAuthority = false)] void CreateTurret()
 				{
 					var turret = Instantiate(turretPrefab, transform.position, Quaternion.identity, GameManager.Instance.GetLevelObjectRoot());
 					turret.GetComponent<TurretController>().SetOwner(transform);
@@ -1266,7 +1329,7 @@ public class PlayerController : NetworkBehaviour
 			SendTrigger(position, playerHit);
 		}
 
-		[Command] void SendTrigger(Vector3 pos, bool playerHit)
+		[Command(requiresAuthority = false)] void SendTrigger(Vector3 pos, bool playerHit)
 		{
 			RecieveTrigger(pos, playerHit);
 		}
@@ -1308,7 +1371,7 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	[Command]
+	[Command(requiresAuthority = false)]
 	private void SpoofHit()
 	{
 		RecieveHit(facing, Vector3.zero, null, null);
@@ -1317,7 +1380,7 @@ public class PlayerController : NetworkBehaviour
 	[ClientRpc]
 	private void RecieveHit(int knockbackDir, Vector3 hitPosition, Transform source, Transform owner)
 	{
-		if (!isLocalPlayer || stasis || GameManager.Instance.IsLevelShop())
+		if (!isLocalPlayer || stasis || GameManager.Instance.IsLevelPeaceful())
 		{
 			return;
 		}
@@ -1331,7 +1394,7 @@ public class PlayerController : NetworkBehaviour
 			hurtbox.MarkHitboxSeen(source);
 		}
 
-		if (invuln != 0)
+		if (invuln != InvulnState.NONE)
 		{
 			if (invuln == InvulnState.PARRY)
 			{
@@ -1505,7 +1568,7 @@ public class PlayerController : NetworkBehaviour
 			sprite.flipX = flipX;
 			SendFacing(flipX);
 		}
-		[Command]
+		[Command(requiresAuthority = false)]
 		void SendFacing(bool facing)
 		{
 			RecieveFacing(facing);
@@ -1599,6 +1662,11 @@ public class PlayerController : NetworkBehaviour
 				break;
 			case PickupType.WEAPON_CHAIN:
 				weaponId = 7;
+				UpdateWeaponDisplay(type);
+				break;
+			case PickupType.WEAPON_GUN:
+				hasAmmo = true;
+				weaponId = 8;
 				UpdateWeaponDisplay(type);
 				break;
 			case PickupType.SKILL_MAGNET:
@@ -1728,7 +1796,7 @@ public class PlayerController : NetworkBehaviour
 	private void UpdateMoneyLock(bool val)
 	{
 		SendLock(val);
-		[Command]
+		[Command(requiresAuthority = false)]
 		void SendLock(bool val)
 		{
 			RecieveLock(val);
@@ -1808,7 +1876,7 @@ public class PlayerController : NetworkBehaviour
 				InterruptCharge();
 				break;
 			case 11:
-				if (GameManager.Instance.IsLevelShop() || GameManager.Instance.GetLevelIndex() == 0)
+				if (GameManager.Instance.IsLevelPeaceful() || GameManager.Instance.GetLevelIndex() == 0)
 				{
 					VFXManager.Instance.SyncPrefabVFX(ParticlePrefabType.DUST_PUFF, transform.position + new Vector3(facing * 2f, -2f, 0));
 					return;
@@ -1831,6 +1899,10 @@ public class PlayerController : NetworkBehaviour
 			case 12:
 				InterruptCharge();
 				break;
+			case 17:
+				hasAmmo = true;
+				break;
+
 		}
 	}
 
@@ -1975,7 +2047,7 @@ public class PlayerController : NetworkBehaviour
 					{
 						SendGrappleMiss(grapplePoint);
 
-						[Command] void SendGrappleMiss(Vector3 grapplePoint)
+						[Command(requiresAuthority = false)] void SendGrappleMiss(Vector3 grapplePoint)
 						{
 							RecieveGrappleMiss(grapplePoint);
 						}
@@ -2023,7 +2095,97 @@ public class PlayerController : NetworkBehaviour
 					.SetSize(new Vector2(2f, 4f))
 					.Finish();
 				break;
+			case 16:
+				SFXManager.Instance.PlaySound("bluntswing");
+				float range = 16;
+				Vector3 origin = transform.position + 0.75f * Vector3.down + new Vector3(1.5f * facing, 0.6f * aim.y);
+				RaycastHit2D bulletRay = Physics2D.Raycast(origin, new Vector2(0.05f * facing, aim.y * 0.015f).normalized,
+													range, LayerMask.GetMask(new[] { "Hurtbox", "World" }));
+				Vector3 targetPos = origin + (Vector3)new Vector2(0.05f * facing, aim.y * 0.015f).normalized * range;
+				if (bulletRay)
+					targetPos = bulletRay.point;
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f)).SetDuration(0.2f)
+						.MakeProjectile(targetPos)
+						.SetOrigin(origin)
+						.DisableEntityImpact()
+						.DisableWorldImpact()
+						.SetLifetime(1f)
+						.SetUnique(UniqueProjectile.BULLET)
+						.Finish();
+				
+				if (bulletRay)
+				{
+					Vector2 dif = (origin - targetPos).normalized;
+					StartCoroutine(DelayRicochet(targetPos + (Vector3)dif * 0.1f));
+				}
 
+				IEnumerator DelayRicochet(Vector3 origin)
+				{
+					yield return new WaitForSeconds(0.1f);
+
+					ProjectileData coin = null;
+					foreach (var proj in FindObjectsByType<ProjectileData>(FindObjectsSortMode.None))
+					{
+						if (proj.IsLocalCoin(transform))
+						{
+							coin = proj;
+							break;
+						}
+					}
+					if (coin == null)
+						yield break;
+
+					Vector3 targetPos = coin.transform.position;
+
+					List<RaycastHit2D> bulletRays = new (Physics2D.RaycastAll(origin, (targetPos - origin).normalized,
+						(targetPos-origin).magnitude, LayerMask.GetMask(new[] { "Hurtbox", "World" })));
+					
+					RaycastHit2D bulletRay = default;
+					foreach (var ray in bulletRays)
+					{
+						var target = ray.collider.transform;
+						if (target.parent != null && target.parent == this.transform)
+						{
+							continue;
+						}
+
+						if (bulletRay == default || (ray.point - (Vector2)origin).sqrMagnitude < (bulletRay.point - (Vector2)origin).sqrMagnitude)
+						{
+							bulletRay = ray;
+						}
+					}
+					
+					if (bulletRay)
+						targetPos = bulletRay.point;
+
+					SFXManager.Instance.PlaySound("bluntswing");
+					AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(1f, 1f)).SetDuration(0.2f)
+							.MakeProjectile(targetPos)
+							.SetOrigin(origin)
+							.DisableEntityImpact()
+							.DisableWorldImpact()
+							.SetLifetime(1f)
+							.SetUnique(UniqueProjectile.BULLET)
+							.Finish();
+					
+					coin.DestoryProjectile();
+
+					StartCoroutine(DelayRicochet(targetPos));
+				}
+			
+				break;
+			case 18:
+				SFXManager.Instance.PlaySound("swiftswing");
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetNonlethal()
+					.MakeProjectile(transform.position + 1.5f * facing * Vector3.right)
+					.SetAnimation(11)
+					.SetVelocity(new Vector2(facing * 7, 20))
+					.SetGravity(3)
+					.SetParticleType(ParticleType.GLINT)
+					.SetUnique(UniqueProjectile.COIN)
+					.DisableEntityImpact()
+					.Finish();
+				break;
 		}
 	}
 
@@ -2120,7 +2282,7 @@ public class PlayerController : NetworkBehaviour
 	public void GetShopReward()
 	{
 		SendShopReward();
-		[Command] void SendShopReward()
+		[Command(requiresAuthority = false)] void SendShopReward()
 		{
 			RecieveShopReward();
 		}
@@ -2168,7 +2330,7 @@ public class PlayerController : NetworkBehaviour
 	public void UpdateVictoryStats()
 	{
 		SendVictoryStats(victoryStats);
-		[Command] void SendVictoryStats(VictoryStats stats)
+		[Command(requiresAuthority = false)] void SendVictoryStats(VictoryStats stats)
 		{
 			RecieveVictoryStats(stats);
 		}
@@ -2200,7 +2362,7 @@ public class PlayerController : NetworkBehaviour
 			SendAmmoRefresh();
 		}
 
-		[Command] void SendAmmoRefresh()
+		[Command(requiresAuthority = false)] void SendAmmoRefresh()
 		{
 			RecieveAmmoRefresh();
 		}
@@ -2222,7 +2384,7 @@ public class PlayerController : NetworkBehaviour
 			SendStatIncrease(stat);
 		}
 
-		[Command] void SendStatIncrease(Stat stat)
+		[Command(requiresAuthority = false)] void SendStatIncrease(Stat stat)
 		{
 			RecieveStatIncrease(stat);
 		}
@@ -2329,7 +2491,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			SendBuffEnd(type);
 		}
-		[Command] void SendBuffEnd(BuffType type)
+		[Command(requiresAuthority = false)] void SendBuffEnd(BuffType type)
 		{
 			RecieveBuffEnd(type);
 		}
@@ -2409,7 +2571,7 @@ public class PlayerController : NetworkBehaviour
 	public void GrapplePull(Vector3 pos)
 	{
 		SendPull(pos);
-		[Command] void SendPull(Vector3 pos)
+		[Command(requiresAuthority = false)] void SendPull(Vector3 pos)
 		{
 			RecievePull(pos);
 		}
@@ -2454,7 +2616,7 @@ public class PlayerController : NetworkBehaviour
 		else
 			SendReset();
 
-		[Command] void SendReset()
+		[Command(requiresAuthority = false)] void SendReset()
 		{
 			RecieveReset();
 		}

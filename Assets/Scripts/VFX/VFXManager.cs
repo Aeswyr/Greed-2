@@ -163,7 +163,7 @@ public class VFXManager : NetworkSingleton<VFXManager>
 	{
 		mainCamera.transform.DOShakePosition(duration, intensity).onComplete += () =>
 		{
-			mainCamera.transform.position = cameraPos;
+			mainCamera.transform.position = GameManager.Instance.GetCameraPosition(true);
 		};
 	}
 

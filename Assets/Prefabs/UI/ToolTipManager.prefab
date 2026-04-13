@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4505717174971369486}
   - component: {fileID: 7406397080100241163}
+  - component: {fileID: 4129793010888673150}
   m_Layer: 5
   m_Name: ToolTipManager
   m_TagString: Untagged
@@ -50,3 +51,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemDescriptions: {fileID: 11400000, guid: 64e7894386abcfe4b9f6f16ac411fbaa, type: 2}
   toolTipPrefab: {fileID: 2763728948567189059, guid: 42e873e2c004c734a9c4a053eb73fca3, type: 3}
+--- !u!223 &4129793010888673150
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762571141118932230}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 576692345
+  m_SortingOrder: 10
+  m_TargetDisplay: 0

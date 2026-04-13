@@ -31,6 +31,8 @@ MonoBehaviour:
     price: 10
   - type: WEAPON_CHAIN
     price: 10
+  - type: WEAPON_GUN
+    price: 20
   - type: SKILL_MAGNET
     price: 15
   - type: SKILL_FLIGHT

@@ -7,9 +7,14 @@ using UnityEngine;
 public class MineInteractable : NetworkBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] private GameObject detectRadius;
+    [SerializeField] private TriggerAction trigger;
     private bool activated;
     private PlayerController owner;
+
+    public void Start()
+    {
+        trigger.enabled = false;
+    }
 
     public void OnInteract(PlayerController owner) {
         
@@ -20,7 +25,7 @@ public class MineInteractable : NetworkBehaviour
 
             activated = true;
             this.owner = owner;
-            detectRadius.SetActive(true);
+            trigger.enabled = true;
         }
 
         [ClientRpc] void RecieveActivation() {

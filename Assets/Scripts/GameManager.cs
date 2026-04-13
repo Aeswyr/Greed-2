@@ -50,6 +50,8 @@ public class GameManager : NetworkSingleton<GameManager>
 	[SerializeField] private GameObject majorTickPrefab;
 	[SerializeField] private Transform levelCounterParent;
 	[SerializeField] private GameObject levelPointer;
+	
+	[SyncVar] private bool isPeaceful;
 
 	private PlayerController[] players;
 	private int levelIndex = 0;
@@ -77,7 +79,45 @@ public class GameManager : NetworkSingleton<GameManager>
 		LoadLevelObjects();
 	}
 
-	public int TotalPlayerCount()
+    void FixedUpdate()
+    {
+		if (currentLevel != null && currentLevel.ShouldCameraFollow())
+		{
+			Camera.main.transform.position = GetCameraPosition();
+		}
+    }
+
+	public Vector3 GetCameraPosition(bool zeroY = false)
+	{
+		Vector3 newPos = Camera.main.transform.position;
+
+		if (zeroY)
+		{
+			newPos.y = 0;
+		}
+
+        if (currentLevel.ShouldCameraFollow())
+		{
+			float xPos = 0;
+			foreach (var player in players)
+			{
+				xPos += player.transform.position.x;
+			}
+			xPos /= players.Length;
+
+			
+			newPos.x = xPos;
+
+			currentLevel.BoundsPosition(ref newPos);
+			
+			return newPos;
+		}
+
+		newPos.x = 0;
+		return newPos;
+	}
+
+    public int TotalPlayerCount()
 	{
 		return GetPlayers().Length;
 	}
@@ -305,6 +345,8 @@ public class GameManager : NetworkSingleton<GameManager>
 		LoadLevelObjects();
 
 		HandlePlayerSpawns();
+
+		Camera.main.transform.position = GetCameraPosition();
 	}
 
 	private void HandlePlayerSpawns()
@@ -706,5 +748,19 @@ public class GameManager : NetworkSingleton<GameManager>
 	{
 		players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 		Debug.Log($"Player Count: {players.Length}");
+	}
+
+	public bool IsLevelPeaceful()
+	{
+		return IsLevelShop() || isPeaceful;
+	}
+
+	public void SetPeaceful(bool state)
+	{
+		Send(state);
+		[Command(requiresAuthority = false)] void Send(bool state)
+		{
+			isPeaceful = state;
+		}
 	}
 }

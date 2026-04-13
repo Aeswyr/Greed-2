@@ -14,8 +14,10 @@ public class ProjectileData : NetworkBehaviour
 	[SerializeField]
 	private Animator animator;
 	[SerializeField] private Rigidbody2D rbody;
-	[SerializeField]
-	private ParticleSystem drillVFX;
+	[SerializeField] private SpriteRenderer sprite;
+	[SerializeField]private ParticleSystem drillVFX;
+	[SerializeField]private ParticleSystem tracerVFX;
+
 	[SerializeField] private GameObject[] spawnablePrefabs;
 	[SerializeField] private AnimationCurve boomerangFire;
 	[SerializeField] private AnimationCurve boomerangReturn;
@@ -42,6 +44,8 @@ public class ProjectileData : NetworkBehaviour
 	private UniqueProjectile uniqueFunction;
 	[SyncVar]
 	private Transform owner;
+	[SyncVar]
+	private Vector3 origin;
 
 	private bool destroyAfterDelay = false;
 
@@ -55,17 +59,34 @@ public class ProjectileData : NetworkBehaviour
 	private void Start()
 	{
 		hitbox.SetParent(transform).Finish();
-		AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-		animatorOverrideController["projectile"] = anims[animIndex];
-		animator.runtimeAnimatorController = animatorOverrideController;
-		transform.GetComponent<SpriteRenderer>().flipX = flipSprite;
+		if (animIndex != -1) {
+			AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+			animatorOverrideController["projectile"] = anims[animIndex];
+			animator.runtimeAnimatorController = animatorOverrideController;
+			sprite.flipX = flipSprite;
+		} else
+		{
+			sprite.enabled = false;
+		}
 
 		speed = rbody.linearVelocity;
 
 		startTime = Time.time;
+
+		if (uniqueFunction == UniqueProjectile.BULLET)
+		{
+			Vector2 dist = origin - transform.position;
+
+			var shape = tracerVFX.shape;
+			shape.radius = dist.magnitude / 2;
+			shape.rotation = Quaternion.FromToRotation(Vector3.right, dist).eulerAngles;
+			shape.position = (Vector3)dist / 2;
+
+			tracerVFX.Play();
+		}
 	}
 
-	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, int uniqueFunction, ParticleType particleType, Transform owner)
+	public void Init(int animIndex, AttackBuilder hitbox, bool destroyOnWorldImpact, bool destroyOnEntityImpact, bool flipSprite, Vector3 origin, int uniqueFunction, ParticleType particleType, Transform owner)
 	{
 		this.hitbox = hitbox;
 		this.destroyOnEntityImpact = destroyOnEntityImpact;
@@ -74,6 +95,7 @@ public class ProjectileData : NetworkBehaviour
 		this.flipSprite = flipSprite;
 		this.particleType = particleType;
 		this.uniqueFunction = (UniqueProjectile)uniqueFunction;
+		this.origin = origin;
 		this.owner = owner;
 	}
 
@@ -134,11 +156,7 @@ public class ProjectileData : NetworkBehaviour
 
 
 		if (destroyOnWorldImpact)
-		{
-			NetworkServer.Destroy(gameObject);
-			if (particleType != ParticleType.NONE)
-				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
-		}
+			DestoryProjectile();
 
 		if (uniqueFunction == UniqueProjectile.BOMB)
 		{
@@ -193,19 +211,39 @@ public class ProjectileData : NetworkBehaviour
 	public void OnEntityCollide()
 	{
 		if (destroyOnEntityImpact)
+			DestoryProjectile();
+		
+		if (uniqueFunction == UniqueProjectile.ARROW)
+			CreateArrowPickup();
+	}
+
+	public void DestoryProjectile()
+	{
+		if (isServer)
 		{
+			Destroy();
+		} else
+		{
+			SyncDestroy();
+		}
+
+		[Command(requiresAuthority = false)] void SyncDestroy() {
+			Destroy();
+		}
+
+		void Destroy() {
 			NetworkServer.Destroy(gameObject);
 			if (particleType != ParticleType.NONE)
 				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
 		}
+	}
 
-		if (uniqueFunction == UniqueProjectile.ARROW)
-		{
-			CreateArrowPickup();
-		}
+	public bool IsLocalCoin(Transform owner)
+	{
+		return uniqueFunction == UniqueProjectile.COIN && this.owner == owner;
 	}
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB, ARROW, BOOMERANG
+	DEFAULT, DRILL, BOMB, ARROW, BOOMERANG, COIN, BULLET
 }

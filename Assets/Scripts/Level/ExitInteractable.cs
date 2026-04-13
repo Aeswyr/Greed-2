@@ -22,7 +22,8 @@ public class ExitInteractable : NetworkBehaviour
 	{
 		owner.SetStasis(value: true);
 		owner.LeaveLevel(playerCount == 0);
-		owner.transform.position = 200f * Vector3.down;
+		Vector3 pos = new Vector3(transform.position.x, -200, 0);
+		owner.transform.position = pos;
 		NextLevelReady();
 	}
 

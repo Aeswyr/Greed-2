@@ -13,5 +13,6 @@ public enum ParticleType
 	TURRET_DESTROY,
 	BLINK_START,
 	BLINK_END,
+	GLINT,
 	NONE
 }

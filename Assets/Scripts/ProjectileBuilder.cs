@@ -7,6 +7,9 @@ public struct ProjectileBuilder
 
 	private Vector3 pos;
 
+	private bool hasOrigin;
+	private Vector3 origin;
+
 	private AttackBuilder hitbox;
 
 	private bool destroyOnWorldImpact;
@@ -34,6 +37,7 @@ public struct ProjectileBuilder
 		result.destroyOnWorldImpact = true;
 		result.destroyOnEntityImpact = true;
 		result.particleType = (int)ParticleType.NONE;
+		result.animationIndex = -1;
 		return result;
 	}
 
@@ -106,6 +110,13 @@ public struct ProjectileBuilder
 		return this;
 	}
 
+	public ProjectileBuilder SetOrigin(Vector3 pos)
+	{
+		this.origin = pos;
+		hasOrigin = true;
+		return this;
+	}
+
 	public void Finish()
 	{
 		GameManager.Instance.SpawnProjectile(this);
@@ -115,7 +126,7 @@ public struct ProjectileBuilder
 	{
 		GameObject gameObject = Object.Instantiate(prefab, pos, Quaternion.identity);
 		ProjectileData component = gameObject.GetComponent<ProjectileData>();
-		component.Init(animationIndex, hitbox, destroyOnWorldImpact, destroyOnEntityImpact, flipSprite, uniqueFunction, (ParticleType)particleType, owner);
+		component.Init(animationIndex, hitbox, destroyOnWorldImpact, destroyOnEntityImpact, flipSprite, hasOrigin ? origin : pos, uniqueFunction, (ParticleType)particleType, owner);
 		if (lifetime > 0f)
 		{
 			component.ApplyLifetime(lifetime);
@@ -147,6 +158,8 @@ public struct ProjectileBuilder
 		writer.Write(gravity);
 		writer.Write(uniqueFunction);
 		writer.Write(owner);
+		writer.Write(origin);
+		writer.Write(hasOrigin);
 
 		hitbox.Write(writer);
 	}
@@ -165,6 +178,8 @@ public struct ProjectileBuilder
 		gravity = reader.Read<float>();
 		uniqueFunction = reader.Read<int>();
 		owner = reader.Read<Transform>();
+		origin = reader.Read<Vector3>();
+		hasOrigin = reader.Read<bool>();
 
 		hitbox.Read(reader);
 		return this;

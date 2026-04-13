@@ -39,7 +39,7 @@ public class TurretController : NetworkBehaviour
         foreach (var player in GameManager.Instance.GetPlayers())
         {
             if ((closest == null
-            || Vector3.SqrMagnitude(transform.position - closest.transform.position) < Vector3.SqrMagnitude(transform.position - player.transform.position))
+            || Vector3.SqrMagnitude(transform.position - closest.transform.position) > Vector3.SqrMagnitude(transform.position - player.transform.position))
             && player.transform != owner)
                 closest = player;
         }
