@@ -75,6 +75,10 @@ MonoBehaviour:
     name: Boomerang
     desc: A relic which launches a returning projectile. If you retrieve it, you
       can throw it again immediately.
+  - type: SKILL_SANDBLAST
+    name: Pouch of Sand
+    desc: A relic which projects a burst of sand which harms opponents and destroys
+      projectiles
   - type: ITEM_POTION_HEALTH
     name: Potion of Health
     desc: Permanently increases your health, making it harder to drop crowns.

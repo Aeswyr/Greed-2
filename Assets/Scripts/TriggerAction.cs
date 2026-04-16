@@ -10,6 +10,9 @@ public class TriggerAction : MonoBehaviour
 	[SerializeField]
 	private UnityEvent exitAction;
 
+	[SerializeField]
+	private UnityEvent<Transform> responsiveAction;
+
 	List<Collider2D> colliding = new();
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -17,6 +20,7 @@ public class TriggerAction : MonoBehaviour
 		if (colliding.Contains(other) || !enabled)
 			return;
 		action?.Invoke();
+		responsiveAction?.Invoke(other.transform);
 		colliding.Add(other);
 	}
 

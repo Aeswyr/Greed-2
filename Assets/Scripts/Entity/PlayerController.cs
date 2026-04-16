@@ -1087,6 +1087,7 @@ public class PlayerController : NetworkBehaviour
 			case 5:
 			case 6:
 			case 9:
+			case 10:
 				SFXManager.Instance.PlaySound("throw");
 				animator.SetTrigger("skill_other");
 				break;
@@ -1306,6 +1307,17 @@ public class PlayerController : NetworkBehaviour
 					.DisableEntityImpact()
 					.SetParticleType(ParticleType.PROJECTILE_HITSPARK)
 					.SetUnique(UniqueProjectile.BOOMERANG)
+					.Finish();
+				break;
+			case 10:
+				AttackBuilder.GetAttack(transform).SetParent(transform).SetSize(new Vector2(4f, 2.5f))
+					.MakeProjectile(transform.position + facing * 4 * Vector3.right)
+					.SetAnimation(12)
+					.FlipSprite(facing < 0)
+					.DisableEntityImpact()
+					.DisableWorldImpact()
+					.SetLifetime(0.8f)
+					.SetUnique(UniqueProjectile.SANDBLAST)
 					.Finish();
 				break;
 		}
@@ -1709,6 +1721,10 @@ public class PlayerController : NetworkBehaviour
 				NewSkill(9);
 				UpdateSkillDisplay(type);
 				break;
+			case PickupType.SKILL_SANDBLAST:
+				NewSkill(10);
+				UpdateSkillDisplay(type);
+				break;
 		}
 
 
@@ -2097,7 +2113,7 @@ public class PlayerController : NetworkBehaviour
 				break;
 			case 16:
 				SFXManager.Instance.PlaySound("bluntswing");
-				float range = 16;
+				float range = 12;
 				Vector3 origin = transform.position + 0.75f * Vector3.down + new Vector3(1.5f * facing, 0.6f * aim.y);
 				RaycastHit2D bulletRay = Physics2D.Raycast(origin, new Vector2(0.05f * facing, aim.y * 0.015f).normalized,
 													range, LayerMask.GetMask(new[] { "Hurtbox", "World" }));

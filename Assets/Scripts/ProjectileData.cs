@@ -179,12 +179,6 @@ public class ProjectileData : NetworkBehaviour
 				drillVFX.Play();
 			}
 		}
-
-		if (uniqueFunction == UniqueProjectile.ARROW)
-		{
-			CreateArrowPickup();
-		}
-		
 	}
 
 	private void CreateArrowPickup() {
@@ -212,9 +206,21 @@ public class ProjectileData : NetworkBehaviour
 	{
 		if (destroyOnEntityImpact)
 			DestoryProjectile();
-		
-		if (uniqueFunction == UniqueProjectile.ARROW)
-			CreateArrowPickup();
+	}
+
+	
+	public void OnProjectileCollide(Transform other)
+	{
+		if (other == null)
+			return;
+
+		var proj = other.GetComponentInParent<ProjectileData>();
+
+		if (uniqueFunction == UniqueProjectile.SANDBLAST
+			&& proj.uniqueFunction != UniqueProjectile.SANDBLAST
+			&& proj.owner != owner) {
+			proj.DestoryProjectile();
+		}
 	}
 
 	public void DestoryProjectile()
@@ -232,6 +238,11 @@ public class ProjectileData : NetworkBehaviour
 		}
 
 		void Destroy() {
+			if (uniqueFunction == UniqueProjectile.ARROW)
+			{
+				CreateArrowPickup();
+			}
+
 			NetworkServer.Destroy(gameObject);
 			if (particleType != ParticleType.NONE)
 				VFXManager.Instance.CreateVFX(particleType, transform.position, flip: false);
@@ -245,5 +256,5 @@ public class ProjectileData : NetworkBehaviour
 }
 
 public enum UniqueProjectile {
-	DEFAULT, DRILL, BOMB, ARROW, BOOMERANG, COIN, BULLET
+	DEFAULT, DRILL, BOMB, ARROW, BOOMERANG, COIN, BULLET, SANDBLAST
 }
