@@ -257,7 +257,7 @@ public class PlayerController : NetworkBehaviour
 	private bool hitStun;
 
 	private int attackId = -1;
-	private int weaponId = 8; //0
+	private int weaponId = 0; //0
 	private int skillId = -1; //-1
 
 	private bool stasis;
