@@ -293,7 +293,11 @@ public class PlayerController : NetworkBehaviour
 	public int PlayerID => playerId;
 	private bool hasAmmo = true;
 	private int unarmedInstall;
-
+	public bool NextLevelReady
+	{
+		get;
+		private set;
+	}
 	private int healthMod => 25 * stats[(int)Stat.HEALTH];
 	private float skillMod => 1 - Utils.LogisticFunc(stats[(int)Stat.SKILL], 1.5f, 0.4f, 0, 0.75f);
 	private float staminaMod => 1 - Utils.LogisticFunc(stats[(int)Stat.STAMINA], 1f, 0.4f, 0, 0.5f);
@@ -2293,6 +2297,7 @@ public class PlayerController : NetworkBehaviour
 
 			unitVFX.ClearParticles();
 		}
+		NextLevelReady = false;
 	}
 
 	public void GetShopReward()
@@ -2337,10 +2342,12 @@ public class PlayerController : NetworkBehaviour
 
 	public void LeaveLevel(bool first)
 	{
+		
 		UpdateMoneyLock(false);
 		if (first)
 			victoryStats.DoorsEntered++;
 		UpdateVictoryStats();
+		NextLevelReady = true;
 	}
 
 	public void UpdateVictoryStats()
